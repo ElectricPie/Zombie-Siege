@@ -50,3 +50,10 @@ void APlayerCharacter::Move(const FVector Direction)
 	AddMovementInput(FVector::ForwardVector, Direction.X * SpeedModifier);
 	AddMovementInput(FVector::RightVector, Direction.Y * SpeedModifier);
 }
+
+void APlayerCharacter::LookAt(const FVector Pos)
+{
+	const FRotator Direction = (GetActorLocation() - Pos).Rotation();
+	DrawDebugLine(GetWorld(), GetActorLocation(), Pos, FColor::Green);
+	//SetActorRotation(Direction);
+}

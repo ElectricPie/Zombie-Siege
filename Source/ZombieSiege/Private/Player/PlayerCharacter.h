@@ -30,6 +30,7 @@ public:
 
 public:
 	void Move(const FVector Direction);
+	void LookAt(const FVector Pos);
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
