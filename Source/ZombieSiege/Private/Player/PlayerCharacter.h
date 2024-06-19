@@ -28,9 +28,14 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
+	void Move(const FVector Direction);
+	
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	USpringArmComponent* CameraArm;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UCameraComponent* Camera;
+
+	float SpeedModifier = 0.8f;
 };

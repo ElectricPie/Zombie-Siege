@@ -14,7 +14,7 @@ APlayerCharacter::APlayerCharacter()
 
 	CameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraArm"));
 	CameraArm->SetupAttachment(RootComponent);
-	CameraArm->SetUsingAbsoluteLocation(true);
+	CameraArm->SetUsingAbsoluteRotation(true);
 	CameraArm->TargetArmLength = 1200.f;
 	CameraArm->SetRelativeRotation(FRotator(-70.f, 0.f, 0.f));
 	CameraArm->bDoCollisionTest = false;
@@ -45,3 +45,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
+void APlayerCharacter::Move(const FVector Direction)
+{
+	AddMovementInput(FVector::ForwardVector, Direction.X * SpeedModifier);
+	AddMovementInput(FVector::RightVector, Direction.Y * SpeedModifier);
+}
