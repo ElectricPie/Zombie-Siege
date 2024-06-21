@@ -7,16 +7,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Units/UnitCharacter.h"
 
-void AUnitAiController::Tick(float DeltaSeconds)
+void AUnitAiController::BeginPlay()
 {
-	Super::Tick(DeltaSeconds);
+	Super::BeginPlay();
 
-	if (Target != nullptr) return;
-	
-	if (AActor* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
-	{
-		Target = PlayerCharacter;
-		MoveToActor(Target.Get(), -1.f, true, true, false, 0, true);
-	
-	}
+	RunBehaviorTree(BehaviorTree);
 }
