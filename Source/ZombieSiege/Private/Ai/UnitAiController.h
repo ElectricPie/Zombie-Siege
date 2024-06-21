@@ -15,8 +15,9 @@ class AUnitAiController : public AAIController
 	GENERATED_BODY()
 
 protected:
-	virtual void Tick(float DeltaSeconds) override;
+	virtual void BeginPlay() override;
 
 private:
-	TWeakObjectPtr<AActor> Target;
+	UPROPERTY(EditAnywhere, Category="AI")
+	UBehaviorTree* BehaviorTree;
 };
