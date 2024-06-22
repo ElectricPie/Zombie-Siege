@@ -4,6 +4,7 @@
 #include "Player/PlayerCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/HealthComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
@@ -22,6 +23,8 @@ APlayerCharacter::APlayerCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(CameraArm);
 	Camera->bUsePawnControlRotation = false;
+
+	Health = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
 }
 
 // Called when the game starts or when spawned
