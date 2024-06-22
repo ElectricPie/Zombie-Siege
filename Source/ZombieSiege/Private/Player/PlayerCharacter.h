@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UHealthComponent;
 class UCameraComponent;
 class USpringArmComponent;
 UCLASS()
@@ -37,6 +38,8 @@ protected:
 	USpringArmComponent* CameraArm;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UCameraComponent* Camera;
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	UHealthComponent* Health;
 
 	float SpeedModifier = 0.8f;
 };
