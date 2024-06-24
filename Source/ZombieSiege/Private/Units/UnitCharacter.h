@@ -16,11 +16,15 @@ public:
 	// Sets default values for this character's properties
 	AUnitCharacter();
 
-	// TODO: Attack method called from task
 	UFUNCTION(BlueprintCallable)
 	void Attack(AActor* Target);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Attack")
+	float GetAttackRange() const { return AttackRange; };
 
 private:
 	UPROPERTY(EditAnywhere, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
 	float AttackDamage = 25.f;
+	UPROPERTY(EditAnywhere, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
+	float AttackRange = 100.f;
 };
