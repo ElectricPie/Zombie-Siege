@@ -3,6 +3,8 @@
 
 #include "Units/UnitCharacter.h"
 
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 AUnitCharacter::AUnitCharacter()
 {
@@ -11,16 +13,11 @@ AUnitCharacter::AUnitCharacter()
 
 }
 
-// Called when the game starts or when spawned
-void AUnitCharacter::BeginPlay()
+void AUnitCharacter::Attack(AActor* Target)
 {
-	Super::BeginPlay();
+	if (Target == nullptr) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("Attacking"));
 	
-}
-
-// Called every frame
-void AUnitCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	UGameplayStatics::ApplyDamage(Target, AttackDamage, GetController(), this, UDamageType::StaticClass());
 }

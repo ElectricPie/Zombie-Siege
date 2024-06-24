@@ -4,7 +4,6 @@
 #include "Player/PlayerCharacter.h"
 
 #include "Camera/CameraComponent.h"
-#include "Components/HealthComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
@@ -23,8 +22,6 @@ APlayerCharacter::APlayerCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(CameraArm);
 	Camera->bUsePawnControlRotation = false;
-
-	Health = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
 }
 
 // Called when the game starts or when spawned
@@ -46,6 +43,14 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	UE_LOG(LogTemp, Warning, TEXT("TakeDamage"));
+	
+	return 0.f;
 }
 
 void APlayerCharacter::Move(const FVector Direction)

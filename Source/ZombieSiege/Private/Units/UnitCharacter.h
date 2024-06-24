@@ -16,12 +16,11 @@ public:
 	// Sets default values for this character's properties
 	AUnitCharacter();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	// TODO: Attack method called from task
+	UFUNCTION(BlueprintCallable)
+	void Attack(AActor* Target);
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+private:
+	UPROPERTY(EditAnywhere, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
+	float AttackDamage = 25.f;
 };
