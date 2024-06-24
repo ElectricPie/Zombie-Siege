@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UHealthComponent;
 class UCameraComponent;
 class USpringArmComponent;
 UCLASS()
@@ -28,6 +29,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 public:
 	void Move(const FVector Direction);
 	void LookAt(const FVector Pos);
@@ -39,4 +42,9 @@ protected:
 	UCameraComponent* Camera;
 
 	float SpeedModifier = 0.8f;
+	
+private:
+	UPROPERTY(EditAnywhere, Category="Health", meta=(ClampMin=0.f, UIMin=0.f))
+	float MaxHealth = 100.f;
+	float CurrentHealth;
 };
