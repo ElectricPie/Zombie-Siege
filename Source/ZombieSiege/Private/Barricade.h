@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Barricade.generated.h"
 
+class APlayerCharacter;
 class UInteractableComponent;
 class UArrowComponent;
 class UBoxComponent;
@@ -50,5 +51,5 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnInteract();
+	void OnInteract(APlayerCharacter* InteractingPlayer);
 };

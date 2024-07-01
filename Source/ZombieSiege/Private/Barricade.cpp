@@ -69,7 +69,7 @@ void ABarricade::BeginPlay()
 	CurrentHealth = MaxHealth;
 }
 
-void ABarricade::OnInteract()
+void ABarricade::OnInteract(APlayerCharacter* InteractingPlayer)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Barricade Interacted"));
 }
