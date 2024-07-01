@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UInteractableComponent;
 class UHealthComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -31,9 +32,15 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	virtual void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+	
 public:
 	void Move(const FVector Direction);
 	void LookAt(const FVector Pos);
+	void Interact();
+
+	void AddInteractable(UInteractableComponent* InteractableComponent);
+	void RemoveInteractable(const UInteractableComponent* InteractableComponent);
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
@@ -47,4 +54,6 @@ private:
 	UPROPERTY(EditAnywhere, Category="Health", meta=(ClampMin=0.f, UIMin=0.f))
 	float MaxHealth = 100.f;
 	float CurrentHealth;
+
+	TSet<UInteractableComponent*> NearbyIntractables;
 };
