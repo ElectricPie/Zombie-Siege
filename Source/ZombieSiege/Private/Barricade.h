@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Barricade.generated.h"
 
+class UInteractableComponent;
 class UArrowComponent;
 class UBoxComponent;
 UCLASS()
@@ -23,7 +24,9 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsDestroyed() const { return CurrentHealth <= 0; };
+	bool IsDestroyed() const { return CurrentHealth <= 0; }
+	UFUNCTION(BlueprintCallable)
+	void Repair();
 	
 protected:
 	UPROPERTY()
@@ -32,8 +35,8 @@ protected:
 	UStaticMeshComponent* Mesh;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UBoxComponent* OuterTrigger;
-	UPROPERTY(VisibleAnywhere, Category="Components")
-	UBoxComponent* InsideTrigger;
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Components")
+	UInteractableComponent* InsideTrigger;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UArrowComponent* InsideDirection;
 
@@ -44,5 +47,8 @@ protected:
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+
+private:
+	UFUNCTION()
+	void OnInteract();
 };

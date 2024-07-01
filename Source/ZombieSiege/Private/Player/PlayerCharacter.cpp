@@ -4,6 +4,7 @@
 #include "Player/PlayerCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/InteractableComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
@@ -53,6 +54,14 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return 0.f;
 }
 
+void APlayerCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp,
+	bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+{
+	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+
+	UE_LOG(LogTemp, Warning, TEXT("Other: %s"), *Other->GetActorNameOrLabel());
+}
+
 void APlayerCharacter::Move(const FVector Direction)
 {
 	AddMovementInput(FVector::ForwardVector, Direction.X * SpeedModifier);
@@ -64,4 +73,22 @@ void APlayerCharacter::LookAt(const FVector Pos)
 	const FRotator Direction = (GetActorLocation() - Pos).Rotation();
 	DrawDebugLine(GetWorld(), GetActorLocation(), Pos, FColor::Green);
 	//SetActorRotation(Direction);
+}
+
+void APlayerCharacter::Interact()
+{
+	for (auto const & Interactable : NearbyIntractables)
+	{
+		Interactable->Interact();
+	}
+}
+
+void APlayerCharacter::AddInteractable(UInteractableComponent* InteractableComponent)
+{
+	NearbyIntractables.Add(InteractableComponent);
+}
+
+void APlayerCharacter::RemoveInteractable(const UInteractableComponent* InteractableComponent)
+{
+	NearbyIntractables.Remove(InteractableComponent);
 }
