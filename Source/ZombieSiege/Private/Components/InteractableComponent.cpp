@@ -11,9 +11,9 @@ UInteractableComponent::UInteractableComponent()
 	OnComponentEndOverlap.AddDynamic(this, &UInteractableComponent::OnOverlapEnd);
 }
 
-void UInteractableComponent::Interact()
+void UInteractableComponent::Interact(APlayerCharacter* InteractingPlayer)
 {
-	OnInteractEvent.Broadcast();
+	OnInteractEvent.Broadcast(InteractingPlayer);
 }
 
 void UInteractableComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,

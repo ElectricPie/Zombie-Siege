@@ -79,7 +79,7 @@ void APlayerCharacter::Interact()
 {
 	for (auto const & Interactable : NearbyIntractables)
 	{
-		Interactable->Interact();
+		Interactable->Interact(this);
 	}
 }
 

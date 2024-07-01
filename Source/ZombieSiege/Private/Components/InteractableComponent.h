@@ -6,7 +6,8 @@
 #include "Components/BoxComponent.h"
 #include "InteractableComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnInteractSignature);
+class APlayerCharacter;
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnInteractSignature, APlayerCharacter* /*InteractingPlayer*/);
 
 /**
  * 
@@ -19,7 +20,7 @@ class UInteractableComponent : public UBoxComponent
 public:
 	UInteractableComponent();
 
-	void Interact();
+	void Interact(APlayerCharacter* InteractingPlayer);
 
 	FOnInteractSignature OnInteractEvent;
 
