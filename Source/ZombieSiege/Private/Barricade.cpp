@@ -71,5 +71,5 @@ void ABarricade::BeginPlay()
 
 void ABarricade::OnInteract(APlayerCharacter* InteractingPlayer)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Barricade Interacted"));
+	Repair();
 }
