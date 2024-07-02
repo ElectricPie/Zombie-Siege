@@ -17,6 +17,7 @@ class UGameHudWidget : public UUserWidget
 
 public:
 	void UpdateInteractText(FText const & InteractText);
+	void ShowInteractText(bool bShowInteractText);
 	
 private:
 	UPROPERTY(VisibleAnywhere, meta=(BindWidget))

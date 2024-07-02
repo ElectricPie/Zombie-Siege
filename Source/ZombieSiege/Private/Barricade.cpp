@@ -27,7 +27,6 @@ ABarricade::ABarricade()
 	
 	InsideTrigger = CreateDefaultSubobject<UInteractableComponent>(TEXT("Inside Interactable"));
 	InsideTrigger->SetupAttachment(RootComponent);
-	InsideTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
 	
 	InsideDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("Inside Direction Arrow"));
 	InsideDirection->SetupAttachment(RootComponent);
@@ -67,6 +66,7 @@ void ABarricade::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentHealth = MaxHealth;
+	InsideTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
 }
 
 void ABarricade::OnInteract(APlayerCharacter* InteractingPlayer)

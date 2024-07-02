@@ -55,14 +55,6 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return 0.f;
 }
 
-void APlayerCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp,
-	bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
-{
-	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
-
-	UE_LOG(LogTemp, Warning, TEXT("Other: %s"), *Other->GetActorNameOrLabel());
-}
-
 void APlayerCharacter::Move(const FVector Direction)
 {
 	AddMovementInput(FVector::ForwardVector, Direction.X * SpeedModifier);
@@ -100,4 +92,12 @@ void APlayerCharacter::AddInteractable(UInteractableComponent* InteractableCompo
 void APlayerCharacter::RemoveInteractable(const UInteractableComponent* InteractableComponent)
 {
 	NearbyIntractables.Remove(InteractableComponent);
+
+	if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (AGameHud* GameHud = Cast<AGameHud>(PlayerController->GetHUD()))
+		{
+			GameHud->HideInteractText();
+		}
+	}
 }

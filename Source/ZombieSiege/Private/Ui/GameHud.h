@@ -19,6 +19,7 @@ public:
 	virtual void BeginPlay() override;
 
 	void SetInteractText(FText const & InteractText);
+	void HideInteractText();
 	
 private:
 	UPROPERTY(EditAnywhere, Category=Widgets)

@@ -23,4 +23,11 @@ void AGameHud::SetInteractText(FText const& InteractText)
 
 	FText const Message = FText::Format(FText::FromString("Press E to {0}"), InteractText);
 	GameHudWidget->UpdateInteractText(Message);
+	GameHudWidget->ShowInteractText(true);
 }
+
+void AGameHud::HideInteractText()
+{
+	GameHudWidget->ShowInteractText(false);
+}
+
