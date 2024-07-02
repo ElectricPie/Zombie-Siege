@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UInteractableComponent;
 class UHealthComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -34,6 +35,10 @@ public:
 public:
 	void Move(const FVector Direction);
 	void LookAt(const FVector Pos);
+	void Interact();
+
+	void AddInteractable(UInteractableComponent* InteractableComponent);
+	void RemoveInteractable(const UInteractableComponent* InteractableComponent);
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
@@ -47,4 +52,6 @@ private:
 	UPROPERTY(EditAnywhere, Category="Health", meta=(ClampMin=0.f, UIMin=0.f))
 	float MaxHealth = 100.f;
 	float CurrentHealth;
+
+	TSet<UInteractableComponent*> NearbyIntractables;
 };

@@ -4,7 +4,9 @@
 #include "Player/PlayerCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/InteractableComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Ui/GameHud.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -64,4 +66,38 @@ void APlayerCharacter::LookAt(const FVector Pos)
 	const FRotator Direction = (GetActorLocation() - Pos).Rotation();
 	DrawDebugLine(GetWorld(), GetActorLocation(), Pos, FColor::Green);
 	//SetActorRotation(Direction);
+}
+
+void APlayerCharacter::Interact()
+{
+	for (auto const & Interactable : NearbyIntractables)
+	{
+		Interactable->Interact(this);
+	}
+}
+
+void APlayerCharacter::AddInteractable(UInteractableComponent* InteractableComponent)
+{
+	NearbyIntractables.Add(InteractableComponent);
+
+	if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (AGameHud* GameHud = Cast<AGameHud>(PlayerController->GetHUD()))
+		{
+			GameHud->SetInteractText(InteractableComponent->GetInteractMessage());
+		}
+	}
+}
+
+void APlayerCharacter::RemoveInteractable(const UInteractableComponent* InteractableComponent)
+{
+	NearbyIntractables.Remove(InteractableComponent);
+
+	if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (AGameHud* GameHud = Cast<AGameHud>(PlayerController->GetHUD()))
+		{
+			GameHud->HideInteractText();
+		}
+	}
 }

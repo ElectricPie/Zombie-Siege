@@ -18,24 +18,24 @@ UCLASS()
 class ZOMBIESIEGE_API ATopDownPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupInputComponent() override;
 	
 private:
-	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category=Input)
 	UInputMappingContext* InputMappingContext;
-	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category=Input)
 	UInputAction* MoveAction;
+	UPROPERTY(EditDefaultsOnly, Category=Input)
+	UInputAction* InteractAction;
 
-	UPROPERTY(EditAnywhere, Category="Look")
+	UPROPERTY(EditAnywhere, Category=Look)
 	float LookRaycastLimit = 3000.f;
-	
-	
 	
 	void Move(const FInputActionValue& Value);
 	void FaceMouse();
-	
+	void Interact();
 };

@@ -31,6 +31,8 @@ void ATopDownPlayerController::SetupInputComponent()
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent)) 
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Move);
+
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Interact);
 	}
 }
 
@@ -74,3 +76,10 @@ void ATopDownPlayerController::FaceMouse()
 	}
 }
 
+void ATopDownPlayerController::Interact()
+{
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->Interact();
+	}
+}
