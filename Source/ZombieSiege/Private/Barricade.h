@@ -19,9 +19,6 @@ public:
 	// Sets default values for this actor's properties
 	ABarricade();
 
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FVector GetOutsideTriggerPos() const;
-
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -34,10 +31,8 @@ protected:
 	USceneComponent* BaseComponent;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UStaticMeshComponent* Mesh;
-	UPROPERTY(VisibleAnywhere, Category="Components")
-	UBoxComponent* OuterTrigger;
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Components")
-	UInteractableComponent* InsideTrigger;
+	UInteractableComponent* PlayerInteractionTrigger;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UArrowComponent* InsideDirection;
 

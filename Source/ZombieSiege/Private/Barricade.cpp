@@ -22,19 +22,11 @@ ABarricade::ABarricade()
 	Mesh->SetCanEverAffectNavigation(false);
 	Mesh->SetCollisionProfileName(TEXT("NoCollision"));
 	
-	OuterTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Outside Trigger"));
-	OuterTrigger->SetupAttachment(RootComponent);
-	
-	InsideTrigger = CreateDefaultSubobject<UInteractableComponent>(TEXT("Inside Interactable"));
-	InsideTrigger->SetupAttachment(RootComponent);
+	PlayerInteractionTrigger = CreateDefaultSubobject<UInteractableComponent>(TEXT("Inside Interactable"));
+	PlayerInteractionTrigger->SetupAttachment(RootComponent);
 	
 	InsideDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("Inside Direction Arrow"));
 	InsideDirection->SetupAttachment(RootComponent);
-}
-
-FVector ABarricade::GetOutsideTriggerPos() const
-{
-	return OuterTrigger->GetComponentLocation();
 }
 
 float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -66,7 +58,7 @@ void ABarricade::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentHealth = MaxHealth;
-	InsideTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
+	PlayerInteractionTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
 }
 
 void ABarricade::OnInteract(APlayerCharacter* InteractingPlayer)
