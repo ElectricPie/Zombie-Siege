@@ -17,6 +17,8 @@ class AGameHud : public AHUD
 
 public:
 	virtual void BeginPlay() override;
+
+	void SetInteractText(FText const & InteractText);
 	
 private:
 	UPROPERTY(EditAnywhere, Category=Widgets)

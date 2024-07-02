@@ -16,3 +16,11 @@ void AGameHud::BeginPlay()
 		GameHudWidget->AddToViewport();
 	}
 }
+
+void AGameHud::SetInteractText(FText const& InteractText)
+{
+	if (!GameHudWidget) return;
+
+	FText const Message = FText::Format(FText::FromString("Press E to {0}"), InteractText);
+	GameHudWidget->UpdateInteractText(Message);
+}

@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InteractableComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Ui/GameHud.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -86,6 +87,14 @@ void APlayerCharacter::Interact()
 void APlayerCharacter::AddInteractable(UInteractableComponent* InteractableComponent)
 {
 	NearbyIntractables.Add(InteractableComponent);
+
+	if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (AGameHud* GameHud = Cast<AGameHud>(PlayerController->GetHUD()))
+		{
+			GameHud->SetInteractText(InteractableComponent->GetInteractMessage());
+		}
+	}
 }
 
 void APlayerCharacter::RemoveInteractable(const UInteractableComponent* InteractableComponent)

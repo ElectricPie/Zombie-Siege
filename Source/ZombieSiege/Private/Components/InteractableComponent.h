@@ -24,9 +24,12 @@ public:
 
 	FOnInteractSignature OnInteractEvent;
 
+	FText GetInteractMessage() { return InteractMessage; }
+
 private:
+	UPROPERTY(EditAnywhere)
+	FText InteractMessage = FText::FromString("Interact");
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	UFUNCTION()
-	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-};
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);};
