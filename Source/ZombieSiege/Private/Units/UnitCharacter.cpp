@@ -21,4 +21,5 @@ void AUnitCharacter::Attack(AActor* Target)
 	
 	UGameplayStatics::ApplyDamage(Target, AttackDamage, GetController(), this, UDamageType::StaticClass());
 	LastAttackTime = GetGameTimeSinceCreation();
+	PlayAnimMontage(AttackMontage);
 }
