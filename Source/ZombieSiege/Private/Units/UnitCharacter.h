@@ -27,4 +27,11 @@ private:
 	float AttackDamage = 25.f;
 	UPROPERTY(EditAnywhere, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
 	float AttackRange = 100.f;
+	UPROPERTY(EditAnywhere, Category=Attack, meta=(ClampMin=0.f, UIMin=0.f))
+	float AttackDelay = 1.f;
+	UPROPERTY(EditAnywhere, Category=Animation)
+	UAnimMontage* AttackMontage;
+
+	UPROPERTY(VisibleAnywhere)
+	float LastAttackTime = 0.f;
 };
