@@ -32,6 +32,14 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	
+	/**
+	 * @brief Gets the lenght of the players velocity relative to the direction they are facing
+	 * @return Returns positive values if moving forward and negative for backwards
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetPlayerDirectionalVelocity();
+	
 public:
 	void Move(const FVector Direction);
 	void LookAt(const FVector Pos);
