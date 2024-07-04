@@ -16,8 +16,10 @@ AUnitCharacter::AUnitCharacter()
 void AUnitCharacter::Attack(AActor* Target)
 {
 	if (Target == nullptr) return;
-
-	UE_LOG(LogTemp, Warning, TEXT("Attacking"));
+	// Delay time between attacks
+	if (GetGameTimeSinceCreation() - LastAttackTime < AttackDelay) return;
 	
 	UGameplayStatics::ApplyDamage(Target, AttackDamage, GetController(), this, UDamageType::StaticClass());
+	LastAttackTime = GetGameTimeSinceCreation();
+	PlayAnimMontage(AttackMontage);
 }
