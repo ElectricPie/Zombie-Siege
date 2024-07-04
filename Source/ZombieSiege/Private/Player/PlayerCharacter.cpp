@@ -55,6 +55,17 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return 0.f;
 }
 
+float APlayerCharacter::GetPlayerDirectionalVelocity()
+{
+	float Speed = GetVelocity().Length();
+	const FVector ForwardDirection = GetActorForwardVector();
+	const FVector NormalisedVel = GetVelocity().GetSafeNormal();
+
+	Speed *= NormalisedVel.Dot(ForwardDirection);
+
+	return Speed;
+}
+
 void APlayerCharacter::Move(const FVector Direction)
 {
 	AddMovementInput(FVector::ForwardVector, Direction.X * SpeedModifier);
