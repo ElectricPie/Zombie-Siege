@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class AGun;
 class UInteractableComponent;
 class UHealthComponent;
 class UCameraComponent;
@@ -55,6 +56,9 @@ protected:
 	UCameraComponent* Camera;
 
 	float SpeedModifier = 0.8f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Weapon)
+	AGun* EquippedWeapon;
 	
 private:
 	UPROPERTY(EditAnywhere, Category=Health, meta=(ClampMin=0.f, UIMin=0.f))
