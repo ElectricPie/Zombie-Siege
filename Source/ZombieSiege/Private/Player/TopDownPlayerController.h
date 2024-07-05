@@ -31,6 +31,8 @@ private:
 	UInputAction* MoveAction;
 	UPROPERTY(EditDefaultsOnly, Category=Input)
 	UInputAction* InteractAction;
+	UPROPERTY(EditDefaultsOnly, Category=Input)
+	UInputAction* FireAction;
 
 	UPROPERTY(EditAnywhere, Category=Look)
 	float LookRaycastLimit = 3000.f;
@@ -38,4 +40,5 @@ private:
 	void Move(const FInputActionValue& Value);
 	void FaceMouse();
 	void Interact();
+	void Fire();
 };

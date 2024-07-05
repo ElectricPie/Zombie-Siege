@@ -45,6 +45,7 @@ public:
 	void Move(const FVector Direction);
 	void LookAt(const FVector Pos);
 	void Interact();
+	void Fire();
 
 	void AddInteractable(UInteractableComponent* InteractableComponent);
 	void RemoveInteractable(const UInteractableComponent* InteractableComponent);

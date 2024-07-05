@@ -13,6 +13,11 @@ AGun::AGun()
 	RootComponent = GunMesh;
 }
 
+void AGun::Fire()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Firing"));
+}
+
 // Called when the game starts or when spawned
 void AGun::BeginPlay()
 {
