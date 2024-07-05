@@ -32,6 +32,14 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	
+	/**
+	 * @brief Gets the velocity relative to the direction they are facing
+	 * @return Returns positive values if moving forward and negative for backwards
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsMovingForward() const;
+	
 public:
 	void Move(const FVector Direction);
 	void LookAt(const FVector Pos);
@@ -41,17 +49,20 @@ public:
 	void RemoveInteractable(const UInteractableComponent* InteractableComponent);
 	
 protected:
-	UPROPERTY(VisibleAnywhere, Category="Components")
+	UPROPERTY(VisibleAnywhere, Category=Components)
 	USpringArmComponent* CameraArm;
-	UPROPERTY(VisibleAnywhere, Category="Components")
+	UPROPERTY(VisibleAnywhere, Category=Components)
 	UCameraComponent* Camera;
 
 	float SpeedModifier = 0.8f;
 	
 private:
-	UPROPERTY(EditAnywhere, Category="Health", meta=(ClampMin=0.f, UIMin=0.f))
+	UPROPERTY(EditAnywhere, Category=Health, meta=(ClampMin=0.f, UIMin=0.f))
 	float MaxHealth = 100.f;
 	float CurrentHealth;
+
+	UPROPERTY(EditAnywhere, Category=Movement, meta=(ToolTip="How far from forward the character can move before they are considered to be moving backwards", ClampMin="-1.0", ClampMax="1.0", UIMin="-1.0", UIMax="1.0"))
+	float BackwardsThreshold = -0.5f;
 
 	TSet<UInteractableComponent*> NearbyIntractables;
 };
