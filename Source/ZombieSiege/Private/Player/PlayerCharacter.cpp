@@ -55,15 +55,13 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return 0.f;
 }
 
-float APlayerCharacter::GetPlayerDirectionalVelocity()
+bool APlayerCharacter::IsMovingForward() const
 {
-	float Speed = GetVelocity().Length();
-	const FVector ForwardDirection = GetActorForwardVector();
-	const FVector NormalisedVel = GetVelocity().GetSafeNormal();
+	const FVector ForwardVector = GetActorForwardVector();
+	const FVector Velocity = GetVelocity().GetSafeNormal();
 
-	Speed *= NormalisedVel.Dot(ForwardDirection);
-
-	return Speed;
+	const float DotProduct = FVector::DotProduct(ForwardVector, Velocity);
+	return DotProduct > BackwardsThreshold;
 }
 
 void APlayerCharacter::Move(const FVector Direction)
