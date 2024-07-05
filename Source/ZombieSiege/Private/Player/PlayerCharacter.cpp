@@ -7,6 +7,7 @@
 #include "Components/InteractableComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Ui/GameHud.h"
+#include "Weapons/Gun.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -85,6 +86,13 @@ void APlayerCharacter::Interact()
 	{
 		Interactable->Interact(this);
 	}
+}
+
+void APlayerCharacter::Fire()
+{
+	if (!EquippedWeapon) return;
+
+	EquippedWeapon->Fire();
 }
 
 void APlayerCharacter::AddInteractable(UInteractableComponent* InteractableComponent)
