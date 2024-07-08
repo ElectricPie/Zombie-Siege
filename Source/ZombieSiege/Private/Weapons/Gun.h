@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Gun.generated.h"
 
+class AGunProjectile;
 UCLASS()
 class AGun : public AActor
 {
@@ -28,4 +29,9 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* GunMesh;
+	UPROPERTY(VisibleAnywhere, Category=Projectile)
+	USceneComponent* ProjectileSpawn;
+
+	UPROPERTY(EditAnywhere, Category=Projetile)
+	TSubclassOf<AGunProjectile> ProjectileClass;
 };
