@@ -3,6 +3,8 @@
 
 #include "Weapons/Gun.h"
 
+#include "GunProjectile.h"
+
 // Sets default values
 AGun::AGun()
 {
@@ -11,11 +13,25 @@ AGun::AGun()
 
 	GunMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Gun Mesh"));
 	RootComponent = GunMesh;
+
+	ProjectileSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn"));
+	ProjectileSpawn->SetupAttachment(RootComponent);
 }
 
 void AGun::Fire()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Firing"));
+
+	if (!ProjectileClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s is missing projectile class"), *GetActorNameOrLabel());
+		return;
+	}
+
+	const FActorSpawnParameters SpawnParameters;
+	const FVector SpawnLocation = ProjectileSpawn->GetComponentLocation();
+	const FRotator SpawnRotation = ProjectileSpawn->GetComponentRotation();
+	GetWorld()->SpawnActor<AGunProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParameters);
 }
 
 // Called when the game starts or when spawned

@@ -4,19 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Gun.generated.h"
+#include "GunProjectile.generated.h"
 
-class AGunProjectile;
-UCLASS()
-class AGun : public AActor
+class UProjectileMovementComponent;
+UCLASS(Abstract)
+class AGunProjectile : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AGun();
-
-	void Fire();
+	AGunProjectile();
 
 protected:
 	// Called when the game starts or when spawned
@@ -28,10 +26,7 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere)
-	USkeletalMeshComponent* GunMesh;
-	UPROPERTY(VisibleAnywhere, Category=Projectile)
-	USceneComponent* ProjectileSpawn;
-
-	UPROPERTY(EditAnywhere, Category=Projetile)
-	TSubclassOf<AGunProjectile> ProjectileClass;
+	UStaticMeshComponent* ProjectileMesh;
+	UPROPERTY(VisibleAnywhere)
+	UProjectileMovementComponent* ProjectileMovementComponent;
 };
