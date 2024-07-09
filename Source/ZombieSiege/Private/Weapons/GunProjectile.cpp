@@ -57,6 +57,7 @@ void AGunProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 {
 	// Hide the mesh so we can keep any effects until the projectile is destroyed
 	ProjectileMesh->SetVisibility(false);
+	CollisionComponent->SetCollisionProfileName("NoCollision");
 	
 	if (AUnitCharacter* UnitCharacter = Cast<AUnitCharacter>(OtherActor))
 	{
