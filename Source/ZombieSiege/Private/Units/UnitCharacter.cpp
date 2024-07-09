@@ -23,3 +23,11 @@ void AUnitCharacter::Attack(AActor* Target)
 	LastAttackTime = GetGameTimeSinceCreation();
 	PlayAnimMontage(AttackMontage);
 }
+
+float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Unit taken %f damage from %s : %s"), DamageAmount, *EventInstigator->GetActorNameOrLabel(), *DamageCauser->GetActorNameOrLabel());
+	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}

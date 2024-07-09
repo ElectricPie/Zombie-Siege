@@ -3,6 +3,7 @@
 
 #include "Player/PlayerCharacter.h"
 
+#include "TopDownPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InteractableComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -88,11 +89,11 @@ void APlayerCharacter::Interact()
 	}
 }
 
-void APlayerCharacter::Fire()
+void APlayerCharacter::Fire(ATopDownPlayerController* Shooter)
 {
 	if (!EquippedWeapon) return;
 
-	EquippedWeapon->Fire();
+	EquippedWeapon->Fire(Shooter);
 }
 
 void APlayerCharacter::AddInteractable(UInteractableComponent* InteractableComponent)

@@ -22,6 +22,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Attack")
 	float GetAttackRange() const { return AttackRange; };
 
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 private:
 	UPROPERTY(EditAnywhere, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
 	float AttackDamage = 25.f;
