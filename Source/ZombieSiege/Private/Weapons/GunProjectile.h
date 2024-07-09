@@ -6,8 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "GunProjectile.generated.h"
 
+class ATopDownPlayerController;
 class USphereComponent;
 class UProjectileMovementComponent;
+
 UCLASS(Abstract)
 class AGunProjectile : public AActor
 {
@@ -16,6 +18,13 @@ class AGunProjectile : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AGunProjectile();
+	
+	UPROPERTY(BlueprintReadWrite, Category=Damage)
+	float Damage;
+	UPROPERTY(BlueprintReadWrite, Category=Projectile)
+	ATopDownPlayerController* Shooter;
+	UPROPERTY(BlueprintReadWrite, Category=Projectile)
+	TSubclassOf<UDamageType> DamageType;
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,13 +35,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category=Components)
 	USphereComponent* CollisionComponent;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category=Components)
 	UStaticMeshComponent* ProjectileMesh;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category=Components)
 	UProjectileMovementComponent* ProjectileMovementComponent;
-
+	
 	UPROPERTY(EditAnywhere, Category=Projectile)
 	float DestroyTime = 5.f;
 

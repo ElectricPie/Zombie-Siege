@@ -5,6 +5,9 @@
 
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/TopDownPlayerController.h"
+#include "Units/UnitCharacter.h"
 
 // Sets default values
 AGunProjectile::AGunProjectile()
@@ -52,9 +55,13 @@ void AGunProjectile::Tick(float DeltaTime)
 void AGunProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Projectile Hit %s"), *OtherActor->GetActorNameOrLabel());
-
+	// Hide the mesh so we can keep any effects until the projectile is destroyed
 	ProjectileMesh->SetVisibility(false);
+	
+	if (AUnitCharacter* UnitCharacter = Cast<AUnitCharacter>(OtherActor))
+	{
+		UGameplayStatics::ApplyDamage(UnitCharacter, Damage, Shooter, Shooter->GetPawn(), nullptr);
+	}
 }
 
 void AGunProjectile::DestroyProjectile()

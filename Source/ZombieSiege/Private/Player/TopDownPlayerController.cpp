@@ -90,6 +90,6 @@ void ATopDownPlayerController::Fire()
 {
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
 	{
-		PlayerCharacter->Fire();
+		PlayerCharacter->Fire(this);
 	}
 }

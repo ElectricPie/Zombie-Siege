@@ -7,10 +7,12 @@
 #include "PlayerCharacter.generated.h"
 
 class AGun;
+class ATopDownPlayerController;
 class UInteractableComponent;
 class UHealthComponent;
 class UCameraComponent;
 class USpringArmComponent;
+
 UCLASS()
 class APlayerCharacter : public ACharacter
 {
@@ -45,7 +47,7 @@ public:
 	void Move(const FVector Direction);
 	void LookAt(const FVector Pos);
 	void Interact();
-	void Fire();
+	void Fire(ATopDownPlayerController* Shooter);
 
 	void AddInteractable(UInteractableComponent* InteractableComponent);
 	void RemoveInteractable(const UInteractableComponent* InteractableComponent);

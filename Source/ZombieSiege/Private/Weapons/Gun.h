@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Gun.generated.h"
 
+class ATopDownPlayerController;
 class AGunProjectile;
 UCLASS()
 class AGun : public AActor
@@ -16,7 +17,7 @@ public:
 	// Sets default values for this actor's properties
 	AGun();
 
-	void Fire();
+	void Fire(ATopDownPlayerController* Shooter);
 
 protected:
 	// Called when the game starts or when spawned
@@ -33,6 +34,10 @@ private:
 	USkeletalMeshComponent* GunMesh;
 	UPROPERTY(VisibleAnywhere, Category=Projectile)
 	USceneComponent* ProjectileSpawn;
+	UPROPERTY(EditAnywhere, Category=Projectile)
+	TSubclassOf<UDamageType> ProjectileDamageType = UDamageType::StaticClass();
+	UPROPERTY(EditAnywhere, Category=Projectile, meta=(ClampMin=0.f, UIMin=0.f))
+	float ProjectileDamage = 20.f;
 
 	UPROPERTY(EditAnywhere, Category=Projetile)
 	TSubclassOf<AGunProjectile> ProjectileClass;

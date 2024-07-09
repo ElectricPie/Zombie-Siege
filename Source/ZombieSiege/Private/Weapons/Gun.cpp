@@ -21,10 +21,8 @@ AGun::AGun()
 	ProjectileSpawn->SetupAttachment(GunMesh);
 }
 
-void AGun::Fire()
+void AGun::Fire(ATopDownPlayerController* Shooter)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Firing"));
-
 	if (!ProjectileClass)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s is missing projectile class"), *GetActorNameOrLabel());
@@ -35,7 +33,11 @@ void AGun::Fire()
 	const FVector SpawnLocation = ProjectileSpawn->GetComponentLocation();
 	FRotator SpawnRotation = GetActorRotation();
 	SpawnRotation.Pitch = 0.f;
-	GetWorld()->SpawnActor<AGunProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParameters);
+
+	AGunProjectile* Projectile = GetWorld()->SpawnActor<AGunProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParameters);
+	Projectile->Shooter = Shooter;
+	Projectile->Damage = ProjectileDamage;
+	Projectile->DamageType = ProjectileDamageType;
 }
 
 // Called when the game starts or when spawned
