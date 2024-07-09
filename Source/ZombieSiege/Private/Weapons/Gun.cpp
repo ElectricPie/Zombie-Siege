@@ -10,12 +10,15 @@ AGun::AGun()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = Root;
+	
 	GunMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Gun Mesh"));
-	RootComponent = GunMesh;
+	GunMesh->SetupAttachment(RootComponent);
 
 	ProjectileSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn"));
-	ProjectileSpawn->SetupAttachment(RootComponent);
+	ProjectileSpawn->SetupAttachment(GunMesh);
 }
 
 void AGun::Fire()
@@ -30,7 +33,8 @@ void AGun::Fire()
 
 	const FActorSpawnParameters SpawnParameters;
 	const FVector SpawnLocation = ProjectileSpawn->GetComponentLocation();
-	const FRotator SpawnRotation = ProjectileSpawn->GetComponentRotation();
+	FRotator SpawnRotation = GetActorRotation();
+	SpawnRotation.Pitch = 0.f;
 	GetWorld()->SpawnActor<AGunProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParameters);
 }
 
@@ -45,6 +49,6 @@ void AGun::BeginPlay()
 void AGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 }
 
