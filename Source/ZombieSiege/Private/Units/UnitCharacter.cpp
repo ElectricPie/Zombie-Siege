@@ -18,7 +18,6 @@ void AUnitCharacter::Attack(AActor* Target)
 	if (Target == nullptr) return;
 	// Delay time between attacks
 	if (GetGameTimeSinceCreation() - LastAttackTime < AttackDelay) return;
-	
 	UGameplayStatics::ApplyDamage(Target, AttackDamage, GetController(), this, UDamageType::StaticClass());
 	LastAttackTime = GetGameTimeSinceCreation();
 	PlayAnimMontage(AttackMontage);
@@ -27,8 +26,6 @@ void AUnitCharacter::Attack(AActor* Target)
 float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Unit taken %f damage from %s : %s"), DamageAmount, *EventInstigator->GetActorNameOrLabel(), *DamageCauser->GetActorNameOrLabel());
-
 	CurrentHealth -= DamageAmount;
 	if (CurrentHealth <= 0.f)
 	{
