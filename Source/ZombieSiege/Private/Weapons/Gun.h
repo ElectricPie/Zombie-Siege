@@ -28,6 +28,8 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere)
+	USceneComponent* Root;
+	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* GunMesh;
 	UPROPERTY(VisibleAnywhere, Category=Projectile)
 	USceneComponent* ProjectileSpawn;
