@@ -37,7 +37,9 @@ AGunProjectile::AGunProjectile()
 void AGunProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+		FTimerHandle DestroyHandle;
+	GetWorld()->GetTimerManager().SetTimer(DestroyHandle, this, &AGunProjectile::DestroyProjectile, DestroyTime, false);
 }
 
 // Called every frame
@@ -51,5 +53,11 @@ void AGunProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 	FVector NormalImpulse, const FHitResult& Hit)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Projectile Hit %s"), *OtherActor->GetActorNameOrLabel());
+	DestroyProjectile();
+}
+
+void AGunProjectile::DestroyProjectile()
+{
+	Destroy();
 }
 
