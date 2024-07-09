@@ -28,6 +28,19 @@ float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	AActor* DamageCauser)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Unit taken %f damage from %s : %s"), DamageAmount, *EventInstigator->GetActorNameOrLabel(), *DamageCauser->GetActorNameOrLabel());
+
+	CurrentHealth -= DamageAmount;
+	if (CurrentHealth <= 0.f)
+	{
+		Destroy();
+	}
 	
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	return DamageAmount;
+}
+
+void AUnitCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	CurrentHealth = MaxHealth;
 }

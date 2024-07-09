@@ -19,21 +19,28 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Attack(AActor* Target);
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Attack")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category=Attack)
 	float GetAttackRange() const { return AttackRange; };
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-private:
-	UPROPERTY(EditAnywhere, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
+protected:
+	virtual void BeginPlay() override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attack, meta=(ClampMin=0.f, UIMin=0.f))
 	float AttackDamage = 25.f;
-	UPROPERTY(EditAnywhere, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attack, meta=(ClampMin=0.f, UIMin=0.f))
 	float AttackRange = 100.f;
-	UPROPERTY(EditAnywhere, Category=Attack, meta=(ClampMin=0.f, UIMin=0.f))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attack, meta=(ClampMin=0.f, UIMin=0.f))
 	float AttackDelay = 1.f;
-	UPROPERTY(EditAnywhere, Category=Animation)
-	UAnimMontage* AttackMontage;
-
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Attack)
 	float LastAttackTime = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Animation)
+	UAnimMontage* AttackMontage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Health)
+	float MaxHealth = 40.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Health)
+	float CurrentHealth = 40.f;;
 };
