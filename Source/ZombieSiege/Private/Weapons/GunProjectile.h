@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "GunProjectile.generated.h"
 
+class USphereComponent;
 class UProjectileMovementComponent;
 UCLASS(Abstract)
 class AGunProjectile : public AActor
@@ -26,7 +27,12 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere)
+	USphereComponent* CollisionComponent;
+	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* ProjectileMesh;
 	UPROPERTY(VisibleAnywhere)
 	UProjectileMovementComponent* ProjectileMovementComponent;
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };
