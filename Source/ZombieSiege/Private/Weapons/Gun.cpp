@@ -4,6 +4,7 @@
 #include "Weapons/Gun.h"
 
 #include "GunProjectile.h"
+#include "Components/ArrowComponent.h"
 
 // Sets default values
 AGun::AGun()
@@ -19,6 +20,9 @@ AGun::AGun()
 
 	ProjectileSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn"));
 	ProjectileSpawn->SetupAttachment(GunMesh);
+
+	FiringArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Firing Direction"));
+	FiringArrow->SetupAttachment(RootComponent);
 }
 
 void AGun::Fire(ATopDownPlayerController* Shooter)
