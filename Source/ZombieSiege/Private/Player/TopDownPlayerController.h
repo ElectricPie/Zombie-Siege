@@ -33,6 +33,8 @@ private:
 	UInputAction* InteractAction;
 	UPROPERTY(EditDefaultsOnly, Category=Input)
 	UInputAction* FireAction;
+	UPROPERTY(EditDefaultsOnly, Category=Input)
+	UInputAction* SwapWeaponAction;
 
 	UPROPERTY(EditAnywhere, Category=Look)
 	float LookRaycastLimit = 3000.f;
@@ -41,4 +43,5 @@ private:
 	void FaceMouse();
 	void Interact();
 	void Fire();
+	void SwapWeapon();
 };

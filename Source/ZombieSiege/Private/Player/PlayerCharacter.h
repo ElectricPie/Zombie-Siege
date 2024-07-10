@@ -38,6 +38,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	AGun* GetEquippedWeapon();
 	
 	/**
 	 * @brief Gets the velocity relative to the direction they are facing
@@ -53,6 +55,8 @@ public:
 
 	void AddInteractable(UInteractableComponent* InteractableComponent);
 	void RemoveInteractable(const UInteractableComponent* InteractableComponent);
+
+	void NextWeapon();
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category=Components)
@@ -62,8 +66,10 @@ protected:
 
 	float SpeedModifier = 0.8f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Weapon)
-	AGun* EquippedWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Weapon, meta=(ClampMin=0, UIMin=0))
+	int32 EquippedWeaponIndex;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Weapon)
+	TArray<AGun*> Weapons;
 	
 private:
 	UPROPERTY(EditAnywhere, Category=Health, meta=(ClampMin=0.f, UIMin=0.f))

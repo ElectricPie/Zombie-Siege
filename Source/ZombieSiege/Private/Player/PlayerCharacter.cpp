@@ -32,8 +32,11 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	OnWeaponChangedEvent.Broadcast(EquippedWeapon);
+
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
+	}
 }
 
 // Called every frame
@@ -56,6 +59,13 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	UE_LOG(LogTemp, Warning, TEXT("TakeDamage"));
 	
 	return 0.f;
+}
+
+AGun* APlayerCharacter::GetEquippedWeapon()
+{
+	if (EquippedWeaponIndex >= Weapons.Num()) return nullptr;
+
+	return Weapons[EquippedWeaponIndex];
 }
 
 bool APlayerCharacter::IsMovingForward() const
@@ -83,7 +93,10 @@ void APlayerCharacter::LookAt(const FVector Pos)
 void APlayerCharacter::Interact()
 {
 	// TODO: Remove after weapon animation switching is done
-	OnWeaponChangedEvent.Broadcast(EquippedWeapon);
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
+	}
 	
 	for (auto const & Interactable : NearbyIntractables)
 	{
@@ -93,9 +106,10 @@ void APlayerCharacter::Interact()
 
 void APlayerCharacter::Fire(ATopDownPlayerController* Shooter)
 {
-	if (!EquippedWeapon) return;
-
-	EquippedWeapon->Fire(Shooter);
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		EquippedWeapon->Fire(Shooter);
+	}
 }
 
 void APlayerCharacter::AddInteractable(UInteractableComponent* InteractableComponent)
@@ -121,5 +135,30 @@ void APlayerCharacter::RemoveInteractable(const UInteractableComponent* Interact
 		{
 			GameHud->HideInteractText();
 		}
+	}
+}
+
+void APlayerCharacter::NextWeapon()
+{
+	// Hide the current weapon
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		EquippedWeapon->SetVisibility(false);
+	}
+	
+	if (EquippedWeaponIndex + 1 >= Weapons.Num())
+	{
+		EquippedWeaponIndex = 0;
+	}
+	else
+	{
+		EquippedWeaponIndex++;
+	}
+
+	// Show the new weapon
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
+		EquippedWeapon->SetVisibility(true);
 	}
 }
