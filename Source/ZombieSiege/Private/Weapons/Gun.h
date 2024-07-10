@@ -17,6 +17,13 @@ enum EGunType
 	Rifle UMETA(DisplayName=Rifle)
 };
 
+UENUM()
+enum EGunFireRate
+{
+	Single UMETA(DisplayName=Single),
+	Burst UMETA(DisplayName=Burst),
+	FullAuto UMETA(DisplayName=FullAuto)
+};
 
 UCLASS()
 class AGun : public AActor
@@ -31,6 +38,7 @@ public:
 	EGunType GetGunType() const { return Type; }
 	
 	void Fire(ATopDownPlayerController* Shooter, FVector FireDirection);
+	void StopFiring();
 	UFUNCTION(BlueprintCallable)
 	void SetVisibility(bool bIsVisible);
 
@@ -61,4 +69,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category=Weapon)
 	TEnumAsByte<EGunType> Type;
+	UPROPERTY(EditDefaultsOnly, Category=Weapon)
+	TEnumAsByte<EGunFireRate> FireRate;
+	bool bIsFiring = false;
+
+	void SpawnProjectile(ATopDownPlayerController* Shooter, FVector FireDirection);
 };

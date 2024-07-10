@@ -11,7 +11,8 @@ void ATopDownPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+		GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(InputMappingContext, 0);
 	}
@@ -28,15 +29,22 @@ void ATopDownPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent)) 
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
+		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Move);
 
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Interact);
+		// Interaction
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
+		                                   &ATopDownPlayerController::Interact);
 
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Fire);
+		// Shooting
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATopDownPlayerController::Fire);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ATopDownPlayerController::StopFiring);
 
-		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::SwapWeapon);
+		// Weapons
+		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this,
+		                                   &ATopDownPlayerController::SwapWeapon);
 	}
 }
 
@@ -53,11 +61,11 @@ void ATopDownPlayerController::FaceMouse()
 {
 	APlayerCharacter* PlayerActor = Cast<APlayerCharacter>(GetPawn());
 	if (PlayerActor == nullptr) return;
-	
+
 	FIntVector2 ViewportSize;
 	GetViewportSize(ViewportSize.X, ViewportSize.Y);
-	
-	FVector2D MouseScreenLocation; 
+
+	FVector2D MouseScreenLocation;
 	if (GetMousePosition(MouseScreenLocation.X, MouseScreenLocation.Y))
 	{
 		FVector WorldPosition;
@@ -92,6 +100,14 @@ void ATopDownPlayerController::Fire()
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
 	{
 		PlayerCharacter->Fire(this, AimDirection);
+	}
+}
+
+void ATopDownPlayerController::StopFiring()
+{
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->StopFiring();
 	}
 }
 
