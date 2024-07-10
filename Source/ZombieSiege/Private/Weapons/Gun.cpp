@@ -30,7 +30,7 @@ AGun::AGun()
 // TODO: Aim direction is only set once so it always shoots the same direction
 void AGun::Fire(ATopDownPlayerController* Shooter)
 {
-	if (bIsFiring) return;
+	if (bIsFiring || Shooter == nullptr) return;
 	bIsFiring = true;
 
 	switch (FireRate)
@@ -39,7 +39,15 @@ void AGun::Fire(ATopDownPlayerController* Shooter)
 		SpawnProjectile(Shooter);
 		break;
 	case Burst:
-		break;
+		{
+			SpawnProjectile(Shooter);
+			BurstShotsFired = 1;
+			FTimerDelegate BurstDelegate;
+			BurstDelegate.BindUFunction(this, FName(TEXT("BurstShot")), Shooter);
+			GetWorld()->GetTimerManager().SetTimer(BurstTimer, BurstDelegate, ShotIntervals, true);
+			
+			break;
+		}
 	case FullAuto:
 		{
 			SpawnProjectile(Shooter);
@@ -88,7 +96,6 @@ void AGun::SpawnProjectile(ATopDownPlayerController* Shooter)
 	const FActorSpawnParameters SpawnParameters;
 	const FVector SpawnLocation = ProjectileSpawn->GetComponentLocation();
 	FRotator SpawnRotation = Shooter->GetAimDirection().Rotation();
-	//FRotator SpawnRotation = FireDirection.Rotation();
 	SpawnRotation.Pitch = 0.f;
 
 	AGunProjectile* Projectile = GetWorld()->SpawnActor<AGunProjectile>(ProjectileClass, SpawnLocation, SpawnRotation,
@@ -96,4 +103,16 @@ void AGun::SpawnProjectile(ATopDownPlayerController* Shooter)
 	Projectile->Shooter = Shooter;
 	Projectile->Damage = ProjectileDamage;
 	Projectile->DamageType = ProjectileDamageType;
+}
+
+void AGun::BurstShot(ATopDownPlayerController* Shooter)
+{
+	SpawnProjectile(Shooter);
+	BurstShotsFired++;
+
+	// Stop the burst
+	if (BurstShotsFired >= BurstShots)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(BurstTimer);
+	}
 }
