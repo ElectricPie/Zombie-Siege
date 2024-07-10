@@ -51,6 +51,7 @@ public:
 	void Move(const FVector Direction);
 	void Interact();
 	void Fire(ATopDownPlayerController* Shooter, FVector Direction);
+	void StopFiring();
 
 	void AddInteractable(UInteractableComponent* InteractableComponent);
 	void RemoveInteractable(const UInteractableComponent* InteractableComponent);

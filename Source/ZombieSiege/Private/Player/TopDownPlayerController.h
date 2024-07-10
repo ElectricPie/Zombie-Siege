@@ -45,5 +45,6 @@ private:
 	void FaceMouse();
 	void Interact();
 	void Fire();
+	void StopFiring();
 	void SwapWeapon();
 };

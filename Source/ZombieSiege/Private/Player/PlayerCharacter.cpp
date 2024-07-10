@@ -105,6 +105,14 @@ void APlayerCharacter::Fire(ATopDownPlayerController* Shooter, FVector Direction
 	}
 }
 
+void APlayerCharacter::StopFiring()
+{
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		EquippedWeapon->StopFiring();
+	}
+}
+
 void APlayerCharacter::AddInteractable(UInteractableComponent* InteractableComponent)
 {
 	NearbyIntractables.Add(InteractableComponent);
