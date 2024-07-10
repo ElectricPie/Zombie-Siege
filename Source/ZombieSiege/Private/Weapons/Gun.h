@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Gun.generated.h"
 
+class UArrowComponent;
 class ATopDownPlayerController;
 class AGunProjectile;
 UCLASS()
@@ -28,17 +29,19 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category=Components)
 	USceneComponent* Root;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category=Components)
 	USkeletalMeshComponent* GunMesh;
+	UPROPERTY(VisibleAnywhere, Category=Components)
+	UArrowComponent* FiringArrow;
+	
 	UPROPERTY(VisibleAnywhere, Category=Projectile)
 	USceneComponent* ProjectileSpawn;
+	UPROPERTY(EditAnywhere, Category=Projectile)
+	TSubclassOf<AGunProjectile> ProjectileClass;
 	UPROPERTY(EditAnywhere, Category=Projectile)
 	TSubclassOf<UDamageType> ProjectileDamageType = UDamageType::StaticClass();
 	UPROPERTY(EditAnywhere, Category=Projectile, meta=(ClampMin=0.f, UIMin=0.f))
 	float ProjectileDamage = 20.f;
-
-	UPROPERTY(EditAnywhere, Category=Projetile)
-	TSubclassOf<AGunProjectile> ProjectileClass;
 };
