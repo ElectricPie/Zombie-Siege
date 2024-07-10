@@ -5,16 +5,18 @@
 
 #include "GunProjectile.h"
 #include "Components/ArrowComponent.h"
+#include "Player/PlayerCharacter.h"
+#include "Player/TopDownPlayerController.h"
 
 // Sets default values
 AGun::AGun()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Root;
-	
+
 	GunMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Gun Mesh"));
 	GunMesh->SetupAttachment(RootComponent);
 
@@ -25,28 +27,37 @@ AGun::AGun()
 	FiringArrow->SetupAttachment(RootComponent);
 }
 
-void AGun::Fire(ATopDownPlayerController* Shooter, FVector FireDirection)
+// TODO: Aim direction is only set once so it always shoots the same direction
+void AGun::Fire(ATopDownPlayerController* Shooter)
 {
 	if (bIsFiring) return;
 	bIsFiring = true;
-	
+
 	switch (FireRate)
 	{
 	case Single:
-		SpawnProjectile(Shooter, FireDirection);
+		SpawnProjectile(Shooter);
 		break;
 	case Burst:
 		break;
 	case FullAuto:
-		break;
+		{
+			SpawnProjectile(Shooter);
+			FTimerDelegate ShotDelegate;
+			ShotDelegate.BindUFunction(this, FName(TEXT("SpawnProjectile")), Shooter);
+			GetWorld()->GetTimerManager().SetTimer(ShotTimer, ShotDelegate, ShotIntervals, true);
+			break;
+		}
 	default:
-		UE_LOG(LogTemp, Error, TEXT("%s is missing Fire Rate"), *GetActorNameOrLabel());;
+		UE_LOG(LogTemp, Error, TEXT("%s is missing Fire Rate"), *GetActorNameOrLabel());
+		break;
 	}
 }
 
 void AGun::StopFiring()
 {
 	bIsFiring = false;
+	GetWorld()->GetTimerManager().ClearTimer(ShotTimer);
 }
 
 void AGun::SetVisibility(const bool bIsVisible)
@@ -58,17 +69,15 @@ void AGun::SetVisibility(const bool bIsVisible)
 void AGun::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void AGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
 }
 
-void AGun::SpawnProjectile(ATopDownPlayerController* Shooter, const FVector FireDirection)
+void AGun::SpawnProjectile(ATopDownPlayerController* Shooter)
 {
 	if (!ProjectileClass)
 	{
@@ -78,12 +87,13 @@ void AGun::SpawnProjectile(ATopDownPlayerController* Shooter, const FVector Fire
 
 	const FActorSpawnParameters SpawnParameters;
 	const FVector SpawnLocation = ProjectileSpawn->GetComponentLocation();
-	FRotator SpawnRotation = FireDirection.Rotation();
+	FRotator SpawnRotation = Shooter->GetAimDirection().Rotation();
+	//FRotator SpawnRotation = FireDirection.Rotation();
 	SpawnRotation.Pitch = 0.f;
 
-	AGunProjectile* Projectile = GetWorld()->SpawnActor<AGunProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParameters);
+	AGunProjectile* Projectile = GetWorld()->SpawnActor<AGunProjectile>(ProjectileClass, SpawnLocation, SpawnRotation,
+	                                                                    SpawnParameters);
 	Projectile->Shooter = Shooter;
 	Projectile->Damage = ProjectileDamage;
 	Projectile->DamageType = ProjectileDamageType;
 }
-
