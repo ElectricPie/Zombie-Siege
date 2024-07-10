@@ -32,6 +32,8 @@ void AGun::Fire(ATopDownPlayerController* Shooter)
 {
 	if (bIsFiring || Shooter == nullptr) return;
 	if (GetGameTimeSinceCreation() - LastFiredTime < FireCooldownTime) return;
+	if (CurrentAmmo <= 0) return;
+	
 	bIsFiring = true;
 	LastFiredTime = GetGameTimeSinceCreation();
 
@@ -45,7 +47,7 @@ void AGun::Fire(ATopDownPlayerController* Shooter)
 			SpawnProjectile(Shooter);
 			BurstShotsFired = 1;
 			FTimerDelegate BurstDelegate;
-			BurstDelegate.BindUFunction(this, FName(TEXT("BurstShot")), Shooter);
+			BurstDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGun, BurstShot), Shooter);
 			GetWorld()->GetTimerManager().SetTimer(BurstTimer, BurstDelegate, ShotIntervals, true);
 			
 			break;
@@ -54,7 +56,7 @@ void AGun::Fire(ATopDownPlayerController* Shooter)
 		{
 			SpawnProjectile(Shooter);
 			FTimerDelegate ShotDelegate;
-			ShotDelegate.BindUFunction(this, FName(TEXT("SpawnProjectile")), Shooter);
+			ShotDelegate.BindUFunction(this,  GET_FUNCTION_NAME_CHECKED(AGun, SingleShot), Shooter);
 			GetWorld()->GetTimerManager().SetTimer(ShotTimer, ShotDelegate, ShotIntervals, true);
 			break;
 		}
@@ -79,6 +81,8 @@ void AGun::SetVisibility(const bool bIsVisible)
 void AGun::BeginPlay()
 {
 	Super::BeginPlay();
+
+	CurrentAmmo = MaxAmmo;
 }
 
 // Called every frame
@@ -105,14 +109,35 @@ void AGun::SpawnProjectile(ATopDownPlayerController* Shooter)
 	Projectile->Shooter = Shooter;
 	Projectile->Damage = ProjectileDamage;
 	Projectile->DamageType = ProjectileDamageType;
+	
+	CurrentAmmo--;
+}
+
+void AGun::SingleShot(ATopDownPlayerController* Shooter)
+{
+	// Stop shooting if out of ammo
+	if (CurrentAmmo <= 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ShotTimer);
+		return;
+	}
+
+	SpawnProjectile(Shooter);
 }
 
 void AGun::BurstShot(ATopDownPlayerController* Shooter)
 {
+	// Stop burst if out of ammo
+	if (CurrentAmmo <= 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(BurstTimer);
+		return;
+	}
+	
 	SpawnProjectile(Shooter);
 	BurstShotsFired++;
 
-	// Stop the burst
+	// Stop the burst if finished
 	if (BurstShotsFired >= BurstShots)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(BurstTimer);
