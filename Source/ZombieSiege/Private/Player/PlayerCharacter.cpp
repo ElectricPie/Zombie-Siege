@@ -32,9 +32,8 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UE_LOG(LogTemp, Warning, TEXT("Runnnign"));
 	
+	OnWeaponChangedEvent.Broadcast(EquippedWeapon);
 }
 
 // Called every frame
@@ -83,6 +82,9 @@ void APlayerCharacter::LookAt(const FVector Pos)
 
 void APlayerCharacter::Interact()
 {
+	// TODO: Remove after weapon animation switching is done
+	OnWeaponChangedEvent.Broadcast(EquippedWeapon);
+	
 	for (auto const & Interactable : NearbyIntractables)
 	{
 		Interactable->Interact(this);
