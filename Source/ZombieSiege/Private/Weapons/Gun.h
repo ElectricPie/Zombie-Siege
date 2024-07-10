@@ -69,8 +69,14 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category=Weapon)
 	TEnumAsByte<EGunType> Type;
-	UPROPERTY(EditDefaultsOnly, Category=Weapon)
+	UPROPERTY(EditDefaultsOnly, Category=FireRate)
 	TEnumAsByte<EGunFireRate> FireRate;
+	UPROPERTY(EditDefaultsOnly, Category=FireRate, meta=(ClampMin=0.1f, UIMin=0.1f, EditCondition="FireRate!=EGunFireRate::Single", ToolTip="The time between shots when Fire Rate is set to full auto or Burst"))
+	float ShotIntervals = 1.f;
+	UPROPERTY(EditDefaultsOnly, Category=FireRate, meta=(ClampMin=1, UIMin=1, EditCondition="FireRate==EGunFireRate::Burst", ToolTip="The number of shots in a burst when Fire Rate is set to Burst"))
+	int32 BurstShots = 3;
+	UPROPERTY(EditDefaultsOnly, Category=FireRate, meta=(ClampMin=0.1f, UIMin=0.1f, EditCondition="FireRate==EGunFireRate::Burst", ToolTip="The time between bursts when Fire Rate is set to Burst"))
+	float BurstInterval = 3.f;
 	bool bIsFiring = false;
 
 	void SpawnProjectile(ATopDownPlayerController* Shooter, FVector FireDirection);
