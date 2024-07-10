@@ -30,7 +30,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	EGunType GetGunType() const { return Type; }
 	
-	void Fire(ATopDownPlayerController* Shooter);
+	void Fire(ATopDownPlayerController* Shooter, FVector FireDirection);
 	UFUNCTION(BlueprintCallable)
 	void SetVisibility(bool bIsVisible);
 

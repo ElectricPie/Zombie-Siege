@@ -49,9 +49,8 @@ public:
 	bool IsMovingForward() const;
 	
 	void Move(const FVector Direction);
-	void LookAt(const FVector Pos);
 	void Interact();
-	void Fire(ATopDownPlayerController* Shooter);
+	void Fire(ATopDownPlayerController* Shooter, FVector Direction);
 
 	void AddInteractable(UInteractableComponent* InteractableComponent);
 	void RemoveInteractable(const UInteractableComponent* InteractableComponent);

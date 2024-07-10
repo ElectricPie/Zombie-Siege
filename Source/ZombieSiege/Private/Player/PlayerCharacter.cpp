@@ -83,13 +83,6 @@ void APlayerCharacter::Move(const FVector Direction)
 	AddMovementInput(FVector::RightVector, Direction.Y * SpeedModifier);
 }
 
-void APlayerCharacter::LookAt(const FVector Pos)
-{
-	const FRotator Direction = (GetActorLocation() - Pos).Rotation();
-	DrawDebugLine(GetWorld(), GetActorLocation(), Pos, FColor::Green);
-	//SetActorRotation(Direction);
-}
-
 void APlayerCharacter::Interact()
 {
 	// TODO: Remove after weapon animation switching is done
@@ -104,11 +97,11 @@ void APlayerCharacter::Interact()
 	}
 }
 
-void APlayerCharacter::Fire(ATopDownPlayerController* Shooter)
+void APlayerCharacter::Fire(ATopDownPlayerController* Shooter, FVector Direction)
 {
 	if (AGun* EquippedWeapon = GetEquippedWeapon())
 	{
-		EquippedWeapon->Fire(Shooter);
+		EquippedWeapon->Fire(Shooter, Direction);
 	}
 }
 

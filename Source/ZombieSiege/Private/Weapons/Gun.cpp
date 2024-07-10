@@ -25,7 +25,7 @@ AGun::AGun()
 	FiringArrow->SetupAttachment(RootComponent);
 }
 
-void AGun::Fire(ATopDownPlayerController* Shooter)
+void AGun::Fire(ATopDownPlayerController* Shooter, FVector FireDirection)
 {
 	if (!ProjectileClass)
 	{
@@ -35,7 +35,7 @@ void AGun::Fire(ATopDownPlayerController* Shooter)
 
 	const FActorSpawnParameters SpawnParameters;
 	const FVector SpawnLocation = ProjectileSpawn->GetComponentLocation();
-	FRotator SpawnRotation = GetActorRotation();
+	FRotator SpawnRotation = FireDirection.Rotation();
 	SpawnRotation.Pitch = 0.f;
 
 	AGunProjectile* Projectile = GetWorld()->SpawnActor<AGunProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParameters);

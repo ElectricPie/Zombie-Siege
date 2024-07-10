@@ -38,6 +38,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category=Look)
 	float LookRaycastLimit = 3000.f;
+
+	FVector AimDirection = FVector(0.f);
 	
 	void Move(const FInputActionValue& Value);
 	void FaceMouse();
