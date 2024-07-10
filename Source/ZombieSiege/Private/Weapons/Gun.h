@@ -75,12 +75,17 @@ private:
 	float ShotIntervals = 1.f;
 	UPROPERTY(EditDefaultsOnly, Category=FireRate, meta=(ClampMin=1, UIMin=1, EditCondition="FireRate==EGunFireRate::Burst", ToolTip="The number of shots in a burst when Fire Rate is set to Burst"))
 	int32 BurstShots = 3;
-	UPROPERTY(EditDefaultsOnly, Category=FireRate, meta=(ClampMin=0.1f, UIMin=0.1f, EditCondition="FireRate==EGunFireRate::Burst", ToolTip="The time between bursts when Fire Rate is set to Burst"))
-	float BurstInterval = 3.f;
+	// UPROPERTY(EditDefaultsOnly, Category=FireRate, meta=(ClampMin=0.1f, UIMin=0.1f, EditCondition="FireRate==EGunFireRate::Burst", ToolTip="The time between bursts when Fire Rate is set to Burst"))
+	// float BurstInterval = 3.f;
 	bool bIsFiring = false;
 
-	FTimerHandle ShotTimer;
+	int32 BurstShotsFired = 0;
 
+	FTimerHandle ShotTimer;
+	FTimerHandle BurstTimer;
+	
 	UFUNCTION()
 	void SpawnProjectile(ATopDownPlayerController* Shooter);
+	UFUNCTION()
+	void BurstShot(ATopDownPlayerController* Shooter);
 };
