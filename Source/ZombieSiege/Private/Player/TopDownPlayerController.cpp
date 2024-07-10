@@ -72,10 +72,9 @@ void ATopDownPlayerController::FaceMouse()
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldPosition, RayEnd, ECC_Visibility, QueryParams))
 		{
 			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 20.f, 8, FColor::Red);
-			//PlayerActor->LookAt(HitResult.ImpactPoint);
-			FVector Direction = (HitResult.ImpactPoint - PlayerActor->GetActorLocation()).GetSafeNormal();
-			Direction.Z = PlayerActor->GetActorLocation().X;
-			ClientSetRotation(Direction.Rotation());
+			AimDirection = (HitResult.ImpactPoint - PlayerActor->GetActorLocation()).GetSafeNormal();
+			AimDirection.Z = PlayerActor->GetActorLocation().X;
+			ClientSetRotation(AimDirection.Rotation());
 		}
 	}
 }
@@ -92,7 +91,7 @@ void ATopDownPlayerController::Fire()
 {
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
 	{
-		PlayerCharacter->Fire(this);
+		PlayerCharacter->Fire(this, AimDirection);
 	}
 }
 
