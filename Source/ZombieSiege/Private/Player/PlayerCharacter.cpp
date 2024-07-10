@@ -97,11 +97,11 @@ void APlayerCharacter::Interact()
 	}
 }
 
-void APlayerCharacter::Fire(ATopDownPlayerController* Shooter, FVector Direction)
+void APlayerCharacter::Fire(ATopDownPlayerController* Shooter)
 {
 	if (AGun* EquippedWeapon = GetEquippedWeapon())
 	{
-		EquippedWeapon->Fire(Shooter, Direction);
+		EquippedWeapon->Fire(Shooter);
 	}
 }
 

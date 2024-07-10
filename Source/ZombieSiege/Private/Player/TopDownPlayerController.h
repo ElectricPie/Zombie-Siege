@@ -18,6 +18,9 @@ UCLASS()
 class ZOMBIESIEGE_API ATopDownPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+	FVector GetAimDirection() const { return AimDirection; }
 	
 protected:
 	virtual void BeginPlay() override;
@@ -38,7 +41,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category=Look)
 	float LookRaycastLimit = 3000.f;
-
+	
 	FVector AimDirection = FVector(0.f);
 	
 	void Move(const FInputActionValue& Value);

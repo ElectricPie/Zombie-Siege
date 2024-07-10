@@ -37,7 +37,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	EGunType GetGunType() const { return Type; }
 	
-	void Fire(ATopDownPlayerController* Shooter, FVector FireDirection);
+	void Fire(ATopDownPlayerController* Shooter);
 	void StopFiring();
 	UFUNCTION(BlueprintCallable)
 	void SetVisibility(bool bIsVisible);
@@ -79,5 +79,8 @@ private:
 	float BurstInterval = 3.f;
 	bool bIsFiring = false;
 
-	void SpawnProjectile(ATopDownPlayerController* Shooter, FVector FireDirection);
+	FTimerHandle ShotTimer;
+
+	UFUNCTION()
+	void SpawnProjectile(ATopDownPlayerController* Shooter);
 };
