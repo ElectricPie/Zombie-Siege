@@ -35,6 +35,8 @@ void ATopDownPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Interact);
 
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Fire);
+
+		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::SwapWeapon);
 	}
 }
 
@@ -91,5 +93,13 @@ void ATopDownPlayerController::Fire()
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
 	{
 		PlayerCharacter->Fire(this);
+	}
+}
+
+void ATopDownPlayerController::SwapWeapon()
+{
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->NextWeapon();
 	}
 }

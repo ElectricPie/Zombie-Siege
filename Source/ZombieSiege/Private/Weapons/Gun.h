@@ -31,6 +31,8 @@ public:
 	EGunType GetGunType() const { return Type; }
 	
 	void Fire(ATopDownPlayerController* Shooter);
+	UFUNCTION(BlueprintCallable)
+	void SetVisibility(bool bIsVisible);
 
 protected:
 	// Called when the game starts or when spawned

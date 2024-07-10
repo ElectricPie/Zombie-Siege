@@ -44,6 +44,11 @@ void AGun::Fire(ATopDownPlayerController* Shooter)
 	Projectile->DamageType = ProjectileDamageType;
 }
 
+void AGun::SetVisibility(const bool bIsVisible)
+{
+	GunMesh->SetVisibility(bIsVisible);
+}
+
 // Called when the game starts or when spawned
 void AGun::BeginPlay()
 {
