@@ -31,7 +31,9 @@ AGun::AGun()
 void AGun::Fire(ATopDownPlayerController* Shooter)
 {
 	if (bIsFiring || Shooter == nullptr) return;
+	if (GetGameTimeSinceCreation() - LastFiredTime < FireCooldownTime) return;
 	bIsFiring = true;
+	LastFiredTime = GetGameTimeSinceCreation();
 
 	switch (FireRate)
 	{
