@@ -7,6 +7,7 @@
 #include "UnitCharacter.generated.h"
 
 class UBehaviorTree;
+
 UCLASS()
 class AUnitCharacter : public ACharacter
 {

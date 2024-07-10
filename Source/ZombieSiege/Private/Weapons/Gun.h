@@ -9,6 +9,15 @@
 class UArrowComponent;
 class ATopDownPlayerController;
 class AGunProjectile;
+
+UENUM(BlueprintType)
+enum EGunType
+{
+	Pistol UMETA(DisplayName=Pistol),
+	Rifle UMETA(DisplayName=Rifle)
+};
+
+
 UCLASS()
 class AGun : public AActor
 {
@@ -18,6 +27,9 @@ public:
 	// Sets default values for this actor's properties
 	AGun();
 
+	UFUNCTION(BlueprintPure)
+	EGunType GetGunType() const { return Type; }
+	
 	void Fire(ATopDownPlayerController* Shooter);
 
 protected:
@@ -44,4 +56,7 @@ private:
 	TSubclassOf<UDamageType> ProjectileDamageType = UDamageType::StaticClass();
 	UPROPERTY(EditAnywhere, Category=Projectile, meta=(ClampMin=0.f, UIMin=0.f))
 	float ProjectileDamage = 20.f;
+
+	UPROPERTY(EditDefaultsOnly, Category=Weapon)
+	TEnumAsByte<EGunType> Type;
 };
