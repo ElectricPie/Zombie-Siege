@@ -52,7 +52,8 @@ public:
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Reload();
-	
+	UFUNCTION(BlueprintPure)
+	UAnimMontage* GetReloadAnimMontage() const { return ReloadMontage; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -95,6 +96,9 @@ private:
 	float ShotIntervals = 1.f;
 	UPROPERTY(EditDefaultsOnly, Category="FireRate", meta=(ClampMin=1, UIMin=1, EditCondition="FireRate==EGunFireRate::Burst", ToolTip="The number of shots in a burst when Fire Rate is set to Burst"))
 	int32 BurstShots = 3;
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UAnimMontage* ReloadMontage;
 	
 	bool bIsFiring = false;
 	float LastFiredTime = 0.f;

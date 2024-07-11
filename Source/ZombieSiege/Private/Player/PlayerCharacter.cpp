@@ -99,6 +99,8 @@ void APlayerCharacter::Interact()
 
 void APlayerCharacter::Fire(ATopDownPlayerController* Shooter)
 {
+	if (bIsReloading) return;
+	
 	if (AGun* EquippedWeapon = GetEquippedWeapon())
 	{
 		EquippedWeapon->Fire(Shooter);
@@ -140,10 +142,28 @@ void APlayerCharacter::NextWeapon()
 
 void APlayerCharacter::ReloadWeapon()
 {
+	if (bIsReloading) return;
+	bIsReloading = true;
+
 	if (AGun* EquippedWeapon = GetEquippedWeapon())
 	{
+		EquippedWeapon->StopFiring();
+		
+		float ReloadTime = DefaultReloadTime;
 		EquippedWeapon->Reload();
+		if (UAnimMontage* ReloadAnimation = EquippedWeapon->GetReloadAnimMontage())
+		{
+			PlayAnimMontage(ReloadAnimation);
+			ReloadTime = ReloadAnimation->GetPlayLength();
+		}
+		
+		GetWorldTimerManager().SetTimer(ReloadingTimerHandle, this, &APlayerCharacter::FinishReload, ReloadTime, false);
 	}
+}
+
+void APlayerCharacter::FinishReload()
+{
+	bIsReloading = false;
 }
 
 
