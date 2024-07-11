@@ -120,6 +120,9 @@ void APlayerCharacter::NextWeapon()
 	// Hide the current weapon
 	if (AGun* EquippedWeapon = GetEquippedWeapon())
 	{
+		// Prevent changing weapons while reloading
+		if (EquippedWeapon->GetIsReloading()) return;
+		
 		EquippedWeapon->SetVisibility(false);
 	}
 	
