@@ -6,7 +6,11 @@
 #include "Blueprint/UserWidget.h"
 #include "GameHudWidget.generated.h"
 
+class UAmmoCounterWidget;
+class AGun;
+class APlayerCharacter;
 class UTextBlock;
+
 /**
  * 
  */
@@ -16,10 +20,22 @@ class UGameHudWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	void Setup(APlayerCharacter* NewPlayerCharacter);
 	void UpdateInteractText(FText const & InteractText);
 	void ShowInteractText(bool bShowInteractText);
 	
 private:
 	UPROPERTY(VisibleAnywhere, meta=(BindWidget))
 	UTextBlock* InteractTextBlock;
+	UPROPERTY(VisibleAnywhere, meta=(BindWidget))
+	UAmmoCounterWidget* AmmoCounterWidget;
+
+	TWeakObjectPtr<AGun> CurrentWeapon;
+
+	FDelegateHandle AmmoChangeHandle;
+
+	UFUNCTION()
+	void OnAmmoChanged(int32 NewAmmoCount, int32 MaxAmmo);
+	UFUNCTION()
+	void OnWeaponChanged(AGun* NewWeapon);
 };
