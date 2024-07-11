@@ -111,6 +111,7 @@ void AGun::SpawnProjectile(ATopDownPlayerController* Shooter)
 	Projectile->DamageType = ProjectileDamageType;
 	
 	CurrentAmmo--;
+	OnAmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
 }
 
 void AGun::SingleShot(ATopDownPlayerController* Shooter)

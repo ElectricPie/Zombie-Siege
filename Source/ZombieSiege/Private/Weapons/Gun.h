@@ -10,6 +10,8 @@ class UArrowComponent;
 class ATopDownPlayerController;
 class AGunProjectile;
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAmmoChangedSignature, int32 /*NewAmmoCount*/, int32 /*MaxAmmo*/);
+
 UENUM(BlueprintType)
 enum EGunType
 {
@@ -34,6 +36,8 @@ public:
 	// Sets default values for this actor's properties
 	AGun();
 
+	FOnAmmoChangedSignature OnAmmoChangedEvent;
+
 	UFUNCTION(BlueprintPure)
 	EGunType GetGunType() const { return Type; }
 	
@@ -41,6 +45,12 @@ public:
 	void StopFiring();
 	UFUNCTION(BlueprintCallable)
 	void SetVisibility(bool bIsVisible);
+
+	UFUNCTION(BlueprintPure, Category="Weapon")
+	int32 GetMaxAmmo() const { return MaxAmmo; }
+	UFUNCTION(BlueprintPure, Category="Weapon")
+	int32 GetCurrentAmmo() const { return CurrentAmmo; }
+	
 
 protected:
 	// Called when the game starts or when spawned
