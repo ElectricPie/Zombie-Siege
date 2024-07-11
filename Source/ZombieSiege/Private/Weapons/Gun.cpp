@@ -30,9 +30,10 @@ AGun::AGun()
 // TODO: Aim direction is only set once so it always shoots the same direction
 void AGun::Fire(ATopDownPlayerController* Shooter)
 {
-	if (bIsFiring || Shooter == nullptr) return;
-	if (GetGameTimeSinceCreation() - LastFiredTime < FireCooldownTime) return;
+	if (Shooter == nullptr) return;
+	if (bIsFiring || bIsReloading) return;
 	if (CurrentAmmo <= 0) return;
+	if (GetGameTimeSinceCreation() - LastFiredTime < FireCooldownTime) return;
 	
 	bIsFiring = true;
 	LastFiredTime = GetGameTimeSinceCreation();
@@ -79,8 +80,16 @@ void AGun::SetVisibility(const bool bIsVisible)
 void AGun::Reload()
 {
 	// TODO: Implement Reload animation
-	CurrentAmmo = MaxAmmo;
-	OnAmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
+	bIsReloading = true;
+	OnReloadStateChangedEvent.Broadcast(true);
+	
+	float ReloadTime = DefaultReloadTime;
+	if (ReloadMontage)
+	{
+		ReloadTime = ReloadMontage->GetPlayLength();
+	}
+	GetWorldTimerManager().SetTimer(ReloadingTimerHandle, this, &AGun::FinishReload, ReloadTime, false);
+
 }
 
 // Called when the game starts or when spawned
@@ -149,4 +158,12 @@ void AGun::BurstShot(ATopDownPlayerController* Shooter)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(BurstTimer);
 	}
+}
+
+void AGun::FinishReload()
+{
+	CurrentAmmo = MaxAmmo;
+	OnAmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
+	OnReloadStateChangedEvent.Broadcast(false);
+	bIsReloading = false;
 }

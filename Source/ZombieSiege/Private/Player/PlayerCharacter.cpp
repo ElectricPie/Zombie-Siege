@@ -142,33 +142,19 @@ void APlayerCharacter::NextWeapon()
 
 void APlayerCharacter::ReloadWeapon()
 {
-	if (bIsReloading) return;
-	bIsReloading = true;
-
 	if (AGun* EquippedWeapon = GetEquippedWeapon())
 	{
-		EquippedWeapon->StopFiring();
+		if (EquippedWeapon->GetIsReloading()) return;
 		
-		float ReloadTime = DefaultReloadTime;
+		EquippedWeapon->StopFiring();
+
+		EquippedWeapon->Reload();
 		if (UAnimMontage* ReloadAnimation = EquippedWeapon->GetReloadAnimMontage())
 		{
 			PlayAnimMontage(ReloadAnimation);
-			ReloadTime = ReloadAnimation->GetPlayLength();
 		}
-		
-		GetWorldTimerManager().SetTimer(ReloadingTimerHandle, this, &APlayerCharacter::FinishReload, ReloadTime, false);
 	}
 }
-
-void APlayerCharacter::FinishReload()
-{
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
-	{
-		EquippedWeapon->Reload();
-	}
-	bIsReloading = false;
-}
-
 
 void APlayerCharacter::AddInteractable(UInteractableComponent* InteractableComponent)
 {

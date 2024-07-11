@@ -11,6 +11,7 @@ class ATopDownPlayerController;
 class AGunProjectile;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAmmoChangedSignature, int32 /*NewAmmoCount*/, int32 /*MaxAmmo*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnReloadStateChanged, bool /*bIsReloading*/);
 
 UENUM(BlueprintType)
 enum EGunType
@@ -37,6 +38,7 @@ public:
 	AGun();
 
 	FOnAmmoChangedSignature OnAmmoChangedEvent;
+	FOnReloadStateChanged OnReloadStateChangedEvent;
 
 	UFUNCTION(BlueprintPure)
 	EGunType GetGunType() const { return Type; }
@@ -54,6 +56,8 @@ public:
 	void Reload();
 	UFUNCTION(BlueprintPure)
 	UAnimMontage* GetReloadAnimMontage() const { return ReloadMontage; }
+	UFUNCTION(BlueprintPure)
+	bool GetIsReloading() { return bIsReloading; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -99,6 +103,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Animation")
 	UAnimMontage* ReloadMontage;
+	UPROPERTY(EditAnywhere, Category="Animation", meta=(ToolTip="The time a reload takes if the there is no reload animation"))
+	float DefaultReloadTime = 2.f;
+	bool bIsReloading = false;
+	FTimerHandle ReloadingTimerHandle;
 	
 	bool bIsFiring = false;
 	float LastFiredTime = 0.f;
@@ -113,4 +121,6 @@ private:
 	void SingleShot(ATopDownPlayerController* Shooter);
 	UFUNCTION()
 	void BurstShot(ATopDownPlayerController* Shooter);
+	UFUNCTION()
+	void FinishReload();
 };
