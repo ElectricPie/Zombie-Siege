@@ -43,13 +43,25 @@ void UGameHudWidget::OnWeaponChanged(AGun* NewWeapon)
 {
 	if (NewWeapon == nullptr) return;
 	
-	if (CurrentWeapon.IsValid() && AmmoChangeHandle.IsValid())
+	if (CurrentWeapon.IsValid())
 	{
-		CurrentWeapon->OnAmmoChangedEvent.Remove(AmmoChangeHandle);
+		if (AmmoChangeHandle.IsValid())
+		{
+			CurrentWeapon->OnAmmoChangedEvent.Remove(AmmoChangeHandle);
+		}
+		if (WeaponReloadHandle.IsValid())
+		{
+			CurrentWeapon->OnReloadStateChangedEvent.Remove(WeaponReloadHandle);
+		}
 	}
-
 	
 	CurrentWeapon = NewWeapon;
 	AmmoCounterWidget->UpdateAmmoText(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
 	AmmoChangeHandle = NewWeapon->OnAmmoChangedEvent.AddUObject(this, &UGameHudWidget::OnAmmoChanged);
+	WeaponReloadHandle = NewWeapon->OnReloadStateChangedEvent.AddUObject(this, &UGameHudWidget::OnWeaponReloadStateChanged);
+}
+
+void UGameHudWidget::OnWeaponReloadStateChanged(bool bIsReloading)
+{
+	AmmoCounterWidget->ShowReloadingMessage(bIsReloading);
 }

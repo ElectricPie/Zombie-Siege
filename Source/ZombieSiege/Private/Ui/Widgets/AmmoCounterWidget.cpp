@@ -10,3 +10,17 @@ void UAmmoCounterWidget::UpdateAmmoText(const int32 CurrentAmmo, const int32 Max
 	const FText AmmoText = FText::FromString(FString::Printf(TEXT("%d / %d"), CurrentAmmo, MaxAmmo));
 	AmmoTextBlock->SetText(AmmoText);
 }
+
+void UAmmoCounterWidget::ShowReloadingMessage(const bool bShowReloadingMessage = true)
+{
+	if (bShowReloadingMessage)
+	{
+		AmmoTextBlock->SetVisibility(ESlateVisibility::Collapsed);
+		ReloadingTextBlock->SetVisibility(ESlateVisibility::Visible);
+		return;
+	}
+	
+	AmmoTextBlock->SetVisibility(ESlateVisibility::Visible);
+	ReloadingTextBlock->SetVisibility(ESlateVisibility::Collapsed);
+}
+

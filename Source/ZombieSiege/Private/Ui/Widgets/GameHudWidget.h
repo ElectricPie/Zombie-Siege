@@ -33,9 +33,12 @@ private:
 	TWeakObjectPtr<AGun> CurrentWeapon;
 
 	FDelegateHandle AmmoChangeHandle;
+	FDelegateHandle WeaponReloadHandle;
 
 	UFUNCTION()
 	void OnAmmoChanged(int32 NewAmmoCount, int32 MaxAmmo);
 	UFUNCTION()
 	void OnWeaponChanged(AGun* NewWeapon);
+	UFUNCTION()
+	void OnWeaponReloadStateChanged(bool bIsReloading);
 };
