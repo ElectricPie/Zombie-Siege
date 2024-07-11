@@ -113,6 +113,40 @@ void APlayerCharacter::StopFiring()
 	}
 }
 
+void APlayerCharacter::NextWeapon()
+{
+	// Hide the current weapon
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		EquippedWeapon->SetVisibility(false);
+	}
+	
+	if (EquippedWeaponIndex + 1 >= Weapons.Num())
+	{
+		EquippedWeaponIndex = 0;
+	}
+	else
+	{
+		EquippedWeaponIndex++;
+	}
+
+	// Show the new weapon
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
+		EquippedWeapon->SetVisibility(true);
+	}
+}
+
+void APlayerCharacter::ReloadWeapon()
+{
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		EquippedWeapon->Reload();
+	}
+}
+
+
 void APlayerCharacter::AddInteractable(UInteractableComponent* InteractableComponent)
 {
 	NearbyIntractables.Add(InteractableComponent);
@@ -136,30 +170,5 @@ void APlayerCharacter::RemoveInteractable(const UInteractableComponent* Interact
 		{
 			GameHud->HideInteractText();
 		}
-	}
-}
-
-void APlayerCharacter::NextWeapon()
-{
-	// Hide the current weapon
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
-	{
-		EquippedWeapon->SetVisibility(false);
-	}
-	
-	if (EquippedWeaponIndex + 1 >= Weapons.Num())
-	{
-		EquippedWeaponIndex = 0;
-	}
-	else
-	{
-		EquippedWeaponIndex++;
-	}
-
-	// Show the new weapon
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
-	{
-		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
-		EquippedWeapon->SetVisibility(true);
 	}
 }

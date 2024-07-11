@@ -26,7 +26,6 @@ void UGameHudWidget::ShowInteractText(bool bShowInteractText)
 {
 	if (bShowInteractText)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Showing"));
 		InteractTextBlock->SetVisibility(ESlateVisibility::Visible);
 	}
 	else
@@ -37,7 +36,6 @@ void UGameHudWidget::ShowInteractText(bool bShowInteractText)
 
 void UGameHudWidget::OnAmmoChanged(int32 NewAmmoCount, int32 MaxAmmo)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Ammo Updated"));
 	AmmoCounterWidget->UpdateAmmoText(NewAmmoCount, MaxAmmo);
 }
 
