@@ -35,31 +35,37 @@ void ATopDownPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Move);
 
 		// Interaction
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
-		                                   &ATopDownPlayerController::Interact);
-
-		// Shooting
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATopDownPlayerController::Fire);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ATopDownPlayerController::StopFiring);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Interact);
 
 		// Weapons
-		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this,
-		                                   &ATopDownPlayerController::SwapWeapon);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATopDownPlayerController::Fire);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ATopDownPlayerController::StopFiring);
+		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::SwapWeapon);
+		EnhancedInputComponent->BindAction(ReloadWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::ReloadWeapon);
+	}
+}
+
+void ATopDownPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	if (APlayerCharacter* PossessedPlayerCharacter = Cast<APlayerCharacter>(InPawn))
+	{
+		PlayerCharacter = PossessedPlayerCharacter;
 	}
 }
 
 void ATopDownPlayerController::Move(const FInputActionValue& Value)
 {
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
-	{
-		const FVector2D Direction = Value.Get<FVector2D>();
-		PlayerCharacter->Move(FVector(Direction.X, Direction.Y, 0.f).GetSafeNormal());
-	}
+	if (PlayerCharacter == nullptr) return;
+
+	const FVector2D Direction = Value.Get<FVector2D>();
+	PlayerCharacter->Move(FVector(Direction.X, Direction.Y, 0.f).GetSafeNormal());
 }
 
 void ATopDownPlayerController::FaceMouse()
 {
-	APlayerCharacter* PlayerActor = Cast<APlayerCharacter>(GetPawn());
+	const APlayerCharacter* PlayerActor = Cast<APlayerCharacter>(GetPawn());
 	if (PlayerActor == nullptr) return;
 
 	FIntVector2 ViewportSize;
@@ -89,32 +95,35 @@ void ATopDownPlayerController::FaceMouse()
 
 void ATopDownPlayerController::Interact()
 {
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
-	{
-		PlayerCharacter->Interact();
-	}
+	if (PlayerCharacter == nullptr) return;
+
+	PlayerCharacter->Interact();
 }
 
 void ATopDownPlayerController::Fire()
 {
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
-	{
-		PlayerCharacter->Fire(this);
-	}
+	if (PlayerCharacter == nullptr) return;
+
+	PlayerCharacter->Fire(this);
 }
 
 void ATopDownPlayerController::StopFiring()
 {
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
-	{
-		PlayerCharacter->StopFiring();
-	}
+	if (PlayerCharacter == nullptr) return;
+
+	PlayerCharacter->StopFiring();
 }
 
 void ATopDownPlayerController::SwapWeapon()
 {
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
-	{
-		PlayerCharacter->NextWeapon();
-	}
+	if (PlayerCharacter == nullptr) return;
+
+	PlayerCharacter->NextWeapon();
+}
+
+void ATopDownPlayerController::ReloadWeapon()
+{
+	if (PlayerCharacter == nullptr) return;
+
+	PlayerCharacter->ReloadWeapon();
 }

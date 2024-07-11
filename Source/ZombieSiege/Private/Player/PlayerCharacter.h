@@ -50,13 +50,15 @@ public:
 	
 	void Move(const FVector Direction);
 	void Interact();
+	
 	void Fire(ATopDownPlayerController* Shooter);
 	void StopFiring();
+	void NextWeapon();
+	void ReloadWeapon();
 
 	void AddInteractable(UInteractableComponent* InteractableComponent);
 	void RemoveInteractable(const UInteractableComponent* InteractableComponent);
 
-	void NextWeapon();
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category=Components)

@@ -50,6 +50,8 @@ public:
 	int32 GetMaxAmmo() const { return MaxAmmo; }
 	UFUNCTION(BlueprintPure, Category="Weapon")
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	void Reload();
 	
 
 protected:

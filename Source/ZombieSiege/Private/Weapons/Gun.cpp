@@ -49,7 +49,6 @@ void AGun::Fire(ATopDownPlayerController* Shooter)
 			FTimerDelegate BurstDelegate;
 			BurstDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGun, BurstShot), Shooter);
 			GetWorld()->GetTimerManager().SetTimer(BurstTimer, BurstDelegate, ShotIntervals, true);
-			
 			break;
 		}
 	case FullAuto:
@@ -75,6 +74,13 @@ void AGun::StopFiring()
 void AGun::SetVisibility(const bool bIsVisible)
 {
 	GunMesh->SetVisibility(bIsVisible);
+}
+
+void AGun::Reload()
+{
+	// TODO: Implement Reload animation
+	CurrentAmmo = MaxAmmo;
+	OnAmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
 }
 
 // Called when the game starts or when spawned
