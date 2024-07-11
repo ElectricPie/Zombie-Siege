@@ -150,7 +150,6 @@ void APlayerCharacter::ReloadWeapon()
 		EquippedWeapon->StopFiring();
 		
 		float ReloadTime = DefaultReloadTime;
-		EquippedWeapon->Reload();
 		if (UAnimMontage* ReloadAnimation = EquippedWeapon->GetReloadAnimMontage())
 		{
 			PlayAnimMontage(ReloadAnimation);
@@ -163,6 +162,10 @@ void APlayerCharacter::ReloadWeapon()
 
 void APlayerCharacter::FinishReload()
 {
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		EquippedWeapon->Reload();
+	}
 	bIsReloading = false;
 }
 
