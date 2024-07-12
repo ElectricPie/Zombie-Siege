@@ -3,6 +3,8 @@
 
 #include "Units/UnitCharacter.h"
 
+#include "Components/MoneyRewardComponent.h"
+#include "Components/MoneyStoreComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -11,6 +13,7 @@ AUnitCharacter::AUnitCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	MoneyRewardComponent = CreateDefaultSubobject<UMoneyRewardComponent>(TEXT("Money Reward"));
 }
 
 void AUnitCharacter::Attack(AActor* Target)
@@ -29,6 +32,7 @@ float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	CurrentHealth -= DamageAmount;
 	if (CurrentHealth <= 0.f)
 	{
+		MoneyRewardComponent->RewardMoney(EventInstigator);
 		Destroy();
 	}
 	
