@@ -11,7 +11,8 @@ void ATopDownPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+		GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(InputMappingContext, 0);
 	}
@@ -28,32 +29,49 @@ void ATopDownPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent)) 
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
+		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Move);
 
+		// Interaction
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Interact);
+
+		// Weapons
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATopDownPlayerController::Fire);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ATopDownPlayerController::StopFiring);
+		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::SwapWeapon);
+		EnhancedInputComponent->BindAction(ReloadWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::ReloadWeapon);
+	}
+}
+
+void ATopDownPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	if (APlayerCharacter* PossessedPlayerCharacter = Cast<APlayerCharacter>(InPawn))
+	{
+		PlayerCharacter = PossessedPlayerCharacter;
 	}
 }
 
 void ATopDownPlayerController::Move(const FInputActionValue& Value)
 {
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
-	{
-		const FVector2D Direction = Value.Get<FVector2D>();
-		PlayerCharacter->Move(FVector(Direction.X, Direction.Y, 0.f).GetSafeNormal());
-	}
+	if (PlayerCharacter == nullptr) return;
+
+	const FVector2D Direction = Value.Get<FVector2D>();
+	PlayerCharacter->Move(FVector(Direction.X, Direction.Y, 0.f).GetSafeNormal());
 }
 
 void ATopDownPlayerController::FaceMouse()
 {
-	APlayerCharacter* PlayerActor = Cast<APlayerCharacter>(GetPawn());
+	const APlayerCharacter* PlayerActor = Cast<APlayerCharacter>(GetPawn());
 	if (PlayerActor == nullptr) return;
-	
+
 	FIntVector2 ViewportSize;
 	GetViewportSize(ViewportSize.X, ViewportSize.Y);
-	
-	FVector2D MouseScreenLocation; 
+
+	FVector2D MouseScreenLocation;
 	if (GetMousePosition(MouseScreenLocation.X, MouseScreenLocation.Y))
 	{
 		FVector WorldPosition;
@@ -68,18 +86,44 @@ void ATopDownPlayerController::FaceMouse()
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldPosition, RayEnd, ECC_Visibility, QueryParams))
 		{
 			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 20.f, 8, FColor::Red);
-			//PlayerActor->LookAt(HitResult.ImpactPoint);
-			FVector Direction = (HitResult.ImpactPoint - PlayerActor->GetActorLocation()).GetSafeNormal();
-			Direction.Z = PlayerActor->GetActorLocation().X;
-			ClientSetRotation(Direction.Rotation());
+			AimDirection = (HitResult.ImpactPoint - PlayerActor->GetActorLocation()).GetSafeNormal();
+			AimDirection.Z = PlayerActor->GetActorLocation().X;
+			ClientSetRotation(AimDirection.Rotation());
 		}
 	}
 }
 
 void ATopDownPlayerController::Interact()
 {
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
-	{
-		PlayerCharacter->Interact();
-	}
+	if (PlayerCharacter == nullptr) return;
+
+	PlayerCharacter->Interact();
+}
+
+void ATopDownPlayerController::Fire()
+{
+	if (PlayerCharacter == nullptr) return;
+
+	PlayerCharacter->Fire(this);
+}
+
+void ATopDownPlayerController::StopFiring()
+{
+	if (PlayerCharacter == nullptr) return;
+
+	PlayerCharacter->StopFiring();
+}
+
+void ATopDownPlayerController::SwapWeapon()
+{
+	if (PlayerCharacter == nullptr) return;
+
+	PlayerCharacter->NextWeapon();
+}
+
+void ATopDownPlayerController::ReloadWeapon()
+{
+	if (PlayerCharacter == nullptr) return;
+
+	PlayerCharacter->ReloadWeapon();
 }
