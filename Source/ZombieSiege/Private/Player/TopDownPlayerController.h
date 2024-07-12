@@ -21,6 +21,7 @@ class ZOMBIESIEGE_API ATopDownPlayerController : public APlayerController
 
 public:
 	FVector GetAimDirection() const { return AimDirection; }
+	void SetMoney(const int32 AmountToSetTo) { Money = AmountToSetTo; }
 	
 protected:
 	virtual void BeginPlay() override;
@@ -42,8 +43,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	UInputAction* ReloadWeaponAction;
 
-	UPROPERTY(EditAnywhere, Category=Look)
+	UPROPERTY(EditAnywhere, Category="Look")
 	float LookRaycastLimit = 3000.f;
+
+	UPROPERTY(VisibleAnywhere, Category="Money")
+	int32 Money;
 
 	TWeakObjectPtr<APlayerCharacter> PlayerCharacter;
 	

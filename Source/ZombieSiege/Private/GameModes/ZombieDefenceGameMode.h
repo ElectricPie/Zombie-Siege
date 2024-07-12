@@ -13,5 +13,11 @@ UCLASS()
 class AZombieDefenceGameMode : public AGameMode
 {
 	GENERATED_BODY()
-	
+
+protected:
+	virtual void OnPostLogin(AController* NewPlayer) override;
+
+private:
+	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))
+	int32 StartingMoney = 500;
 };
