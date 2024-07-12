@@ -7,6 +7,19 @@
 #include "EnhancedInputSubsystems.h"
 #include "PlayerCharacter.h"
 
+void ATopDownPlayerController::SetMoney(const int32 AmountToSetTo)
+{
+	float ChangeInMoney = Money;
+	Money = AmountToSetTo;
+	OnMoneyChangedEvent.Broadcast(Money, ChangeInMoney);
+}
+
+void ATopDownPlayerController::AddMoney(const int32 AmountToAdd)
+{
+	Money += AmountToAdd;
+	OnMoneyChangedEvent.Broadcast(Money, AmountToAdd);
+}
+
 void ATopDownPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
