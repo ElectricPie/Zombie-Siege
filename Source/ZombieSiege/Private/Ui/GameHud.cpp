@@ -20,10 +20,9 @@ void AGameHud::BeginPlay()
 			GameHudWidget->AddToViewport();
 			if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetPawn()))
 			{
-				GameHudWidget->Setup(PlayerCharacter);
+				GameHudWidget->Setup(PlayerController, PlayerCharacter);
 			}
 		}
-		
 	}
 }
 

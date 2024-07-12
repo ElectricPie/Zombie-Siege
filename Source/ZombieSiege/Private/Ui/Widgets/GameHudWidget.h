@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "GameHudWidget.generated.h"
 
+class ATopDownPlayerController;
+class UPlayerMoneyWidget;
 class UAmmoCounterWidget;
 class AGun;
 class APlayerCharacter;
@@ -20,7 +22,7 @@ class UGameHudWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void Setup(APlayerCharacter* NewPlayerCharacter);
+	void Setup(ATopDownPlayerController* PlayerController, APlayerCharacter* PlayerCharacter);
 	void UpdateInteractText(FText const & InteractText);
 	void ShowInteractText(bool bShowInteractText);
 	
@@ -29,6 +31,8 @@ private:
 	UTextBlock* InteractTextBlock;
 	UPROPERTY(VisibleAnywhere, meta=(BindWidget))
 	UAmmoCounterWidget* AmmoCounterWidget;
+	UPROPERTY(VisibleAnywhere, meta=(BindWidget))
+	UPlayerMoneyWidget* MoneyWidget;
 
 	TWeakObjectPtr<AGun> CurrentWeapon;
 
@@ -41,4 +45,6 @@ private:
 	void OnWeaponChanged(AGun* NewWeapon);
 	UFUNCTION()
 	void OnWeaponReloadStateChanged(bool bIsReloading);
+	UFUNCTION()
+	void OnMoneyChanged(int32 NewMoneyAmount, int32 AmountChanged);
 };

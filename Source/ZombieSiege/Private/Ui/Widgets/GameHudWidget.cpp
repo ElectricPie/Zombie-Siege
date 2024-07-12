@@ -4,16 +4,24 @@
 #include "Ui/Widgets/GameHudWidget.h"
 
 #include "AmmoCounterWidget.h"
+#include "PlayerMoneyWidget.h"
 #include "Components/TextBlock.h"
 #include "Player/PlayerCharacter.h"
+#include "Player/TopDownPlayerController.h"
 #include "Weapons/Gun.h"
 
 
-void UGameHudWidget::Setup(APlayerCharacter* NewPlayerCharacter)
+void UGameHudWidget::Setup(ATopDownPlayerController* PlayerController, APlayerCharacter* PlayerCharacter)
 {
-	if (NewPlayerCharacter)
+	if (PlayerCharacter)
 	{
-		NewPlayerCharacter->OnWeaponChangedEvent.AddUniqueDynamic(this, &UGameHudWidget::OnWeaponChanged);
+		PlayerCharacter->OnWeaponChangedEvent.AddUniqueDynamic(this, &UGameHudWidget::OnWeaponChanged);
+	}
+
+	if (PlayerController)
+	{
+		PlayerController->OnMoneyChangedEvent.AddUObject(this, &UGameHudWidget::OnMoneyChanged);
+		MoneyWidget->SetMoneyText(PlayerController->GetMoney());
 	}
 }
 
@@ -64,4 +72,9 @@ void UGameHudWidget::OnWeaponChanged(AGun* NewWeapon)
 void UGameHudWidget::OnWeaponReloadStateChanged(bool bIsReloading)
 {
 	AmmoCounterWidget->ShowReloadingMessage(bIsReloading);
+}
+
+void UGameHudWidget::OnMoneyChanged(int32 NewMoneyAmount, int32 AmountChanged)
+{
+	MoneyWidget->SetMoneyText(NewMoneyAmount);
 }
