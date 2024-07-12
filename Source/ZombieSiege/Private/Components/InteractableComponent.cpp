@@ -16,20 +16,43 @@ void UInteractableComponent::Interact(APlayerCharacter* InteractingPlayer)
 	OnInteractEvent.Broadcast(InteractingPlayer);
 }
 
+void UInteractableComponent::SetDisplayMessage(const bool bShouldDisplayMessage)
+{
+	bDisplayMessage = bShouldDisplayMessage;
+
+	for (const auto& Player : PlayersInRange)
+	{
+		if (bDisplayMessage)
+		{
+			Player->AddInteractable(this);
+		}
+		else
+		{
+			Player->RemoveInteractable(this);
+		}
+	}
+}
+
 void UInteractableComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-                                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                            const FHitResult& SweepResult)
 {
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor))
 	{
-		PlayerCharacter->AddInteractable(this);
+		PlayersInRange.Add(PlayerCharacter);
+		if (bDisplayMessage)
+		{
+			PlayerCharacter->AddInteractable(this);
+		}
 	}
 }
 
 void UInteractableComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+                                          UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor))
 	{
+		PlayersInRange.Remove(PlayerCharacter);
 		PlayerCharacter->RemoveInteractable(this);
 	}
 }

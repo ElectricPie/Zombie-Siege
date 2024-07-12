@@ -43,6 +43,8 @@ float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	{
 		Mesh->SetVisibility(false);
 	}
+	
+	PlayerInteractionTrigger->SetDisplayMessage(true);
 
 	return DamageDealt;
 }
@@ -51,6 +53,8 @@ void ABarricade::Repair()
 {
 	CurrentHealth = MaxHealth;
 	Mesh->SetVisibility(true);
+
+	PlayerInteractionTrigger->SetDisplayMessage(false);
 }
 
 // Called when the game starts or when spawned
