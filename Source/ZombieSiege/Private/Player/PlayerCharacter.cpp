@@ -85,12 +85,6 @@ void APlayerCharacter::Move(const FVector Direction)
 
 void APlayerCharacter::Interact()
 {
-	// TODO: Remove after weapon animation switching is done
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
-	{
-		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
-	}
-	
 	for (auto const & Interactable : NearbyIntractables)
 	{
 		Interactable->Interact(this);
