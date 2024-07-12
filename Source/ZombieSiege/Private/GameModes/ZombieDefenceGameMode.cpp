@@ -3,14 +3,14 @@
 
 #include "GameModes/ZombieDefenceGameMode.h"
 
-#include "Player/TopDownPlayerController.h"
+#include "Components/MoneyStoreComponent.h"
 
 void AZombieDefenceGameMode::OnPostLogin(AController* NewPlayer)
 {
 	Super::OnPostLogin(NewPlayer);
 
-	if (ATopDownPlayerController* Player = Cast<ATopDownPlayerController>(NewPlayer))
+	if (UMoneyStoreComponent* MoneyStore = NewPlayer->GetComponentByClass<UMoneyStoreComponent>())
 	{
-		Player->SetMoney(StartingMoney);
+		MoneyStore->SetMoney(StartingMoney);
 	}
 }

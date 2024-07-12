@@ -6,18 +6,11 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "PlayerCharacter.h"
+#include "Components/MoneyStoreComponent.h"
 
-void ATopDownPlayerController::SetMoney(const int32 AmountToSetTo)
+ATopDownPlayerController::ATopDownPlayerController()
 {
-	float ChangeInMoney = Money;
-	Money = AmountToSetTo;
-	OnMoneyChangedEvent.Broadcast(Money, ChangeInMoney);
-}
-
-void ATopDownPlayerController::AddMoney(const int32 AmountToAdd)
-{
-	Money += AmountToAdd;
-	OnMoneyChangedEvent.Broadcast(Money, AmountToAdd);
+	MoneyStoreComponent = CreateDefaultSubobject<UMoneyStoreComponent>(TEXT("Money Store"));
 }
 
 void ATopDownPlayerController::BeginPlay()

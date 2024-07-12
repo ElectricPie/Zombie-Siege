@@ -6,12 +6,11 @@
 #include "GameFramework/PlayerController.h"
 #include "TopDownPlayerController.generated.h"
 
+class UMoneyStoreComponent;
 class APlayerCharacter;
 struct FInputActionValue;
 class UInputMappingContext;
 class UInputAction;
-
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnMoneyChangedSinganture, int32 /*NewMoneyAmount*/, int32 /*AmountChanged*/);
 
 /**
  * 
@@ -22,21 +21,9 @@ class ZOMBIESIEGE_API ATopDownPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-	FOnMoneyChangedSinganture OnMoneyChangedEvent;
+	ATopDownPlayerController();
 	
 	FVector GetAimDirection() const { return AimDirection; }
-	
-	/**
-	 * @brief Sets the players money to the provided amount
-	 * @param AmountToSetTo The amount of money to set the player
-	 */
-	void SetMoney(const int32 AmountToSetTo);
-	/**
-	 * @brief Adds the given amount to the players current money
-	 * @param AmountToAdd The amount of money to add
-	 */
-	void AddMoney(const int32 AmountToAdd);
-	int32 GetMoney() const { return Money; }
 	
 protected:
 	virtual void BeginPlay() override;
@@ -45,6 +32,9 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	
 private:
+	UPROPERTY(VisibleAnywhere, Category="Money")
+	UMoneyStoreComponent* MoneyStoreComponent;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	UInputMappingContext* InputMappingContext;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
@@ -60,9 +50,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Look")
 	float LookRaycastLimit = 3000.f;
-
-	UPROPERTY(VisibleAnywhere, Category="Money")
-	int32 Money;
 
 	TWeakObjectPtr<APlayerCharacter> PlayerCharacter;
 	

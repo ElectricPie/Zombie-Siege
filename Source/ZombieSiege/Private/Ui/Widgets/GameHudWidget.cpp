@@ -5,6 +5,7 @@
 
 #include "AmmoCounterWidget.h"
 #include "PlayerMoneyWidget.h"
+#include "Components/MoneyStoreComponent.h"
 #include "Components/TextBlock.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/TopDownPlayerController.h"
@@ -20,8 +21,12 @@ void UGameHudWidget::Setup(ATopDownPlayerController* PlayerController, APlayerCh
 
 	if (PlayerController)
 	{
-		PlayerController->OnMoneyChangedEvent.AddUObject(this, &UGameHudWidget::OnMoneyChanged);
-		MoneyWidget->SetMoneyText(PlayerController->GetMoney());
+		if (UMoneyStoreComponent* MoneyStore = PlayerController->GetComponentByClass<UMoneyStoreComponent>())
+		{
+			MoneyStore->OnMoneyChangedEvent.AddUObject(this, &UGameHudWidget::OnMoneyChanged);
+			MoneyWidget->SetMoneyText(MoneyStore->GetMoney());
+		}
+		
 	}
 }
 
