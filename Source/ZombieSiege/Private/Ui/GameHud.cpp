@@ -4,6 +4,8 @@
 #include "Ui/GameHud.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Player/PlayerCharacter.h"
+#include "Player/TopDownPlayerController.h"
 #include "Widgets/GameHudWidget.h"
 
 void AGameHud::BeginPlay()
@@ -12,8 +14,16 @@ void AGameHud::BeginPlay()
 
 	if (GameHudWidgetClass)
 	{
-		GameHudWidget = CreateWidget<UGameHudWidget>(GetOwningPlayerController(), GameHudWidgetClass);
-		GameHudWidget->AddToViewport();
+		if (ATopDownPlayerController* PlayerController = Cast<ATopDownPlayerController>(GetOwningPlayerController()))
+		{
+			GameHudWidget = CreateWidget<UGameHudWidget>(PlayerController, GameHudWidgetClass);
+			GameHudWidget->AddToViewport();
+			if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetPawn()))
+			{
+				GameHudWidget->Setup(PlayerCharacter);
+			}
+		}
+		
 	}
 }
 

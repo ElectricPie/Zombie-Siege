@@ -3,10 +3,12 @@
 
 #include "Player/PlayerCharacter.h"
 
+#include "TopDownPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InteractableComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Ui/GameHud.h"
+#include "Weapons/Gun.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -30,7 +32,11 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
+	}
 }
 
 // Called every frame
@@ -55,6 +61,13 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return 0.f;
 }
 
+AGun* APlayerCharacter::GetEquippedWeapon()
+{
+	if (EquippedWeaponIndex >= Weapons.Num()) return nullptr;
+
+	return Weapons[EquippedWeaponIndex];
+}
+
 bool APlayerCharacter::IsMovingForward() const
 {
 	const FVector ForwardVector = GetActorForwardVector();
@@ -70,18 +83,79 @@ void APlayerCharacter::Move(const FVector Direction)
 	AddMovementInput(FVector::RightVector, Direction.Y * SpeedModifier);
 }
 
-void APlayerCharacter::LookAt(const FVector Pos)
-{
-	const FRotator Direction = (GetActorLocation() - Pos).Rotation();
-	DrawDebugLine(GetWorld(), GetActorLocation(), Pos, FColor::Green);
-	//SetActorRotation(Direction);
-}
-
 void APlayerCharacter::Interact()
 {
+	// TODO: Remove after weapon animation switching is done
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
+	}
+	
 	for (auto const & Interactable : NearbyIntractables)
 	{
 		Interactable->Interact(this);
+	}
+}
+
+void APlayerCharacter::Fire(ATopDownPlayerController* Shooter)
+{
+	if (bIsReloading) return;
+	
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		EquippedWeapon->Fire(Shooter);
+	}
+}
+
+void APlayerCharacter::StopFiring()
+{
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		EquippedWeapon->StopFiring();
+	}
+}
+
+void APlayerCharacter::NextWeapon()
+{
+	// Hide the current weapon
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		// Prevent changing weapons while reloading
+		if (EquippedWeapon->GetIsReloading()) return;
+		
+		EquippedWeapon->SetVisibility(false);
+	}
+	
+	if (EquippedWeaponIndex + 1 >= Weapons.Num())
+	{
+		EquippedWeaponIndex = 0;
+	}
+	else
+	{
+		EquippedWeaponIndex++;
+	}
+
+	// Show the new weapon
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
+		EquippedWeapon->SetVisibility(true);
+	}
+}
+
+void APlayerCharacter::ReloadWeapon()
+{
+	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	{
+		if (EquippedWeapon->GetIsReloading()) return;
+		
+		EquippedWeapon->StopFiring();
+
+		EquippedWeapon->Reload();
+		if (UAnimMontage* ReloadAnimation = EquippedWeapon->GetReloadAnimMontage())
+		{
+			PlayAnimMontage(ReloadAnimation);
+		}
 	}
 }
 

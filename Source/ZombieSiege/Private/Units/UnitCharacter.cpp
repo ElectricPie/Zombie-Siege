@@ -18,8 +18,26 @@ void AUnitCharacter::Attack(AActor* Target)
 	if (Target == nullptr) return;
 	// Delay time between attacks
 	if (GetGameTimeSinceCreation() - LastAttackTime < AttackDelay) return;
-	
 	UGameplayStatics::ApplyDamage(Target, AttackDamage, GetController(), this, UDamageType::StaticClass());
 	LastAttackTime = GetGameTimeSinceCreation();
 	PlayAnimMontage(AttackMontage);
+}
+
+float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	CurrentHealth -= DamageAmount;
+	if (CurrentHealth <= 0.f)
+	{
+		Destroy();
+	}
+	
+	return DamageAmount;
+}
+
+void AUnitCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	CurrentHealth = MaxHealth;
 }
