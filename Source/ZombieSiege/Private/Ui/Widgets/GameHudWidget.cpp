@@ -79,7 +79,7 @@ void UGameHudWidget::OnWeaponReloadStateChanged(bool bIsReloading)
 	AmmoCounterWidget->ShowReloadingMessage(bIsReloading);
 }
 
-void UGameHudWidget::OnMoneyChanged(int32 NewMoneyAmount, int32 AmountChanged)
-{
-	MoneyWidget->SetMoneyText(NewMoneyAmount);
+void UGameHudWidget::OnMoneyChanged(const int32 NewMoneyAmount, const int32 AmountChanged)
+{	
+	MoneyWidget->SetMoneyText(NewMoneyAmount, AmountChanged);
 }

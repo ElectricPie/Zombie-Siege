@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "PlayerMoneyWidget.generated.h"
 
+class UMoneyChangedWidget;
+class UOverlay;
 class UTextBlock;
 /**
  * 
@@ -16,11 +18,16 @@ class UPlayerMoneyWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void SetMoneyText(const int32 MoneyAmount) const;
+	void SetMoneyText(const int32 MoneyAmount, const int32 AmountChanged = 0);
 	
 private:
-	UPROPERTY(VisibleAnywhere, meta=(BindWidget))
+	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
+	UOverlay* Overlay;
+	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
 	UTextBlock* MoneyText;
 	UPROPERTY(EditAnywhere)
 	FString TextPrefix = TEXT("£");
+	
+	UPROPERTY(EditAnywhere, Category="Widgets")
+	TSubclassOf<UMoneyChangedWidget> MoneyChangedWidgetClass;
 };

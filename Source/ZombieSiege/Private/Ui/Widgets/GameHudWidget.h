@@ -27,11 +27,11 @@ public:
 	void ShowInteractText(bool bShowInteractText);
 	
 private:
-	UPROPERTY(VisibleAnywhere, meta=(BindWidget))
+	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
 	UTextBlock* InteractTextBlock;
-	UPROPERTY(VisibleAnywhere, meta=(BindWidget))
+	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
 	UAmmoCounterWidget* AmmoCounterWidget;
-	UPROPERTY(VisibleAnywhere, meta=(BindWidget))
+	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
 	UPlayerMoneyWidget* MoneyWidget;
 
 	TWeakObjectPtr<AGun> CurrentWeapon;
