@@ -6,6 +6,8 @@
 #include "GameFramework/GameMode.h"
 #include "ZombieDefenceGameMode.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnMoneyChangedSinganture, int32 /*NewMoneyAmount*/, int32 /*AmountChanged*/);
+
 /**
  * 
  */
