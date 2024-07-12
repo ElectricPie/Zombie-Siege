@@ -50,6 +50,7 @@ float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 void ABarricade::Repair()
 {
 	CurrentHealth = MaxHealth;
+	Mesh->SetVisibility(true);
 }
 
 // Called when the game starts or when spawned
