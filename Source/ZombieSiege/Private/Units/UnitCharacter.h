@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "UnitCharacter.generated.h"
 
+class UMoneyRewardComponent;
 class UBehaviorTree;
 
 UCLASS()
@@ -28,20 +29,24 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attack, meta=(ClampMin=0.f, UIMin=0.f))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
 	float AttackDamage = 25.f;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attack, meta=(ClampMin=0.f, UIMin=0.f))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
 	float AttackRange = 100.f;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attack, meta=(ClampMin=0.f, UIMin=0.f))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
 	float AttackDelay = 1.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Attack)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Attack")
 	float LastAttackTime = 0.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Animation)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Animation")
 	UAnimMontage* AttackMontage;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
 	float MaxHealth = 40.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Health)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Health")
 	float CurrentHealth = 40.f;;
+
+private:
+	UPROPERTY(VisibleAnywhere, Category="Money")
+	UMoneyRewardComponent* MoneyRewardComponent;
 };
