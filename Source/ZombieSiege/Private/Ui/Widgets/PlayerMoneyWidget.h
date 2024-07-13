@@ -19,6 +19,9 @@ class UPlayerMoneyWidget : public UUserWidget
 
 public:
 	void SetMoneyText(const int32 MoneyAmount, const int32 AmountChanged = 0);
+
+protected:
+	virtual void NativeConstruct() override;
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
@@ -28,6 +31,10 @@ private:
 	UPROPERTY(EditAnywhere)
 	FString TextPrefix = TEXT("£");
 	
-	UPROPERTY(EditAnywhere, Category="Widgets")
+	UPROPERTY(EditDefaultsOnly, Category="Widgets")
 	TSubclassOf<UMoneyChangedWidget> MoneyChangedWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category="Widgets", meta=(ClampMin=0, UIMin=0))
+	int32 ChangedWidgetCount = 5;
+
+	TQueue<UMoneyChangedWidget*> MoneyChangedWidgetPool;
 };

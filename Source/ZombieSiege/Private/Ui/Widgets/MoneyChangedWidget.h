@@ -17,6 +17,9 @@ class UMoneyChangedWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintImplementableEvent)
+	void TriggerAnimation();
+	
 	void SetAmount(const int32 Amount); 
 
 private:
