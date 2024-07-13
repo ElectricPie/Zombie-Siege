@@ -85,7 +85,9 @@ void APlayerCharacter::Move(const FVector Direction)
 
 void APlayerCharacter::Interact()
 {
-	for (auto const & Interactable : NearbyIntractables)
+	// Copy to prevent changes while iterating
+	TSet<UInteractableComponent*> TempInteractables = NearbyIntractables;
+	for (auto const & Interactable : TempInteractables)
 	{
 		Interactable->Interact(this);
 	}
