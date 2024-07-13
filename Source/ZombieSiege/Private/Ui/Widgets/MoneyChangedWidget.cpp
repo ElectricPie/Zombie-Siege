@@ -21,4 +21,6 @@ void UMoneyChangedWidget::SetAmount(const int32 Amount)
 	MoneyTextBlock->SetColorAndOpacity(TextColor);
 	const FText Text = FText::FromString(FString::Printf(TEXT("%s%d"), *Prefix, Amount));
 	MoneyTextBlock->SetText(Text);
+
+	TriggerAnimation();
 }
