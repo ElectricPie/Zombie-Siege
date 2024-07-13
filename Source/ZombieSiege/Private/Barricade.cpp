@@ -10,6 +10,7 @@
 #include "Player/PlayerCharacter.h"
 
 #define DEFAULT_BARRICADE_REWARD 40
+#define DEFAULT_BARRICADE_TIME_BETWEEN_REWARDS 5
 
 // Sets default values
 ABarricade::ABarricade()
@@ -33,6 +34,8 @@ ABarricade::ABarricade()
 
 	MoneyRewardComponent = CreateDefaultSubobject<UMoneyRewardComponent>(TEXT("Money Reward"));
 	MoneyRewardComponent->SetAmountToGive(DEFAULT_BARRICADE_REWARD);
+	MoneyRewardComponent->SetTimeBetweenRewards(DEFAULT_BARRICADE_TIME_BETWEEN_REWARDS);
+
 }
 
 float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -70,10 +73,17 @@ void ABarricade::BeginPlay()
 
 	CurrentHealth = MaxHealth;
 	PlayerInteractionTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
+
+	// if (AActor* MoneyOwner = MoneyRewardComponent->GetOwner())
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("Owner Re: %s"), *MoneyOwner->GetActorNameOrLabel());
+	// }
 }
 
 void ABarricade::OnInteract(APlayerCharacter* InteractingPlayer)
 {
 	Repair();
+
+	// This is being called on cdo
 	MoneyRewardComponent->RewardMoney(InteractingPlayer->GetController());
 }

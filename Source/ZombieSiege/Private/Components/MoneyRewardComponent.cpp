@@ -4,6 +4,7 @@
 #include "Components/MoneyRewardComponent.h"
 
 #include "MoneyStoreComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UMoneyRewardComponent::UMoneyRewardComponent()
@@ -11,15 +12,34 @@ UMoneyRewardComponent::UMoneyRewardComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
+
 }
 
-void UMoneyRewardComponent::RewardMoney(const AActor* ActorToReward) const
+void UMoneyRewardComponent::RewardMoney(const AActor* ActorToReward)
 {
 	if (ActorToReward == nullptr) return;
+	if (GetWorld() == nullptr) return;
 
+	const double CurrentTime = UGameplayStatics::GetTimeSeconds(GetWorld());
+	if (TimeBetweenRewards != 0.f)
+	{
+		if (CurrentTime - LastRewardAt < TimeBetweenRewards)
+		{
+			return;
+		}
+	}
+	
 	if (UMoneyStoreComponent* MoneyStore = ActorToReward->GetComponentByClass<UMoneyStoreComponent>())
 	{
 		MoneyStore->AddMoney(AmountToGive);	
+
+		LastRewardAt = CurrentTime;
 	}
 }
 
+void UMoneyRewardComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	LastRewardAt = -TimeBetweenRewards;
+}
