@@ -17,6 +17,7 @@ public:
 	UMoneyRewardComponent();
 
 	void RewardMoney(const AActor* ActorToReward) const;
+	void SetAmountToGive(const int32 NewAmountToGive) { AmountToGive = NewAmountToGive; }
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Money", meta=(ToolTip="The amount of money to give the store on reward"))

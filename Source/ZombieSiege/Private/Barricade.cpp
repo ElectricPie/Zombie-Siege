@@ -6,7 +6,10 @@
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/InteractableComponent.h"
+#include "Components/MoneyRewardComponent.h"
 #include "Player/PlayerCharacter.h"
+
+#define DEFAULT_BARRICADE_REWARD 40
 
 // Sets default values
 ABarricade::ABarricade()
@@ -27,6 +30,9 @@ ABarricade::ABarricade()
 	
 	InsideDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("Inside Direction Arrow"));
 	InsideDirection->SetupAttachment(RootComponent);
+
+	MoneyRewardComponent = CreateDefaultSubobject<UMoneyRewardComponent>(TEXT("Money Reward"));
+	MoneyRewardComponent->SetAmountToGive(DEFAULT_BARRICADE_REWARD);
 }
 
 float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -69,4 +75,5 @@ void ABarricade::BeginPlay()
 void ABarricade::OnInteract(APlayerCharacter* InteractingPlayer)
 {
 	Repair();
+	MoneyRewardComponent->RewardMoney(InteractingPlayer->GetController());
 }

@@ -15,7 +15,6 @@ UMoneyRewardComponent::UMoneyRewardComponent()
 
 void UMoneyRewardComponent::RewardMoney(const AActor* ActorToReward) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Rewarding"));
 	if (ActorToReward == nullptr) return;
 
 	if (UMoneyStoreComponent* MoneyStore = ActorToReward->GetComponentByClass<UMoneyStoreComponent>())
