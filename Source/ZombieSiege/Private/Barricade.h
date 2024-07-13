@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Barricade.generated.h"
 
+class UMoneyRewardComponent;
 class APlayerCharacter;
 class UInteractableComponent;
 class UArrowComponent;
@@ -35,6 +36,8 @@ protected:
 	UInteractableComponent* PlayerInteractionTrigger;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UArrowComponent* InsideDirection;
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	UMoneyRewardComponent* MoneyRewardComponent;
 
 	UPROPERTY(EditAnywhere, Category="Health", meta=(ClampMin=1, UIMin=1))
 	int32 MaxHealth = 200;
