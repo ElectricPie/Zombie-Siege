@@ -55,7 +55,6 @@ public:
 	void StopFiring();
 	void NextWeapon();
 	void ReloadWeapon();
-	void FinishReload();
 
 	void AddInteractable(UInteractableComponent* InteractableComponent);
 	void RemoveInteractable(const UInteractableComponent* InteractableComponent);
