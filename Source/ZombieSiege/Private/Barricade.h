@@ -23,7 +23,7 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsDestroyed() const { return CurrentHealth <= 0; }
+	bool IsDestroyed() const { return DestroyedPlanks >= Planks.Num();  }
 	UFUNCTION(BlueprintCallable)
 	void Repair();
 	
@@ -38,6 +38,11 @@ protected:
 	UArrowComponent* InsideDirection;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UMoneyRewardComponent* MoneyRewardComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Health")
+	TArray<UStaticMeshComponent*> Planks;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
+	int32 DestroyedPlanks = 0;
 
 	UPROPERTY(EditAnywhere, Category="Health", meta=(ClampMin=1, UIMin=1))
 	int32 MaxHealth = 200;

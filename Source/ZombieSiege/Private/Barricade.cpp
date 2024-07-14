@@ -41,21 +41,15 @@ ABarricade::ABarricade()
 float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	float const DamageDealt = FMath::Clamp(DamageAmount, 0.f, CurrentHealth); 
-	
-	if (CurrentHealth > 0)
-	{
-		CurrentHealth -= DamageDealt;
-	}
+	if (IsDestroyed()) return 0.f;
 
-	if (CurrentHealth <= 0)
+	if (UStaticMeshComponent* Plank = Planks[DestroyedPlanks])
 	{
-		Mesh->SetVisibility(false);
+		Plank->SetVisibility(false);
+		DestroyedPlanks++;
 	}
 	
-	PlayerInteractionTrigger->SetDisplayMessage(true);
-
-	return DamageDealt;
+	return DamageAmount;
 }
 
 void ABarricade::Repair()
@@ -73,11 +67,6 @@ void ABarricade::BeginPlay()
 
 	CurrentHealth = MaxHealth;
 	PlayerInteractionTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
-
-	// if (AActor* MoneyOwner = MoneyRewardComponent->GetOwner())
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("Owner Re: %s"), *MoneyOwner->GetActorNameOrLabel());
-	// }
 }
 
 void ABarricade::OnInteract(APlayerCharacter* InteractingPlayer)
