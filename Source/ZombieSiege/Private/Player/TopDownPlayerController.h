@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "TopDownPlayerController.generated.h"
 
+class UMoneyStoreComponent;
 class APlayerCharacter;
 struct FInputActionValue;
 class UInputMappingContext;
@@ -20,6 +21,8 @@ class ZOMBIESIEGE_API ATopDownPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	ATopDownPlayerController();
+	
 	FVector GetAimDirection() const { return AimDirection; }
 	
 protected:
@@ -29,6 +32,9 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	
 private:
+	UPROPERTY(VisibleAnywhere, Category="Money")
+	UMoneyStoreComponent* MoneyStoreComponent;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	UInputMappingContext* InputMappingContext;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
@@ -42,7 +48,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	UInputAction* ReloadWeaponAction;
 
-	UPROPERTY(EditAnywhere, Category=Look)
+	UPROPERTY(EditAnywhere, Category="Look")
 	float LookRaycastLimit = 3000.f;
 
 	TWeakObjectPtr<APlayerCharacter> PlayerCharacter;
