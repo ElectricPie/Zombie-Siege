@@ -43,11 +43,6 @@ protected:
 	TArray<UStaticMeshComponent*> Planks;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	int32 DestroyedPlanks = 0;
-
-	UPROPERTY(EditAnywhere, Category="Health", meta=(ClampMin=1, UIMin=1))
-	int32 MaxHealth = 200;
-	UPROPERTY(VisibleAnywhere, Category="Health")
-	int32 CurrentHealth = 200;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
