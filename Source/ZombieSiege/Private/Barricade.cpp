@@ -28,6 +28,7 @@ ABarricade::ABarricade()
 	
 	PlayerInteractionTrigger = CreateDefaultSubobject<UInteractableComponent>(TEXT("Inside Interactable"));
 	PlayerInteractionTrigger->SetupAttachment(RootComponent);
+	PlayerInteractionTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
 	
 	InsideDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("Inside Direction Arrow"));
 	InsideDirection->SetupAttachment(RootComponent);
@@ -48,14 +49,19 @@ float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		Plank->SetVisibility(false);
 		DestroyedPlanks++;
 	}
+
+	PlayerInteractionTrigger->SetDisplayMessage(true);
 	
 	return DamageAmount;
 }
 
 void ABarricade::Repair()
 {
-	CurrentHealth = MaxHealth;
-	Mesh->SetVisibility(true);
+	for (const auto & Plank : Planks)
+	{
+		Plank->SetVisibility(true);
+	}
+	DestroyedPlanks = 0;
 
 	PlayerInteractionTrigger->SetDisplayMessage(false);
 }
@@ -64,15 +70,10 @@ void ABarricade::Repair()
 void ABarricade::BeginPlay()
 {
 	Super::BeginPlay();
-
-	CurrentHealth = MaxHealth;
-	PlayerInteractionTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
 }
 
 void ABarricade::OnInteract(APlayerCharacter* InteractingPlayer)
 {
 	Repair();
-
-	// This is being called on cdo
 	MoneyRewardComponent->RewardMoney(InteractingPlayer->GetController());
 }
