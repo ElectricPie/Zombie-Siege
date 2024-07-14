@@ -6,6 +6,12 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "PlayerCharacter.h"
+#include "Components/MoneyStoreComponent.h"
+
+ATopDownPlayerController::ATopDownPlayerController()
+{
+	MoneyStoreComponent = CreateDefaultSubobject<UMoneyStoreComponent>(TEXT("Money Store"));
+}
 
 void ATopDownPlayerController::BeginPlay()
 {
