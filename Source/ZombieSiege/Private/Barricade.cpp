@@ -28,6 +28,7 @@ ABarricade::ABarricade()
 	
 	PlayerInteractionTrigger = CreateDefaultSubobject<UInteractableComponent>(TEXT("Inside Interactable"));
 	PlayerInteractionTrigger->SetupAttachment(RootComponent);
+	PlayerInteractionTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
 	
 	InsideDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("Inside Direction Arrow"));
 	InsideDirection->SetupAttachment(RootComponent);
@@ -41,27 +42,26 @@ ABarricade::ABarricade()
 float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	float const DamageDealt = FMath::Clamp(DamageAmount, 0.f, CurrentHealth); 
-	
-	if (CurrentHealth > 0)
+	if (IsDestroyed()) return 0.f;
+
+	if (UStaticMeshComponent* Plank = Planks[DestroyedPlanks])
 	{
-		CurrentHealth -= DamageDealt;
+		Plank->SetVisibility(false);
+		DestroyedPlanks++;
 	}
 
-	if (CurrentHealth <= 0)
-	{
-		Mesh->SetVisibility(false);
-	}
-	
 	PlayerInteractionTrigger->SetDisplayMessage(true);
-
-	return DamageDealt;
+	
+	return DamageAmount;
 }
 
 void ABarricade::Repair()
 {
-	CurrentHealth = MaxHealth;
-	Mesh->SetVisibility(true);
+	for (const auto & Plank : Planks)
+	{
+		Plank->SetVisibility(true);
+	}
+	DestroyedPlanks = 0;
 
 	PlayerInteractionTrigger->SetDisplayMessage(false);
 }
@@ -70,20 +70,10 @@ void ABarricade::Repair()
 void ABarricade::BeginPlay()
 {
 	Super::BeginPlay();
-
-	CurrentHealth = MaxHealth;
-	PlayerInteractionTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
-
-	// if (AActor* MoneyOwner = MoneyRewardComponent->GetOwner())
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("Owner Re: %s"), *MoneyOwner->GetActorNameOrLabel());
-	// }
 }
 
 void ABarricade::OnInteract(APlayerCharacter* InteractingPlayer)
 {
 	Repair();
-
-	// This is being called on cdo
 	MoneyRewardComponent->RewardMoney(InteractingPlayer->GetController());
 }
