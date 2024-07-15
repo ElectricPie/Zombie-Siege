@@ -25,7 +25,7 @@ ADoor::ADoor()
 	InteractableTrigger->SetCanInteract(true);
 }
 
-void ADoor::OnInteract(APlayerCharacter* InteractingPlayer)
+void ADoor::OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser)
 {
 	if (DoorPart == nullptr) return;
 	

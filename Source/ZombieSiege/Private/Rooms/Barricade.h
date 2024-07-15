@@ -33,7 +33,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UStaticMeshComponent* Mesh;
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Components")
-	UInteractableComponent* PlayerInteractionTrigger;
+	TObjectPtr<UInteractableComponent> PlayerInteractionTrigger;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UArrowComponent* InsideDirection;
 	UPROPERTY(VisibleAnywhere, Category="Components")
@@ -49,5 +49,5 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnInteract(APlayerCharacter* InteractingPlayer);
+	void OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
 };
