@@ -30,6 +30,9 @@ private:
 	UStaticMeshComponent* DoorFrameMesh;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UInteractableComponent* InteractableTrigger;
+
+	UPROPERTY(EditAnywhere, Category="Money", meta=(ClampMin=0, UIMin=0))
+	int32 OpenCost = 500;
 	
 	UFUNCTION()
 	void OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);

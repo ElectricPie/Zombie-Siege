@@ -22,3 +22,17 @@ void UMoneyStoreComponent::AddMoney(const int32 AmountToAdd)
 	Money += AmountToAdd;
 	OnMoneyChangedEvent.Broadcast(Money, AmountToAdd);
 }
+
+bool UMoneyStoreComponent::TakeMoney(int32 AmountToTake)
+{
+	if (AmountToTake < 0) return false;
+	
+	if (Money >= AmountToTake)
+	{
+		Money -= AmountToTake;
+		OnMoneyChangedEvent.Broadcast(Money, -AmountToTake);
+		return true;
+	}
+
+	return false;
+}
