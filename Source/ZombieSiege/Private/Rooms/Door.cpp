@@ -3,6 +3,7 @@
 #include "Rooms/Door.h"
 
 #include "Components/InteractableComponent.h"
+#include "Components/MoneyStoreComponent.h"
 
 #define DEFAULT_DOOR_INTERACT_MESSAGE "Open Door"
 
@@ -28,7 +29,12 @@ ADoor::ADoor()
 void ADoor::OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser)
 {
 	if (DoorPart == nullptr) return;
-	
-	DoorPart->Destroy();
-	InteractableTrigger->SetCanInteract(false);
+	if (UMoneyStoreComponent* MoneyStore = InteractionInstigator->GetComponentByClass<UMoneyStoreComponent>())
+	{
+		if (MoneyStore->TakeMoney(OpenCost))
+		{
+			DoorPart->Destroy();
+			InteractableTrigger->SetCanInteract(false);
+		}
+	}
 }
