@@ -2,6 +2,7 @@
 
 #include "Rooms/Door.h"
 
+#include "Room.h"
 #include "Components/InteractableComponent.h"
 #include "Components/MoneyStoreComponent.h"
 
@@ -43,6 +44,11 @@ void ADoor::OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakO
 		{
 			DoorPart->Destroy();
 			InteractableTrigger->SetCanInteract(false);
+
+			for (const auto& Room : ConnectedRooms)
+			{
+				Room->UnlockRoom();
+			}
 		}
 	}
 }
