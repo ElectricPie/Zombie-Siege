@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Door.generated.h"
 
+class ARoom;
 class UNavModifierComponent;
 class UNavLinkComponent;
 class UInteractableComponent;
@@ -36,6 +37,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Money", meta=(ClampMin=0, UIMin=0))
 	int32 OpenCost = 500;
+
+	UPROPERTY(EditAnywhere, Category="Room")
+	TArray<TWeakObjectPtr<ARoom>> ConnectedRooms;
 	
 	UFUNCTION()
 	void OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
