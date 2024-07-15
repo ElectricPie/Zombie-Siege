@@ -32,5 +32,5 @@ private:
 	UInteractableComponent* InteractableTrigger;
 	
 	UFUNCTION()
-	void OnInteract(APlayerCharacter* InteractingPlayer);
+	void OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
 };

@@ -4,7 +4,6 @@
 #include "Barricade.h"
 
 #include "Components/ArrowComponent.h"
-#include "Components/BoxComponent.h"
 #include "Components/InteractableComponent.h"
 #include "Components/MoneyRewardComponent.h"
 #include "Player/PlayerCharacter.h"
@@ -72,8 +71,8 @@ void ABarricade::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ABarricade::OnInteract(APlayerCharacter* InteractingPlayer)
+void ABarricade::OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser)
 {
 	Repair();
-	MoneyRewardComponent->RewardMoney(InteractingPlayer->GetController());
+	MoneyRewardComponent->RewardMoney(InteractionInstigator.Get());
 }

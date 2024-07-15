@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UInteractorComponent;
 class AGun;
 class ATopDownPlayerController;
 class UInteractableComponent;
@@ -55,16 +56,14 @@ public:
 	void StopFiring();
 	void NextWeapon();
 	void ReloadWeapon();
-
-	void AddInteractable(UInteractableComponent* InteractableComponent);
-	void RemoveInteractable(const UInteractableComponent* InteractableComponent);
-
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
-	USpringArmComponent* CameraArm;
+	TObjectPtr<USpringArmComponent> CameraArm;
 	UPROPERTY(VisibleAnywhere, Category="Components")
-	UCameraComponent* Camera;
+    TObjectPtr<UCameraComponent> Camera;
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<UInteractorComponent> InteractorComponent;
 
 	float SpeedModifier = 0.8f;
 	
@@ -86,6 +85,6 @@ private:
 	UPROPERTY(EditAnywhere, Category="Movement", meta=(ToolTip="How far from forward the character can move before they are considered to be moving backwards", ClampMin="-1.0", ClampMax="1.0", UIMin="-1.0", UIMax="1.0"))
 	float BackwardsThreshold = -0.5f;
 
-	TSet<UInteractableComponent*> NearbyIntractables;
-
+	void OnInteractionEntered(TWeakObjectPtr<UInteractableComponent> InteractableComponent);
+	void OnInteractionExited(TWeakObjectPtr<UInteractableComponent> InteractableComponent);
 };

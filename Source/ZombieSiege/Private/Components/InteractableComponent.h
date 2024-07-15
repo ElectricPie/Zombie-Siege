@@ -6,8 +6,9 @@
 #include "Components/BoxComponent.h"
 #include "InteractableComponent.generated.h"
 
-class APlayerCharacter;
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnInteractSignature, APlayerCharacter* /*InteractingPlayer*/);
+class UInteractorComponent;
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInteractSignature, TWeakObjectPtr<AController> /*InteractionInstigator*/, TWeakObjectPtr<AActor> /*InteractionCauser*/);
 
 /**
  * 
@@ -20,7 +21,7 @@ class UInteractableComponent : public UBoxComponent
 public:
 	UInteractableComponent();
 
-	void Interact(APlayerCharacter* InteractingPlayer);
+	void Interact(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
 
 	FOnInteractSignature OnInteractEvent;
 
@@ -36,7 +37,7 @@ private:
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	TArray<APlayerCharacter*> PlayersInRange;
+	TArray<TWeakObjectPtr<UInteractorComponent>> InteractorsInRange;
 
 	UPROPERTY(EditAnywhere, Category="Interaction")
 	bool bCanInteract;
