@@ -50,7 +50,7 @@ float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		DestroyedPlanks++;
 	}
 
-	PlayerInteractionTrigger->SetDisplayMessage(true);
+	PlayerInteractionTrigger->SetCanInteract(true);
 	
 	return DamageAmount;
 }
@@ -63,7 +63,7 @@ void ABarricade::Repair()
 	}
 	DestroyedPlanks = 0;
 
-	PlayerInteractionTrigger->SetDisplayMessage(false);
+	PlayerInteractionTrigger->SetCanInteract(false);
 }
 
 // Called when the game starts or when spawned
