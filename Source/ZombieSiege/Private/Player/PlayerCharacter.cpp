@@ -6,6 +6,7 @@
 #include "TopDownPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InteractableComponent.h"
+#include "Components/InteractorComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Ui/GameHud.h"
 #include "Weapons/Gun.h"
@@ -26,6 +27,10 @@ APlayerCharacter::APlayerCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(CameraArm);
 	Camera->bUsePawnControlRotation = false;
+
+	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
+	InteractorComponent->OnEnterInteractableEvent.AddUObject(this, &APlayerCharacter::OnInteractionEntered);
+	InteractorComponent->OnExitInteractableEvent.AddUObject(this, &APlayerCharacter::OnInteractionExited);
 }
 
 // Called when the game starts or when spawned
@@ -85,12 +90,7 @@ void APlayerCharacter::Move(const FVector Direction)
 
 void APlayerCharacter::Interact()
 {
-	// Copy to prevent changes while iterating
-	TSet<UInteractableComponent*> TempInteractables = NearbyIntractables;
-	for (auto const & Interactable : TempInteractables)
-	{
-		Interactable->Interact(this);
-	}
+	InteractorComponent->Interact();
 }
 
 void APlayerCharacter::Fire(ATopDownPlayerController* Shooter)
@@ -155,10 +155,8 @@ void APlayerCharacter::ReloadWeapon()
 	}
 }
 
-void APlayerCharacter::AddInteractable(UInteractableComponent* InteractableComponent)
+void APlayerCharacter::OnInteractionEntered(TWeakObjectPtr<UInteractableComponent> InteractableComponent)
 {
-	NearbyIntractables.Add(InteractableComponent);
-
 	if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if (AGameHud* GameHud = Cast<AGameHud>(PlayerController->GetHUD()))
@@ -168,10 +166,8 @@ void APlayerCharacter::AddInteractable(UInteractableComponent* InteractableCompo
 	}
 }
 
-void APlayerCharacter::RemoveInteractable(const UInteractableComponent* InteractableComponent)
+void APlayerCharacter::OnInteractionExited(TWeakObjectPtr<UInteractableComponent> InteractableComponent)
 {
-	NearbyIntractables.Remove(InteractableComponent);
-
 	if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if (AGameHud* GameHud = Cast<AGameHud>(PlayerController->GetHUD()))

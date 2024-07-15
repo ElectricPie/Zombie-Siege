@@ -4,7 +4,6 @@
 #include "Barricade.h"
 
 #include "Components/ArrowComponent.h"
-#include "Components/BoxComponent.h"
 #include "Components/InteractableComponent.h"
 #include "Components/MoneyRewardComponent.h"
 #include "Player/PlayerCharacter.h"
@@ -50,7 +49,7 @@ float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		DestroyedPlanks++;
 	}
 
-	PlayerInteractionTrigger->SetDisplayMessage(true);
+	PlayerInteractionTrigger->SetCanInteract(true);
 	
 	return DamageAmount;
 }
@@ -63,7 +62,7 @@ void ABarricade::Repair()
 	}
 	DestroyedPlanks = 0;
 
-	PlayerInteractionTrigger->SetDisplayMessage(false);
+	PlayerInteractionTrigger->SetCanInteract(false);
 }
 
 // Called when the game starts or when spawned
@@ -72,8 +71,8 @@ void ABarricade::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ABarricade::OnInteract(APlayerCharacter* InteractingPlayer)
+void ABarricade::OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser)
 {
 	Repair();
-	MoneyRewardComponent->RewardMoney(InteractingPlayer->GetController());
+	MoneyRewardComponent->RewardMoney(InteractionInstigator.Get());
 }

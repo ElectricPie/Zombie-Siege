@@ -33,6 +33,14 @@ public:
 	void AddMoney(const int32 AmountToAdd);
 	UFUNCTION(BlueprintPure, Category="Money")
 	int32 GetMoney() const { return Money; }
+	/**
+	 * @brief Attempts to take the amount provided from the store, if there is the money will be taken otherwise nothing
+	 * will happen
+	 * @param AmountToTake How much money to take
+	 * @return Returns true if the money can be taken, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, Category="Money")
+	bool TakeMoney(int32 AmountToTake);
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Money")
