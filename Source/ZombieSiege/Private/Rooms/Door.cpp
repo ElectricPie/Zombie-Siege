@@ -26,6 +26,14 @@ ADoor::ADoor()
 	InteractableTrigger->SetCanInteract(true);
 }
 
+void ADoor::BeginPlay()
+{
+	Super::BeginPlay();
+
+	const FText InteractMessage = FText::FromString(FString::Printf(TEXT("Open Door [Costs %d]"), OpenCost));
+	InteractableTrigger->SetInteractMessage(InteractMessage);
+}
+
 void ADoor::OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser)
 {
 	if (DoorPart == nullptr) return;
