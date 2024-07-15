@@ -24,9 +24,9 @@ public:
 
 	FOnInteractSignature OnInteractEvent;
 
+	void SetInteractMessage(const FText NewInteractMessage) { InteractMessage = NewInteractMessage; }
 	FText GetInteractMessage() { return InteractMessage; }
-
-	void SetDisplayMessage(bool bShouldDisplayMessage);
+	void SetCanInteract(bool bNewCanInteract);
 	
 private:
 	UPROPERTY(EditAnywhere)
@@ -37,6 +37,7 @@ private:
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	TArray<APlayerCharacter*> PlayersInRange;
-	
-	bool bDisplayMessage;
+
+	UPROPERTY(EditAnywhere, Category="Interaction")
+	bool bCanInteract;
 };

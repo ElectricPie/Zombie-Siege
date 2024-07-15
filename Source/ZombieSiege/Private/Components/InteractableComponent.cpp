@@ -13,16 +13,18 @@ UInteractableComponent::UInteractableComponent()
 
 void UInteractableComponent::Interact(APlayerCharacter* InteractingPlayer)
 {
+	if (!bCanInteract) return;
+	
 	OnInteractEvent.Broadcast(InteractingPlayer);
 }
 
-void UInteractableComponent::SetDisplayMessage(const bool bShouldDisplayMessage)
+void UInteractableComponent::SetCanInteract(const bool bNewCanInteract)
 {
-	bDisplayMessage = bShouldDisplayMessage;
+	bCanInteract = bNewCanInteract;
 
 	for (const auto& Player : PlayersInRange)
 	{
-		if (bDisplayMessage)
+		if (bCanInteract)
 		{
 			Player->AddInteractable(this);
 		}
@@ -40,7 +42,7 @@ void UInteractableComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp,
 	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor))
 	{
 		PlayersInRange.Add(PlayerCharacter);
-		if (bDisplayMessage)
+		if (bCanInteract)
 		{
 			PlayerCharacter->AddInteractable(this);
 		}
