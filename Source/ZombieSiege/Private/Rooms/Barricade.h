@@ -22,10 +22,14 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Barricade")
 	bool IsDestroyed() const { return DestroyedPlanks >= Planks.Num();  }
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Barricade")
 	void Repair();
+	UFUNCTION(BlueprintCallable, Category="Barricade")
+	void SetIsActive(const bool bNewIsActive) { bIsActive = bNewIsActive; }
+	UFUNCTION(BlueprintPure, Category="Barricade")
+	bool GetIsActive() const { return bIsActive; }
 	
 protected:
 	UPROPERTY()
@@ -33,7 +37,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UStaticMeshComponent* Mesh;
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Components")
-	UInteractableComponent* PlayerInteractionTrigger;
+	TObjectPtr<UInteractableComponent> PlayerInteractionTrigger;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UArrowComponent* InsideDirection;
 	UPROPERTY(VisibleAnywhere, Category="Components")
@@ -48,6 +52,9 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY(EditAnywhere)
+	bool bIsActive = false;
+	
 	UFUNCTION()
-	void OnInteract(APlayerCharacter* InteractingPlayer);
+	void OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
 };
