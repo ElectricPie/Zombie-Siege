@@ -6,11 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "Barricade.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnActiveChangedSignature, TWeakObjectPtr<ABarricade> /*BarricadeChanging*/, bool /*bNewActiveState*/);
+
 class UMoneyRewardComponent;
 class APlayerCharacter;
 class UInteractableComponent;
 class UArrowComponent;
 class UBoxComponent;
+
 UCLASS()
 class ABarricade : public AActor
 {
@@ -22,12 +25,14 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	FOnActiveChangedSignature OnActiveChangedEvent;
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Barricade")
 	bool IsDestroyed() const { return DestroyedPlanks >= Planks.Num();  }
 	UFUNCTION(BlueprintCallable, Category="Barricade")
 	void Repair();
 	UFUNCTION(BlueprintCallable, Category="Barricade")
-	void SetIsActive(const bool bNewIsActive) { bIsActive = bNewIsActive; }
+	void SetIsActive(const bool bNewIsActive);
 	UFUNCTION(BlueprintPure, Category="Barricade")
 	bool GetIsActive() const { return bIsActive; }
 	
