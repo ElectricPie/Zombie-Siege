@@ -4,11 +4,18 @@
 #include "GameModes/ZombieDefenceGameMode.h"
 
 #include "Components/MoneyStoreComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Units/UnitSpawnPoint.h"
 
 void AZombieDefenceGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Delay getting active spawn points until they are ready
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AZombieDefenceGameMode::GetActiveUnitSpawnPoints);
+	}
 }
 
 void AZombieDefenceGameMode::OnPostLogin(AController* NewPlayer)
@@ -29,4 +36,30 @@ int32 AZombieDefenceGameMode::WaveCountBelow20()
 int32 AZombieDefenceGameMode::WaveCount20AndAbove()
 {
 	return 0.09f * (RoundNumber * RoundNumber) - 0.0029f * RoundNumber + 23.9580;
+}
+
+void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
+{
+	if (GetWorld())
+	{
+		TArray<AActor*> UnitSpawnPoints;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AUnitSpawnPoint::StaticClass(), UnitSpawnPoints);
+		UE_LOG(LogTemp, Warning, TEXT("Found %d unit spawn points"), UnitSpawnPoints.Num());
+		for (const auto& UnitSpawnPointActor : UnitSpawnPoints)
+		{
+			if (AUnitSpawnPoint* UnitSpawnPoint = Cast<AUnitSpawnPoint>(UnitSpawnPointActor))
+			{
+				if (UnitSpawnPoint->GetIsActive())
+				{
+					ActiveSpawnPoints.Add(UnitSpawnPoint);
+				}
+				else
+				{
+					// Register for spawn point listener
+				}
+			}
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("Found %d Active spawn points"), ActiveSpawnPoints.Num());
+	}
 }

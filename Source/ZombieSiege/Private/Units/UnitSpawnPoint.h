@@ -8,6 +8,7 @@
 
 class UCapsuleComponent;
 class UArrowComponent;
+class ABarricade;
 UCLASS()
 class AUnitSpawnPoint : public AActor
 {
@@ -17,6 +18,11 @@ public:
 	// Sets default values for this actor's properties
 	AUnitSpawnPoint();
 
+	bool GetIsActive() const { return bIsActive; }
+	
+protected:
+	virtual void BeginPlay() override;
+
 private:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UCapsuleComponent> CapsuleComponent;
@@ -25,3 +31,8 @@ private:
 	TObjectPtr<UArrowComponent> SpawnDirectionArrow;
 #endif
 	
+	UPROPERTY(EditAnywhere, meta=(ToolTip="The barricades that units spawned here will go to"))
+	TArray<TWeakObjectPtr<ABarricade>> ConnectedBarricades;
+	
+	UPROPERTY(VisibleAnywhere)
+	bool bIsActive = false;

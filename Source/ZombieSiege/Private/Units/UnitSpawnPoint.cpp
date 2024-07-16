@@ -6,6 +6,7 @@
 #include "UnitCharacter.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Rooms/Barricade.h"
 
 // Sets default values
 AUnitSpawnPoint::AUnitSpawnPoint()
@@ -35,4 +36,22 @@ AUnitSpawnPoint::AUnitSpawnPoint()
 		SpawnDirectionArrow->bIsScreenSizeScaled = true;
 	}
 #endif
+}
+
+void AUnitSpawnPoint::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	// Set to active if at least one of the connected barricades is active
+	bIsActive = false;
+	UE_LOG(LogTemp, Warning, TEXT("Connected Barricades %d"), ConnectedBarricades.Num());
+	for (const auto& Barricade : ConnectedBarricades)
+	{
+		if (Barricade->GetIsActive())
+		{
+			bIsActive = true;
+			// Barricade->OnActiveChangedEvent.AddUObject(this, &AUnitSpawnPoint::OnBarricadeActiveChanged);
+			return;
+		}
+	}
 }
