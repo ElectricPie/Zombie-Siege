@@ -26,8 +26,8 @@ private:
 	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))
 	int32 StartingMoney = 500;
 
-	// UPROPERTY(EditAnywhere, Category="Units")
-	// TSubclassOf<AUnitCharacter> UnitClass;
+	UPROPERTY(EditAnywhere, Category="Units")
+	TSubclassOf<AUnitCharacter> UnitClass;
 	UPROPERTY(EditAnywhere, Category="Units", meta=(ClampMin=1, UIMin=1, ToolTip="The maximum amount of units that can be spawned in at one time"))
 	int32 MaxCurrentSpawnedUnits = 20;
 	UPROPERTY(EditAnywhere, Category="Units", meta=(ClampMin=1, UIMin=1, ToolTip="The number of units in the first wave"))

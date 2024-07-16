@@ -11,7 +11,7 @@
 // Sets default values
 AUnitSpawnPoint::AUnitSpawnPoint()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CollisionCapsule"));
@@ -38,20 +38,46 @@ AUnitSpawnPoint::AUnitSpawnPoint()
 #endif
 }
 
+bool AUnitSpawnPoint::SpawnUnit(TSubclassOf<AUnitCharacter> UnitClass)
+{
+	if (UnitClass == nullptr) return false;
+	if (!bIsActive) return false;
+	if (GetWorld() == nullptr) return false;
+
+	const AActor* ActorToFit = UnitClass->GetDefaultObject<AActor>();
+	const FVector SpawnLocation = GetActorLocation();
+	const FRotator SpawnRotation = GetActorRotation();
+	// Check if there is space to spawn the unit
+	if (GetWorld()->EncroachingBlockingGeometry(ActorToFit, SpawnLocation, SpawnRotation)) return false;
+
+	// Spawn the unit
+	FActorSpawnParameters SpawnParameters;
+	AUnitCharacter* SpawnedUnit = GetWorld()->SpawnActor<AUnitCharacter>(UnitClass, GetActorLocation(), GetActorRotation());
+	
+	return true;
+}
+
 void AUnitSpawnPoint::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	// Set to active if at least one of the connected barricades is active
 	bIsActive = false;
-	UE_LOG(LogTemp, Warning, TEXT("Connected Barricades %d"), ConnectedBarricades.Num());
 	for (const auto& Barricade : ConnectedBarricades)
 	{
 		if (Barricade->GetIsActive())
 		{
 			bIsActive = true;
-			// Barricade->OnActiveChangedEvent.AddUObject(this, &AUnitSpawnPoint::OnBarricadeActiveChanged);
+			Barricade->OnActiveChangedEvent.AddUObject(this, &AUnitSpawnPoint::OnBarricadeActiveChanged);
 			return;
 		}
+	}
+}
+
+void AUnitSpawnPoint::OnBarricadeActiveChanged(TWeakObjectPtr<ABarricade> BarricadeChanging, bool bNewActiveState)
+{
+	if (bNewActiveState)
+	{
+		bIsActive = true;
 	}
 }

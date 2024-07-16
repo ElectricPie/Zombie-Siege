@@ -8,6 +8,7 @@
 
 class UCapsuleComponent;
 class UArrowComponent;
+class AUnitCharacter;
 class ABarricade;
 UCLASS()
 class AUnitSpawnPoint : public AActor
@@ -20,6 +21,13 @@ public:
 
 	bool GetIsActive() const { return bIsActive; }
 	
+	/**
+	 * @brief Attempts to spawn the given unit at this spawn point
+	 * @param UnitClass The class of unit to spawn
+	 * @return Returns true if spawning was successful otherwise false
+	 */
+	bool SpawnUnit(TSubclassOf<AUnitCharacter> UnitClass);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -36,3 +44,6 @@ private:
 	
 	UPROPERTY(VisibleAnywhere)
 	bool bIsActive = false;
+
+	void OnBarricadeActiveChanged(TWeakObjectPtr<ABarricade> BarricadeChanging, bool bNewActiveState);
+};

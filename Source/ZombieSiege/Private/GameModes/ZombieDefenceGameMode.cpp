@@ -42,9 +42,10 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 {
 	if (GetWorld())
 	{
+		ActiveSpawnPoints.Empty();
+		
 		TArray<AActor*> UnitSpawnPoints;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AUnitSpawnPoint::StaticClass(), UnitSpawnPoints);
-		UE_LOG(LogTemp, Warning, TEXT("Found %d unit spawn points"), UnitSpawnPoints.Num());
 		for (const auto& UnitSpawnPointActor : UnitSpawnPoints)
 		{
 			if (AUnitSpawnPoint* UnitSpawnPoint = Cast<AUnitSpawnPoint>(UnitSpawnPointActor))
@@ -52,6 +53,8 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 				if (UnitSpawnPoint->GetIsActive())
 				{
 					ActiveSpawnPoints.Add(UnitSpawnPoint);
+					// TODO: Remove after testing
+					UnitSpawnPoint->SpawnUnit(UnitClass);
 				}
 				else
 				{
@@ -59,7 +62,5 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 				}
 			}
 		}
-
-		UE_LOG(LogTemp, Warning, TEXT("Found %d Active spawn points"), ActiveSpawnPoints.Num());
 	}
 }
