@@ -5,6 +5,7 @@
 
 #include "Components/MoneyStoreComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Units/UnitSpawnPoint.h"
 
 void AZombieDefenceGameMode::BeginPlay()
@@ -15,6 +16,9 @@ void AZombieDefenceGameMode::BeginPlay()
 	if (GetWorld())
 	{
 		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AZombieDefenceGameMode::GetActiveUnitSpawnPoints);
+		UnitsSpawnedThisRound = 0;
+		UnitsToBeSpawnedThisRound = InitialUnitCount;
+		GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit, RoundStartDelay, true, CurrentSpawnDelay);
 	}
 }
 
@@ -28,12 +32,12 @@ void AZombieDefenceGameMode::OnPostLogin(AController* NewPlayer)
 	}
 }
 
-int32 AZombieDefenceGameMode::WaveCountBelow20()
+int32 AZombieDefenceGameMode::RoundUnitCountBelow20()
 {
 	return -1.091f + 6.312f * RoundNumber - 0.421f * (RoundNumber * RoundNumber) + 0.013 * (RoundNumber * RoundNumber * RoundNumber);
 }
 
-int32 AZombieDefenceGameMode::WaveCount20AndAbove()
+int32 AZombieDefenceGameMode::RoundUnitCount20AndAbove()
 {
 	return 0.09f * (RoundNumber * RoundNumber) - 0.0029f * RoundNumber + 23.9580;
 }
@@ -61,6 +65,23 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 					// Register for spawn point listener
 				}
 			}
+		}
+	}
+}
+
+void AZombieDefenceGameMode::SpawnUnit()
+{
+	if (ActiveSpawnPoints.IsEmpty()) return;
+
+	// TODO: Need a weighted spawn point selector as theres is a decent chance with low active spawn points to keep
+	// spawning at the same one 
+	const int32 SelectedSpawnPoint = UKismetMathLibrary::RandomInteger(ActiveSpawnPoints.Num());
+	if (ActiveSpawnPoints[SelectedSpawnPoint]->SpawnUnit(UnitClass))
+	{
+		UnitsSpawnedThisRound++;
+		if (UnitsSpawnedThisRound >= UnitsToBeSpawnedThisRound)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(RoundSpawnTimerHandle);
 		}
 	}
 }
