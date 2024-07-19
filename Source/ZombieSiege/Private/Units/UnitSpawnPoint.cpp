@@ -38,23 +38,23 @@ AUnitSpawnPoint::AUnitSpawnPoint()
 #endif
 }
 
-bool AUnitSpawnPoint::SpawnUnit(TSubclassOf<AUnitCharacter> UnitClass)
+TWeakObjectPtr<AUnitCharacter> AUnitSpawnPoint::SpawnUnit(const TSubclassOf<AUnitCharacter> UnitClass)
 {
-	if (UnitClass == nullptr) return false;
-	if (!bIsActive) return false;
-	if (GetWorld() == nullptr) return false;
+	if (UnitClass == nullptr) return nullptr;
+	if (!bIsActive) return nullptr;
+	if (GetWorld() == nullptr) return nullptr;
 
 	const AActor* ActorToFit = UnitClass->GetDefaultObject<AActor>();
 	const FVector SpawnLocation = GetActorLocation();
 	const FRotator SpawnRotation = GetActorRotation();
 	// Check if there is space to spawn the unit
-	if (GetWorld()->EncroachingBlockingGeometry(ActorToFit, SpawnLocation, SpawnRotation)) return false;
+	if (GetWorld()->EncroachingBlockingGeometry(ActorToFit, SpawnLocation, SpawnRotation)) return nullptr;
 
 	// Spawn the unit
 	FActorSpawnParameters SpawnParameters;
-	AUnitCharacter* SpawnedUnit = GetWorld()->SpawnActor<AUnitCharacter>(UnitClass, GetActorLocation(), GetActorRotation());
+	TWeakObjectPtr<AUnitCharacter> SpawnedUnit = GetWorld()->SpawnActor<AUnitCharacter>(UnitClass, GetActorLocation(), GetActorRotation());
 	
-	return true;
+	return SpawnedUnit;
 }
 
 void AUnitSpawnPoint::BeginPlay()

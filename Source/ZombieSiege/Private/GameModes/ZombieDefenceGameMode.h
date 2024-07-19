@@ -24,6 +24,15 @@ protected:
 	virtual void OnPostLogin(AController* NewPlayer) override;
 
 private:
+	void OnUnitKilled(TWeakObjectPtr<AUnitCharacter> UnitKilled, TWeakObjectPtr<AController> KillerInstigator, TWeakObjectPtr<AActor> KillCauser);
+
+	int32 RoundUnitCountBelow20();
+	int32 RoundUnitCount20AndAbove();
+	
+	void GetActiveUnitSpawnPoints();
+	void SpawnUnit(); 
+	
+private:
 	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))
 	int32 StartingMoney = 500;
 
@@ -40,6 +49,8 @@ private:
 	int32 UnitsToBeSpawnedThisRound = 0;
 	UPROPERTY(VisibleAnywhere, Category="Spawning")
 	int32 UnitsSpawnedThisRound = 0;
+	UPROPERTY(VisibleAnywhere, Category="Spawning")
+	int32 UnitsKilledThisRound = 0;
 	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=1.f, UIMin=1.f, ToolTip="The amount of time after the game starts before units start spawning"))
 	float RoundStartDelay = 4.f;
 	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The initial time between units spawning"))
@@ -50,13 +61,7 @@ private:
 	
 	UPROPERTY(VisibleAnywhere)
 	TArray<TWeakObjectPtr<AUnitSpawnPoint>> ActiveSpawnPoints;
-	TArray<TWeakObjectPtr<AUnitCharacter>> ActiveUnits;
+	TSet<TWeakObjectPtr<AUnitCharacter>> ActiveUnits;
 
 	FTimerHandle RoundSpawnTimerHandle;
-	
-	int32 RoundUnitCountBelow20();
-	int32 RoundUnitCount20AndAbove();
-	
-	void GetActiveUnitSpawnPoints();
-	void SpawnUnit();
 };
