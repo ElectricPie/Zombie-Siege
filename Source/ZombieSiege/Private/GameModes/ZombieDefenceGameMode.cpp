@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Units/UnitSpawnPoint.h"
+#include "Units/UnitCharacter.h"
 
 void AZombieDefenceGameMode::BeginPlay()
 {
@@ -18,7 +19,8 @@ void AZombieDefenceGameMode::BeginPlay()
 		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AZombieDefenceGameMode::GetActiveUnitSpawnPoints);
 		UnitsSpawnedThisRound = 0;
 		UnitsToBeSpawnedThisRound = InitialUnitCount;
-		GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit, RoundStartDelay, true, CurrentSpawnDelay);
+		GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
+		                                       RoundStartDelay, true, CurrentSpawnDelay);
 	}
 }
 
@@ -32,9 +34,25 @@ void AZombieDefenceGameMode::OnPostLogin(AController* NewPlayer)
 	}
 }
 
+void AZombieDefenceGameMode::OnUnitKilled(TWeakObjectPtr<AUnitCharacter> UnitKilled,
+                                          TWeakObjectPtr<AController> KillerInstigator,
+                                          TWeakObjectPtr<AActor> KillCauser)
+{
+	if (!ActiveUnits.Contains(UnitKilled)) return;
+
+	UnitsKilledThisRound++;
+	ActiveUnits.Remove(UnitKilled);
+
+	if (UnitsKilledThisRound >= UnitsToBeSpawnedThisRound)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("All Units killed"));
+	}
+}
+
 int32 AZombieDefenceGameMode::RoundUnitCountBelow20()
 {
-	return -1.091f + 6.312f * RoundNumber - 0.421f * (RoundNumber * RoundNumber) + 0.013 * (RoundNumber * RoundNumber * RoundNumber);
+	return -1.091f + 6.312f * RoundNumber - 0.421f * (RoundNumber * RoundNumber) + 0.013 * (RoundNumber * RoundNumber *
+		RoundNumber);
 }
 
 int32 AZombieDefenceGameMode::RoundUnitCount20AndAbove()
@@ -47,7 +65,7 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 	if (GetWorld())
 	{
 		ActiveSpawnPoints.Empty();
-		
+
 		TArray<AActor*> UnitSpawnPoints;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AUnitSpawnPoint::StaticClass(), UnitSpawnPoints);
 		for (const auto& UnitSpawnPointActor : UnitSpawnPoints)
@@ -57,11 +75,10 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 				if (UnitSpawnPoint->GetIsActive())
 				{
 					ActiveSpawnPoints.Add(UnitSpawnPoint);
-					// TODO: Remove after testing
-					UnitSpawnPoint->SpawnUnit(UnitClass);
 				}
 				else
 				{
+					// TODO: Listen for new spawn points becoming active
 					// Register for spawn point listener
 				}
 			}
@@ -72,12 +89,16 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 void AZombieDefenceGameMode::SpawnUnit()
 {
 	if (ActiveSpawnPoints.IsEmpty()) return;
+	// TODO: Don't spawn units if max active units is reached
 
 	// TODO: Need a weighted spawn point selector as theres is a decent chance with low active spawn points to keep
 	// spawning at the same one 
 	const int32 SelectedSpawnPoint = UKismetMathLibrary::RandomInteger(ActiveSpawnPoints.Num());
-	if (ActiveSpawnPoints[SelectedSpawnPoint]->SpawnUnit(UnitClass))
+	TWeakObjectPtr<AUnitCharacter> NewUnit = ActiveSpawnPoints[SelectedSpawnPoint]->SpawnUnit(UnitClass);
+	if (NewUnit.IsValid())
 	{
+		ActiveUnits.Add(NewUnit);
+		NewUnit.Get()->OnKilledEvent.AddUObject(this, &AZombieDefenceGameMode::OnUnitKilled);
 		UnitsSpawnedThisRound++;
 		if (UnitsSpawnedThisRound >= UnitsToBeSpawnedThisRound)
 		{

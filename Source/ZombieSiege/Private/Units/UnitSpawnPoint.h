@@ -24,9 +24,9 @@ public:
 	/**
 	 * @brief Attempts to spawn the given unit at this spawn point
 	 * @param UnitClass The class of unit to spawn
-	 * @return Returns true if spawning was successful otherwise false
+	 * @return A pointer to the spawned unit or a nullptr if it fails to spawn
 	 */
-	bool SpawnUnit(TSubclassOf<AUnitCharacter> UnitClass);
+	TWeakObjectPtr<AUnitCharacter> SpawnUnit(TSubclassOf<AUnitCharacter> UnitClass);
 
 protected:
 	virtual void BeginPlay() override;
