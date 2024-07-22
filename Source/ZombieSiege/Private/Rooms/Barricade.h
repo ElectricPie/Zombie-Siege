@@ -25,8 +25,6 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-	FOnActiveChangedSignature OnActiveChangedEvent;
-
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Barricade")
 	bool IsDestroyed() const { return DestroyedPlanks >= Planks.Num();  }
 	UFUNCTION(BlueprintCallable, Category="Barricade")
@@ -35,7 +33,14 @@ public:
 	void SetIsActive(const bool bNewIsActive);
 	UFUNCTION(BlueprintPure, Category="Barricade")
 	bool GetIsActive() const { return bIsActive; }
+
+public:
+	FOnActiveChangedSignature OnActiveChangedEvent;
 	
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 protected:
 	UPROPERTY()
 	USceneComponent* BaseComponent;
@@ -52,14 +57,12 @@ protected:
 	TArray<UStaticMeshComponent*> Planks;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	int32 DestroyedPlanks = 0;
-	
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+
+private:
+	UFUNCTION()
+	void OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
 
 private:
 	UPROPERTY(EditAnywhere)
 	bool bIsActive = false;
-	
-	UFUNCTION()
-	void OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
 };

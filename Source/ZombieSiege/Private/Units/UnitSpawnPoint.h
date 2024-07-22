@@ -39,11 +39,16 @@ private:
 	TObjectPtr<UArrowComponent> SpawnDirectionArrow;
 #endif
 	
-	UPROPERTY(EditAnywhere, meta=(ToolTip="The barricades that units spawned here will go to"))
+	UPROPERTY(EditAnywhere, Category="Barricades",meta=(ToolTip="The barricades that units spawned here will go to"))
 	TArray<TWeakObjectPtr<ABarricade>> ConnectedBarricades;
+	UPROPERTY(VisibleAnywhere, Category="Barricades")
+	TSet<TWeakObjectPtr<ABarricade>> ActiveBarricades;
 	
 	UPROPERTY(VisibleAnywhere)
 	bool bIsActive = false;
 
 	void OnBarricadeActiveChanged(TWeakObjectPtr<ABarricade> BarricadeChanging, bool bNewActiveState);
+
+private:
+	TMap<TWeakObjectPtr<ABarricade>, FDelegateHandle> BarricadeChangedHandles;
 };
