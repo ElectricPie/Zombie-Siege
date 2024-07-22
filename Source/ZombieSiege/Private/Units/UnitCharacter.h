@@ -6,8 +6,11 @@
 #include "GameFramework/Character.h"
 #include "UnitCharacter.generated.h"
 
+class ABarricade;
 class UMoneyRewardComponent;
 class UBehaviorTree;
+
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnUnitKilledSingature, TWeakObjectPtr<AUnitCharacter> /*UnitKilled*/, TWeakObjectPtr<AController> /*KillerInstigator*/, TWeakObjectPtr<AActor> /*KillCauser*/)
 
 UCLASS()
 class AUnitCharacter : public ACharacter
@@ -26,9 +29,17 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION(BlueprintPure, Category="Target")
+	ABarricade* GetTargetBarricade() const { return TargetBarricade.Get(); }
+	void SetTargetBarricade(TWeakObjectPtr<ABarricade> NewTargetBarricade);
+	
+public:
+	FOnUnitKilledSingature OnKilledEvent;
+	
 protected:
 	virtual void BeginPlay() override;
-	
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
 	float AttackDamage = 25.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
@@ -44,9 +55,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
 	float MaxHealth = 40.f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Health")
-	float CurrentHealth = 40.f;;
-
+	float CurrentHealth = 40.f;
+	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Money")
 	UMoneyRewardComponent* MoneyRewardComponent;
+	UPROPERTY(VisibleAnywhere, Category="Target")
+	TWeakObjectPtr<ABarricade> TargetBarricade;
 };

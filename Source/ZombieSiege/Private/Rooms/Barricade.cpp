@@ -35,7 +35,6 @@ ABarricade::ABarricade()
 	MoneyRewardComponent = CreateDefaultSubobject<UMoneyRewardComponent>(TEXT("Money Reward"));
 	MoneyRewardComponent->SetAmountToGive(DEFAULT_BARRICADE_REWARD);
 	MoneyRewardComponent->SetTimeBetweenRewards(DEFAULT_BARRICADE_TIME_BETWEEN_REWARDS);
-
 }
 
 float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -63,6 +62,12 @@ void ABarricade::Repair()
 	DestroyedPlanks = 0;
 
 	PlayerInteractionTrigger->SetCanInteract(false);
+}
+
+void ABarricade::SetIsActive(const bool bNewIsActive)
+{
+	bIsActive = bNewIsActive;
+	OnActiveChangedEvent.Broadcast(this, bIsActive);
 }
 
 // Called when the game starts or when spawned

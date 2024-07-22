@@ -6,11 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "Barricade.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnActiveChangedSignature, TWeakObjectPtr<ABarricade> /*BarricadeChanging*/, bool /*bNewActiveState*/);
+
 class UMoneyRewardComponent;
 class APlayerCharacter;
 class UInteractableComponent;
 class UArrowComponent;
 class UBoxComponent;
+
 UCLASS()
 class ABarricade : public AActor
 {
@@ -27,10 +30,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Barricade")
 	void Repair();
 	UFUNCTION(BlueprintCallable, Category="Barricade")
-	void SetIsActive(const bool bNewIsActive) { bIsActive = bNewIsActive; }
+	void SetIsActive(const bool bNewIsActive);
 	UFUNCTION(BlueprintPure, Category="Barricade")
 	bool GetIsActive() const { return bIsActive; }
+
+public:
+	FOnActiveChangedSignature OnActiveChangedEvent;
 	
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 protected:
 	UPROPERTY()
 	USceneComponent* BaseComponent;
@@ -47,14 +57,12 @@ protected:
 	TArray<UStaticMeshComponent*> Planks;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	int32 DestroyedPlanks = 0;
-	
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+
+private:
+	UFUNCTION()
+	void OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
 
 private:
 	UPROPERTY(EditAnywhere)
 	bool bIsActive = false;
-	
-	UFUNCTION()
-	void OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
 };
