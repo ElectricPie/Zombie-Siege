@@ -63,14 +63,23 @@ void AUnitSpawnPoint::BeginPlay()
 
 	// Set to active if at least one of the connected barricades is active
 	bIsActive = false;
+	// Keep track of the active barricades
 	for (const auto& Barricade : ConnectedBarricades)
 	{
 		if (Barricade->GetIsActive())
 		{
-			bIsActive = true;
-			Barricade->OnActiveChangedEvent.AddUObject(this, &AUnitSpawnPoint::OnBarricadeActiveChanged);
-			return;
+			ActiveBarricades.Add(Barricade);
 		}
+		else
+		{
+			BarricadeChangedHandles.Add(Barricade ,Barricade->OnActiveChangedEvent.AddUObject(this, &AUnitSpawnPoint::OnBarricadeActiveChanged));
+		}
+	}
+
+	// Enable the spawn point if there is at least one active barricades
+	if (ActiveBarricades.Num() > 0)
+	{
+		bIsActive = true;
 	}
 }
 
@@ -79,5 +88,11 @@ void AUnitSpawnPoint::OnBarricadeActiveChanged(TWeakObjectPtr<ABarricade> Barric
 	if (bNewActiveState)
 	{
 		bIsActive = true;
+		ActiveBarricades.Add(BarricadeChanging);
+		if (BarricadeChangedHandles.Contains(BarricadeChanging))
+		{
+			BarricadeChanging->OnActiveChangedEvent.Remove(BarricadeChangedHandles[BarricadeChanging]);
+			BarricadeChangedHandles.Remove(BarricadeChanging);
+		}
 	}
 }
