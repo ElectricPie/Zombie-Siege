@@ -4,7 +4,7 @@
 #include "Units/UnitCharacter.h"
 
 #include "Components/MoneyRewardComponent.h"
-#include "Components/MoneyStoreComponent.h"
+#include "Rooms/Barricade.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -39,6 +39,12 @@ float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	}
 	
 	return DamageAmount;
+}
+
+void AUnitCharacter::SetTargetBarricade(TWeakObjectPtr<ABarricade> NewTargetBarricade)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Setting %s's target barricade to %s"), *GetName(), *NewTargetBarricade->GetName());
+	TargetBarricade = NewTargetBarricade; 
 }
 
 void AUnitCharacter::BeginPlay()

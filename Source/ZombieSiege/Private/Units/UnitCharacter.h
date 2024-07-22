@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "UnitCharacter.generated.h"
 
+class ABarricade;
 class UMoneyRewardComponent;
 class UBehaviorTree;
 
@@ -28,6 +29,10 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION(BlueprintPure, Category="Target")
+	ABarricade* GetTargetBarricade() const { return TargetBarricade.Get(); }
+	void SetTargetBarricade(TWeakObjectPtr<ABarricade> NewTargetBarricade);
+	
 public:
 	FOnUnitKilledSingature OnKilledEvent;
 	
@@ -55,4 +60,6 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, Category="Money")
 	UMoneyRewardComponent* MoneyRewardComponent;
+	UPROPERTY(VisibleAnywhere, Category="Target")
+	TWeakObjectPtr<ABarricade> TargetBarricade;
 };
