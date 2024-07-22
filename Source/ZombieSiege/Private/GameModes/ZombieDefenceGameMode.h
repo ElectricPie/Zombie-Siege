@@ -9,7 +9,6 @@
 class AUnitSpawnPoint;
 class AUnitCharacter;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnMoneyChangedSinganture, int32 /*NewMoneyAmount*/, int32 /*AmountChanged*/);
 
 /**
  * 

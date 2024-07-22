@@ -23,8 +23,6 @@ void AZombieDefenceGameMode::BeginPlay()
 		UnitsToBeSpawnedThisRound = InitialUnitCount;
 		GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
 										   RoundStartDelay, true, CurrentSpawnDelay);
-		
-		UE_LOG(LogTemp, Warning, TEXT("Round %d Started, Units: %d"), RoundNumber, UnitsToBeSpawnedThisRound);
 	}
 }
 
@@ -129,8 +127,7 @@ void AZombieDefenceGameMode::StartNewRound()
 	{
 		UnitsToBeSpawnedThisRound = RoundUnitCount20AndAbove();
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Round %d Started, Units: %d"), RoundNumber, UnitsToBeSpawnedThisRound);
+	
 	GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
 										   RoundStartDelay, true, CurrentSpawnDelay);
 }
