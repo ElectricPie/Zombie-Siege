@@ -61,7 +61,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	UE_LOG(LogTemp, Warning, TEXT("TakeDamage"));
+	//UE_LOG(LogTemp, Warning, TEXT("TakeDamage"));
 	
 	return 0.f;
 }
