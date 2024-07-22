@@ -42,7 +42,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="Barricades",meta=(ToolTip="The barricades that units spawned here will go to"))
 	TArray<TWeakObjectPtr<ABarricade>> ConnectedBarricades;
 	UPROPERTY(VisibleAnywhere, Category="Barricades")
-	TSet<TWeakObjectPtr<ABarricade>> ActiveBarricades;
+	TArray<TWeakObjectPtr<ABarricade>> ActiveBarricades;
 	
 	UPROPERTY(VisibleAnywhere)
 	bool bIsActive = false;

@@ -41,8 +41,13 @@ AUnitSpawnPoint::AUnitSpawnPoint()
 TWeakObjectPtr<AUnitCharacter> AUnitSpawnPoint::SpawnUnit(const TSubclassOf<AUnitCharacter> UnitClass)
 {
 	if (UnitClass == nullptr) return nullptr;
-	if (!bIsActive) return nullptr;
+	if (!bIsActive || ActiveBarricades.Num() == 0) return nullptr;
 	if (GetWorld() == nullptr) return nullptr;
+
+	// Select barricade for unit
+	const int32 BarricadeIndex = FMath::RandRange(0, ActiveBarricades.Num() - 1);
+	TWeakObjectPtr<ABarricade> TargetBarricade = ActiveBarricades[BarricadeIndex];
+	if (!TargetBarricade.IsValid()) return nullptr;
 
 	const AActor* ActorToFit = UnitClass->GetDefaultObject<AActor>();
 	const FVector SpawnLocation = GetActorLocation();
@@ -53,6 +58,7 @@ TWeakObjectPtr<AUnitCharacter> AUnitSpawnPoint::SpawnUnit(const TSubclassOf<AUni
 	// Spawn the unit
 	FActorSpawnParameters SpawnParameters;
 	TWeakObjectPtr<AUnitCharacter> SpawnedUnit = GetWorld()->SpawnActor<AUnitCharacter>(UnitClass, GetActorLocation(), GetActorRotation());
+	SpawnedUnit->SetTargetBarricade(TargetBarricade);
 	
 	return SpawnedUnit;
 }
@@ -68,7 +74,10 @@ void AUnitSpawnPoint::BeginPlay()
 	{
 		if (Barricade->GetIsActive())
 		{
-			ActiveBarricades.Add(Barricade);
+			if (!ActiveBarricades.Contains(Barricade))
+			{
+				ActiveBarricades.Add(Barricade);
+			}
 		}
 		else
 		{
@@ -88,7 +97,10 @@ void AUnitSpawnPoint::OnBarricadeActiveChanged(TWeakObjectPtr<ABarricade> Barric
 	if (bNewActiveState)
 	{
 		bIsActive = true;
-		ActiveBarricades.Add(BarricadeChanging);
+		if (!ActiveBarricades.Contains(BarricadeChanging))
+		{
+			ActiveBarricades.Add(BarricadeChanging);
+		}
 		if (BarricadeChangedHandles.Contains(BarricadeChanging))
 		{
 			BarricadeChanging->OnActiveChangedEvent.Remove(BarricadeChangedHandles[BarricadeChanging]);
