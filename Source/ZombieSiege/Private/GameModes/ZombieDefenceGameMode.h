@@ -30,7 +30,10 @@ private:
 	int32 RoundUnitCount20AndAbove();
 	
 	void GetActiveUnitSpawnPoints();
-	void SpawnUnit(); 
+	void SpawnUnit();
+
+	void StartNewRound();
+	void ResetRoundStats();
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))

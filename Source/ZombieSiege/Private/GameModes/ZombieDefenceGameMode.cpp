@@ -17,10 +17,14 @@ void AZombieDefenceGameMode::BeginPlay()
 	if (GetWorld())
 	{
 		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AZombieDefenceGameMode::GetActiveUnitSpawnPoints);
-		UnitsSpawnedThisRound = 0;
+
+		// Initial round setup
+		ResetRoundStats();
 		UnitsToBeSpawnedThisRound = InitialUnitCount;
 		GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
-		                                       RoundStartDelay, true, CurrentSpawnDelay);
+										   RoundStartDelay, true, CurrentSpawnDelay);
+		
+		UE_LOG(LogTemp, Warning, TEXT("Round %d Started, Units: %d"), RoundNumber, UnitsToBeSpawnedThisRound);
 	}
 }
 
@@ -45,7 +49,7 @@ void AZombieDefenceGameMode::OnUnitKilled(TWeakObjectPtr<AUnitCharacter> UnitKil
 
 	if (UnitsKilledThisRound >= UnitsToBeSpawnedThisRound)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("All Units killed"));
+		StartNewRound();
 	}
 }
 
@@ -105,4 +109,30 @@ void AZombieDefenceGameMode::SpawnUnit()
 			GetWorld()->GetTimerManager().ClearTimer(RoundSpawnTimerHandle);
 		}
 	}
+}
+
+void AZombieDefenceGameMode::StartNewRound()
+{
+	RoundNumber++;
+	
+	ResetRoundStats();
+	// Get the number of units to be spawned this round
+	if (RoundNumber < 20)
+	{
+		UnitsToBeSpawnedThisRound = RoundUnitCountBelow20();
+	}
+	else
+	{
+		UnitsToBeSpawnedThisRound = RoundUnitCount20AndAbove();
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Round %d Started, Units: %d"), RoundNumber, UnitsToBeSpawnedThisRound);
+	GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
+										   RoundStartDelay, true, CurrentSpawnDelay);
+}
+
+void AZombieDefenceGameMode::ResetRoundStats()
+{
+	UnitsSpawnedThisRound = 0;
+	UnitsKilledThisRound = 0;
 }
