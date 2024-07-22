@@ -93,7 +93,11 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 void AZombieDefenceGameMode::SpawnUnit()
 {
 	if (ActiveSpawnPoints.IsEmpty()) return;
-	// TODO: Don't spawn units if max active units is reached
+	if (ActiveUnits.Num() >= MaxCurrentSpawnedUnits)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Reached max spawned units"));
+		return;
+	}
 
 	// TODO: Need a weighted spawn point selector as theres is a decent chance with low active spawn points to keep
 	// spawning at the same one 
