@@ -43,7 +43,6 @@ float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 void AUnitCharacter::SetTargetBarricade(TWeakObjectPtr<ABarricade> NewTargetBarricade)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Setting %s's target barricade to %s"), *GetName(), *NewTargetBarricade->GetName());
 	TargetBarricade = NewTargetBarricade; 
 }
 
