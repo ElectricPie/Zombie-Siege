@@ -20,6 +20,9 @@ public:
 
 	void SetInteractText(FText const & InteractText);
 	void HideInteractText();
+
+private:
+	void OnRoundChanged(int32 RoundNumber);
 	
 private:
 	UPROPERTY(EditAnywhere, Category=Widgets)
