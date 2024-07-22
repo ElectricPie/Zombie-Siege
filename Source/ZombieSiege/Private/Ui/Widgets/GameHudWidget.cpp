@@ -47,6 +47,11 @@ void UGameHudWidget::ShowInteractText(bool bShowInteractText)
 	}
 }
 
+void UGameHudWidget::UpdateRoundNumber(int32 RoundNumber)
+{
+	RoundText->SetText(FText::FromString(FString::FromInt(RoundNumber)));
+}
+
 void UGameHudWidget::OnAmmoChanged(int32 NewAmmoCount, int32 MaxAmmo)
 {
 	AmmoCounterWidget->UpdateAmmoText(NewAmmoCount, MaxAmmo);

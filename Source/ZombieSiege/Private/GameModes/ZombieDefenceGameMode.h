@@ -9,6 +9,8 @@
 class AUnitSpawnPoint;
 class AUnitCharacter;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnRoundChangedSignature, int32 /*RoundNumber*/);
+
 
 /**
  * 
@@ -18,6 +20,9 @@ class AZombieDefenceGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
+public:
+	FOnRoundChangedSignature OnRoundChangedEvent;
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPostLogin(AController* NewPlayer) override;

@@ -20,6 +20,7 @@ void AZombieDefenceGameMode::BeginPlay()
 
 		// Initial round setup
 		ResetRoundStats();
+		OnRoundChangedEvent.Broadcast(RoundNumber);
 		UnitsToBeSpawnedThisRound = InitialUnitCount;
 		GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
 										   RoundStartDelay, true, CurrentSpawnDelay);
@@ -116,6 +117,7 @@ void AZombieDefenceGameMode::SpawnUnit()
 void AZombieDefenceGameMode::StartNewRound()
 {
 	RoundNumber++;
+	OnRoundChangedEvent.Broadcast(RoundNumber);
 	
 	ResetRoundStats();
 	// Get the number of units to be spawned this round

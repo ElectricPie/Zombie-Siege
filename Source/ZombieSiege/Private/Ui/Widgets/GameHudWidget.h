@@ -25,20 +25,9 @@ public:
 	void Setup(ATopDownPlayerController* PlayerController, APlayerCharacter* PlayerCharacter);
 	void UpdateInteractText(FText const & InteractText);
 	void ShowInteractText(bool bShowInteractText);
+	void UpdateRoundNumber(int32 RoundNumber);
 	
 private:
-	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
-	UTextBlock* InteractTextBlock;
-	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
-	UAmmoCounterWidget* AmmoCounterWidget;
-	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
-	UPlayerMoneyWidget* MoneyWidget;
-
-	TWeakObjectPtr<AGun> CurrentWeapon;
-
-	FDelegateHandle AmmoChangeHandle;
-	FDelegateHandle WeaponReloadHandle;
-
 	UFUNCTION()
 	void OnAmmoChanged(int32 NewAmmoCount, int32 MaxAmmo);
 	UFUNCTION()
@@ -47,4 +36,19 @@ private:
 	void OnWeaponReloadStateChanged(bool bIsReloading);
 	UFUNCTION()
 	void OnMoneyChanged(int32 NewMoneyAmount, int32 AmountChanged);
+	
+private:
+	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
+	UTextBlock* InteractTextBlock;
+	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
+	UAmmoCounterWidget* AmmoCounterWidget;
+	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
+	UPlayerMoneyWidget* MoneyWidget;
+	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
+	UTextBlock* RoundText;
+
+	TWeakObjectPtr<AGun> CurrentWeapon;
+
+	FDelegateHandle AmmoChangeHandle;
+	FDelegateHandle WeaponReloadHandle;
 };
