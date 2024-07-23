@@ -19,6 +19,7 @@ public:
 	// Sets default values for this actor's properties
 	AUnitSpawnPoint();
 
+	bool GetIsForceDeactivated() const { return bForceDeactivate; }
 	bool GetIsActive() const { return bIsActive; }
 	
 	/**
@@ -43,7 +44,9 @@ private:
 	TArray<TWeakObjectPtr<ABarricade>> ConnectedBarricades;
 	UPROPERTY(VisibleAnywhere, Category="Barricades")
 	TArray<TWeakObjectPtr<ABarricade>> ActiveBarricades;
-	
+
+	UPROPERTY(EditAnywhere)
+	bool bForceDeactivate = false;
 	UPROPERTY(VisibleAnywhere)
 	bool bIsActive = false;
 

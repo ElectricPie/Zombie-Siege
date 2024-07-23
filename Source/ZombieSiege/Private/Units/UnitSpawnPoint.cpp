@@ -40,6 +40,7 @@ AUnitSpawnPoint::AUnitSpawnPoint()
 
 TWeakObjectPtr<AUnitCharacter> AUnitSpawnPoint::SpawnUnit(const TSubclassOf<AUnitCharacter> UnitClass)
 {
+	if (bForceDeactivate) return nullptr;
 	if (UnitClass == nullptr) return nullptr;
 	if (!bIsActive || ActiveBarricades.Num() == 0) return nullptr;
 	if (GetWorld() == nullptr) return nullptr;
