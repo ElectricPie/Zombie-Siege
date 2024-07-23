@@ -72,6 +72,11 @@ void AUnitSpawnPoint::BeginPlay()
 	// Keep track of the active barricades
 	for (const auto& Barricade : ConnectedBarricades)
 	{
+		if (!Barricade.IsValid())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s has an invalid barricade in its connected barricades"), *GetActorNameOrLabel());
+			continue;
+		}
 		if (Barricade->GetIsActive())
 		{
 			if (!ActiveBarricades.Contains(Barricade))
