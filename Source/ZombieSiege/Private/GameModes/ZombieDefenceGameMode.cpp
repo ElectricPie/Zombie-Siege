@@ -75,7 +75,7 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 		{
 			if (AUnitSpawnPoint* UnitSpawnPoint = Cast<AUnitSpawnPoint>(UnitSpawnPointActor))
 			{
-				if (UnitSpawnPoint->GetIsActive())
+				if (UnitSpawnPoint->GetIsActive() && !UnitSpawnPoint->GetIsForceDeactivated())
 				{
 					ActiveSpawnPoints.Add(UnitSpawnPoint);
 				}
