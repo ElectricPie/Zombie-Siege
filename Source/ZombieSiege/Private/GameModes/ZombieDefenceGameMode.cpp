@@ -102,6 +102,9 @@ void AZombieDefenceGameMode::SpawnUnit()
 	// spawning at the same one 
 	const int32 SelectedSpawnPoint = UKismetMathLibrary::RandomInteger(ActiveSpawnPoints.Num());
 	TWeakObjectPtr<AUnitCharacter> NewUnit = ActiveSpawnPoints[SelectedSpawnPoint]->SpawnUnit(UnitClass);
+	
+	UE_LOG(LogTemp, Warning, TEXT("Spawning unit at %s"), *ActiveSpawnPoints[SelectedSpawnPoint]->GetActorNameOrLabel());
+
 	if (NewUnit.IsValid())
 	{
 		ActiveUnits.Add(NewUnit);
