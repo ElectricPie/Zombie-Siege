@@ -65,11 +65,7 @@ float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 
 void ABarricade::Repair()
 {
-	if (AgentsCrossing.Num() > 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Unit is crossing barricade, cannot repair!"));
-		return;
-	}
+	if (AgentsCrossing.Num() > 0) return;
 	
 	for (const auto & Plank : Planks)
 	{
