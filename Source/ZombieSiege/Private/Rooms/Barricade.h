@@ -6,7 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "Barricade.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnActiveChangedSignature, TWeakObjectPtr<ABarricade> /*BarricadeChanging*/, bool /*bNewActiveState*/);
+struct FNavigationLink;
+class UNavLinkComponent;
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnActiveChangedSignature, TWeakObjectPtr<ABarricade> /*BarricadeChanging*/,
+                                     bool /*bNewActiveState*/);
 
 class UMoneyRewardComponent;
 class APlayerCharacter;
@@ -18,15 +21,17 @@ UCLASS()
 class ABarricade : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ABarricade();
 
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	                         AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Barricade")
-	bool IsDestroyed() const { return DestroyedPlanks >= Planks.Num();  }
+	bool IsDestroyed() const { return DestroyedPlanks >= Planks.Num(); }
+
 	UFUNCTION(BlueprintCallable, Category="Barricade")
 	void Repair();
 	UFUNCTION(BlueprintCallable, Category="Barricade")
@@ -34,9 +39,14 @@ public:
 	UFUNCTION(BlueprintPure, Category="Barricade")
 	bool GetIsActive() const { return bIsActive; }
 
+	UFUNCTION(BlueprintPure, Category="Barricade")
+	FVector GetInsideLocation() const;
+	UFUNCTION(BlueprintPure, Category="Barricade")
+	FVector GetOutsideLocation() const;
+
 public:
 	FOnActiveChangedSignature OnActiveChangedEvent;
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -52,7 +62,9 @@ protected:
 	UArrowComponent* InsideDirection;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UMoneyRewardComponent* MoneyRewardComponent;
-	
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<UNavLinkComponent> NavLinkComponent;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Health")
 	TArray<UStaticMeshComponent*> Planks;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")

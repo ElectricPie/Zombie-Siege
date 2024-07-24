@@ -10,6 +10,9 @@ class UCapsuleComponent;
 class UArrowComponent;
 class AUnitCharacter;
 class ABarricade;
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSpawnPointActiveChangedSignature, TWeakObjectPtr<AUnitSpawnPoint> /*BarricadeChanging*/, bool /*bNewActiveState*/);
+
 UCLASS()
 class AUnitSpawnPoint : public AActor
 {
@@ -19,6 +22,7 @@ public:
 	// Sets default values for this actor's properties
 	AUnitSpawnPoint();
 
+	bool GetIsForceDeactivated() const { return bForceDeactivate; }
 	bool GetIsActive() const { return bIsActive; }
 	
 	/**
@@ -27,7 +31,10 @@ public:
 	 * @return A pointer to the spawned unit or a nullptr if it fails to spawn
 	 */
 	TWeakObjectPtr<AUnitCharacter> SpawnUnit(TSubclassOf<AUnitCharacter> UnitClass);
-
+	
+public:
+	FOnSpawnPointActiveChangedSignature OnActiveStateChangedEvent;
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -43,7 +50,9 @@ private:
 	TArray<TWeakObjectPtr<ABarricade>> ConnectedBarricades;
 	UPROPERTY(VisibleAnywhere, Category="Barricades")
 	TArray<TWeakObjectPtr<ABarricade>> ActiveBarricades;
-	
+
+	UPROPERTY(EditAnywhere)
+	bool bForceDeactivate = false;
 	UPROPERTY(VisibleAnywhere)
 	bool bIsActive = false;
 

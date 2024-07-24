@@ -17,6 +17,11 @@ void ARoom::UnlockRoom()
 {
 	for (const auto& Barricade : Barricades)
 	{
+		if (!Barricade.IsValid())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Barricade on %s room is invalid"), *GetActorNameOrLabel());
+			continue;
+		}
 		Barricade->SetIsActive(true);
 	}
 }
