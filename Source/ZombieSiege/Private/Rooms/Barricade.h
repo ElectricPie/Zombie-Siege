@@ -43,7 +43,12 @@ public:
 	FVector GetInsideLocation() const;
 	UFUNCTION(BlueprintPure, Category="Barricade")
 	FVector GetOutsideLocation() const;
-
+	
+	UFUNCTION(BlueprintCallable, Category="Barricade")
+	void StartCrossing(AActor* Agent);
+	UFUNCTION(BlueprintCallable, Category="Barricade")
+	void StopCrossing(AActor* Agent);
+	
 public:
 	FOnActiveChangedSignature OnActiveChangedEvent;
 
@@ -77,4 +82,6 @@ private:
 private:
 	UPROPERTY(EditAnywhere)
 	bool bIsActive = false;
+
+	TArray<TWeakObjectPtr<AActor>> AgentsCrossing;
 };
