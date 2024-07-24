@@ -103,6 +103,7 @@ void AUnitSpawnPoint::OnBarricadeActiveChanged(TWeakObjectPtr<ABarricade> Barric
 	if (bNewActiveState)
 	{
 		bIsActive = true;
+		OnActiveStateChangedEvent.Broadcast(this, true);
 		if (!ActiveBarricades.Contains(BarricadeChanging))
 		{
 			ActiveBarricades.Add(BarricadeChanging);

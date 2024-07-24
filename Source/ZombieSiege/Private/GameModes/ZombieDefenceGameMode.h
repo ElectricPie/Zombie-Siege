@@ -38,6 +38,8 @@ private:
 
 	void StartNewRound();
 	void ResetRoundStats();
+
+	void OnSpawnPointActiveChanged(TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint, bool bNewActiveState);
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))

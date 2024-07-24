@@ -10,6 +10,9 @@ class UCapsuleComponent;
 class UArrowComponent;
 class AUnitCharacter;
 class ABarricade;
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSpawnPointActiveChangedSignature, TWeakObjectPtr<AUnitSpawnPoint> /*BarricadeChanging*/, bool /*bNewActiveState*/);
+
 UCLASS()
 class AUnitSpawnPoint : public AActor
 {
@@ -28,7 +31,10 @@ public:
 	 * @return A pointer to the spawned unit or a nullptr if it fails to spawn
 	 */
 	TWeakObjectPtr<AUnitCharacter> SpawnUnit(TSubclassOf<AUnitCharacter> UnitClass);
-
+	
+public:
+	FOnSpawnPointActiveChangedSignature OnActiveStateChangedEvent;
+	
 protected:
 	virtual void BeginPlay() override;
 
