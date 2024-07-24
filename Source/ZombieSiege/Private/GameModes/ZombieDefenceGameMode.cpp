@@ -81,8 +81,8 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 				}
 				else
 				{
-					// TODO: Listen for new spawn points becoming active
-					// Register for spawn point listener
+					// Keep track of when a spawn point becomes active
+					UnitSpawnPoint->OnActiveStateChangedEvent.AddUObject(this, &AZombieDefenceGameMode::OnSpawnPointActiveChanged);
 				}
 			}
 		}
@@ -141,4 +141,19 @@ void AZombieDefenceGameMode::ResetRoundStats()
 {
 	UnitsSpawnedThisRound = 0;
 	UnitsKilledThisRound = 0;
+}
+
+void AZombieDefenceGameMode::OnSpawnPointActiveChanged(TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint, bool bNewActiveState)
+{
+	if (SpawnPoint.IsValid())
+	{
+		if (bNewActiveState && !ActiveSpawnPoints.Contains(SpawnPoint))
+		{
+			ActiveSpawnPoints.Add(SpawnPoint);
+		}
+		else if (!bNewActiveState && ActiveSpawnPoints.Contains(SpawnPoint))
+		{
+			ActiveSpawnPoints.Remove(SpawnPoint);
+		}
+	}
 }
