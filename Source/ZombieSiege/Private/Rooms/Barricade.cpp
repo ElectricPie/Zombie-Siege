@@ -65,6 +65,12 @@ float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 
 void ABarricade::Repair()
 {
+	if (AgentsCrossing.Num() > 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Unit is crossing barricade, cannot repair!"));
+		return;
+	}
+	
 	for (const auto & Plank : Planks)
 	{
 		Plank->SetVisibility(true);
@@ -98,6 +104,25 @@ FVector ABarricade::GetOutsideLocation() const
 		OutSidePos = NavLinkComponent->GetComponentTransform().TransformPosition(NavLinkComponent->Links[0].Left);
 	}
 	return OutSidePos;
+}
+
+void ABarricade::StartCrossing(AActor* Agent)
+{
+	if (AgentsCrossing.Contains(Agent)) return;
+	AgentsCrossing.Add(Agent);
+	Agent->OnDestroyed.AddUniqueDynamic(this, &ABarricade::StopCrossing);
+}
+
+void ABarricade::StopCrossing(AActor* Agent)
+{
+	if (AgentsCrossing.Contains(Agent))
+	{
+		AgentsCrossing.Remove(Agent);
+		if (Agent->IsValidLowLevel())
+		{
+			Agent->OnDestroyed.RemoveDynamic(this, &ABarricade::StopCrossing);
+		}
+	}
 }
 
 // Called when the game starts or when spawned
