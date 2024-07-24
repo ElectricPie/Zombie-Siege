@@ -15,7 +15,7 @@
 ABarricade::ABarricade()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	BaseComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = BaseComponent;
@@ -85,7 +85,7 @@ FVector ABarricade::GetInsideLocation() const
 	FVector InsidePos = FVector::ZeroVector;
 	if (NavLinkComponent->Links.Num() > 0)
 	{
-		InsidePos = GetActorLocation() + NavLinkComponent->Links[0].Right;
+		InsidePos = NavLinkComponent->GetComponentTransform().TransformPosition(NavLinkComponent->Links[0].Right);
 	}
 	return InsidePos;
 }
@@ -95,7 +95,7 @@ FVector ABarricade::GetOutsideLocation() const
 	FVector OutSidePos = FVector::ZeroVector;
 	if (NavLinkComponent->Links.Num() > 0)
 	{
-		OutSidePos = GetActorLocation() + NavLinkComponent->Links[0].Left;
+		OutSidePos = NavLinkComponent->GetComponentTransform().TransformPosition(NavLinkComponent->Links[0].Left);
 	}
 	return OutSidePos;
 }
@@ -104,16 +104,6 @@ FVector ABarricade::GetOutsideLocation() const
 void ABarricade::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void ABarricade::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	if (NavLinkComponent->Links.Num() == 0) return;
-	FNavigationLink& Link = NavLinkComponent->Links[0];
-	DrawDebugSphere(GetWorld(), GetActorLocation() + Link.Left, 10.f, 12, FColor::Red);
-	DrawDebugSphere(GetWorld(), GetActorLocation() + Link.Right, 10.f, 12, FColor::Green);
 }
 
 void ABarricade::OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser)
