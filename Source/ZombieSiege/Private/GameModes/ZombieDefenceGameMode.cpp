@@ -75,14 +75,14 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 		{
 			if (AUnitSpawnPoint* UnitSpawnPoint = Cast<AUnitSpawnPoint>(UnitSpawnPointActor))
 			{
-				if (UnitSpawnPoint->GetIsActive())
+				if (UnitSpawnPoint->GetIsActive() && !UnitSpawnPoint->GetIsForceDeactivated())
 				{
 					ActiveSpawnPoints.Add(UnitSpawnPoint);
 				}
 				else
 				{
-					// TODO: Listen for new spawn points becoming active
-					// Register for spawn point listener
+					// Keep track of when a spawn point becomes active
+					UnitSpawnPoint->OnActiveStateChangedEvent.AddUObject(this, &AZombieDefenceGameMode::OnSpawnPointActiveChanged);
 				}
 			}
 		}
@@ -102,6 +102,9 @@ void AZombieDefenceGameMode::SpawnUnit()
 	// spawning at the same one 
 	const int32 SelectedSpawnPoint = UKismetMathLibrary::RandomInteger(ActiveSpawnPoints.Num());
 	TWeakObjectPtr<AUnitCharacter> NewUnit = ActiveSpawnPoints[SelectedSpawnPoint]->SpawnUnit(UnitClass);
+	
+	UE_LOG(LogTemp, Warning, TEXT("Spawning unit at %s"), *ActiveSpawnPoints[SelectedSpawnPoint]->GetActorNameOrLabel());
+
 	if (NewUnit.IsValid())
 	{
 		ActiveUnits.Add(NewUnit);
@@ -138,4 +141,19 @@ void AZombieDefenceGameMode::ResetRoundStats()
 {
 	UnitsSpawnedThisRound = 0;
 	UnitsKilledThisRound = 0;
+}
+
+void AZombieDefenceGameMode::OnSpawnPointActiveChanged(TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint, bool bNewActiveState)
+{
+	if (SpawnPoint.IsValid())
+	{
+		if (bNewActiveState && !ActiveSpawnPoints.Contains(SpawnPoint))
+		{
+			ActiveSpawnPoints.Add(SpawnPoint);
+		}
+		else if (!bNewActiveState && ActiveSpawnPoints.Contains(SpawnPoint))
+		{
+			ActiveSpawnPoints.Remove(SpawnPoint);
+		}
+	}
 }

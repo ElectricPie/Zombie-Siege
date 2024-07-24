@@ -40,6 +40,7 @@ AUnitSpawnPoint::AUnitSpawnPoint()
 
 TWeakObjectPtr<AUnitCharacter> AUnitSpawnPoint::SpawnUnit(const TSubclassOf<AUnitCharacter> UnitClass)
 {
+	if (bForceDeactivate) return nullptr;
 	if (UnitClass == nullptr) return nullptr;
 	if (!bIsActive || ActiveBarricades.Num() == 0) return nullptr;
 	if (GetWorld() == nullptr) return nullptr;
@@ -72,6 +73,11 @@ void AUnitSpawnPoint::BeginPlay()
 	// Keep track of the active barricades
 	for (const auto& Barricade : ConnectedBarricades)
 	{
+		if (!Barricade.IsValid())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s has an invalid barricade in its connected barricades"), *GetActorNameOrLabel());
+			continue;
+		}
 		if (Barricade->GetIsActive())
 		{
 			if (!ActiveBarricades.Contains(Barricade))
@@ -97,6 +103,7 @@ void AUnitSpawnPoint::OnBarricadeActiveChanged(TWeakObjectPtr<ABarricade> Barric
 	if (bNewActiveState)
 	{
 		bIsActive = true;
+		OnActiveStateChangedEvent.Broadcast(this, true);
 		if (!ActiveBarricades.Contains(BarricadeChanging))
 		{
 			ActiveBarricades.Add(BarricadeChanging);

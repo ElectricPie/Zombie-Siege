@@ -3,10 +3,10 @@
 
 #include "Barricade.h"
 
+#include "NavLinkComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/InteractableComponent.h"
 #include "Components/MoneyRewardComponent.h"
-#include "Player/PlayerCharacter.h"
 
 #define DEFAULT_BARRICADE_REWARD 40
 #define DEFAULT_BARRICADE_TIME_BETWEEN_REWARDS 5
@@ -15,7 +15,7 @@
 ABarricade::ABarricade()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	BaseComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = BaseComponent;
@@ -35,6 +35,16 @@ ABarricade::ABarricade()
 	MoneyRewardComponent = CreateDefaultSubobject<UMoneyRewardComponent>(TEXT("Money Reward"));
 	MoneyRewardComponent->SetAmountToGive(DEFAULT_BARRICADE_REWARD);
 	MoneyRewardComponent->SetTimeBetweenRewards(DEFAULT_BARRICADE_TIME_BETWEEN_REWARDS);
+
+	NavLinkComponent = CreateDefaultSubobject<UNavLinkComponent>(TEXT("Nav Link Component"));
+	NavLinkComponent->SetupAttachment(RootComponent);
+	NavLinkComponent->Links.Empty();
+	// Left is outside, right is inside
+	FNavigationLink Link;
+	Link.Left = FVector(-120.f, 0.f, 0.f);
+	Link.Right = FVector(120.f, 0.f, 0.f);
+	Link.Direction = ENavLinkDirection::LeftToRight;
+	NavLinkComponent->Links.Add(Link);
 }
 
 float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -68,6 +78,26 @@ void ABarricade::SetIsActive(const bool bNewIsActive)
 {
 	bIsActive = bNewIsActive;
 	OnActiveChangedEvent.Broadcast(this, bIsActive);
+}
+
+FVector ABarricade::GetInsideLocation() const
+{
+	FVector InsidePos = FVector::ZeroVector;
+	if (NavLinkComponent->Links.Num() > 0)
+	{
+		InsidePos = NavLinkComponent->GetComponentTransform().TransformPosition(NavLinkComponent->Links[0].Right);
+	}
+	return InsidePos;
+}
+
+FVector ABarricade::GetOutsideLocation() const
+{
+	FVector OutSidePos = FVector::ZeroVector;
+	if (NavLinkComponent->Links.Num() > 0)
+	{
+		OutSidePos = NavLinkComponent->GetComponentTransform().TransformPosition(NavLinkComponent->Links[0].Left);
+	}
+	return OutSidePos;
 }
 
 // Called when the game starts or when spawned
