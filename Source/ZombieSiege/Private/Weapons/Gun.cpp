@@ -90,10 +90,10 @@ void AGun::Reload()
 	GetWorldTimerManager().SetTimer(ReloadingTimerHandle, this, &AGun::FinishReload, ReloadTime, false);
 }
 
-// Called when the game starts or when spawned
-void AGun::BeginPlay()
+
+void AGun::PostInitProperties()
 {
-	Super::BeginPlay();
+	Super::PostInitProperties();
 
 	CurrentAmmo = MaxAmmo;
 }
