@@ -6,6 +6,7 @@
 #include "GameFramework/GameMode.h"
 #include "ZombieDefenceGameMode.generated.h"
 
+class AGun;
 class AUnitSpawnPoint;
 class AUnitCharacter;
 
@@ -26,6 +27,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPostLogin(AController* NewPlayer) override;
+	virtual void RestartPlayer(AController* NewPlayer) override;
 
 private:
 	void OnUnitKilled(TWeakObjectPtr<AUnitCharacter> UnitKilled, TWeakObjectPtr<AController> KillerInstigator, TWeakObjectPtr<AActor> KillCauser);
@@ -71,6 +73,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TArray<TWeakObjectPtr<AUnitSpawnPoint>> ActiveSpawnPoints;
 	TSet<TWeakObjectPtr<AUnitCharacter>> ActiveUnits;
+
+	UPROPERTY(EditAnywhere, Category="Weapon")
+	TArray<TSubclassOf<AGun>> StartingWeaponClasses;
 
 	FTimerHandle RoundSpawnTimerHandle;
 };
