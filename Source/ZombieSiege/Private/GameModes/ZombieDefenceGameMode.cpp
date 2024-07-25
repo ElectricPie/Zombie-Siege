@@ -4,10 +4,12 @@
 #include "GameModes/ZombieDefenceGameMode.h"
 
 #include "Components/MoneyStoreComponent.h"
+#include "Components/WeaponLoadoutComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Units/UnitSpawnPoint.h"
 #include "Units/UnitCharacter.h"
+#include "Weapons/Gun.h"
 
 void AZombieDefenceGameMode::BeginPlay()
 {
@@ -34,6 +36,26 @@ void AZombieDefenceGameMode::OnPostLogin(AController* NewPlayer)
 	if (UMoneyStoreComponent* MoneyStore = NewPlayer->GetComponentByClass<UMoneyStoreComponent>())
 	{
 		MoneyStore->SetMoney(StartingMoney);
+	}
+}
+
+void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
+{
+	Super::RestartPlayer(NewPlayer);
+
+	// Gives the player their starting weapons
+	if (const AActor* PlayerPawn = NewPlayer->GetPawn())
+	{
+		if (UWeaponLoadoutComponent* WeaponLoadout = PlayerPawn->FindComponentByClass<UWeaponLoadoutComponent>())
+		{
+			for (auto& Weapon : StartingWeaponClasses)
+			{
+				if (Weapon == nullptr) continue;
+				
+				AGun* NewWeapon = GetWorld()->SpawnActor<AGun>(Weapon);
+				WeaponLoadout->AddWeapon(NewWeapon);
+			}
+		}
 	}
 }
 
