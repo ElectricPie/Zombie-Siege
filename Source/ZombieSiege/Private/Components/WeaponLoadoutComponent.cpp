@@ -25,6 +25,7 @@ void UWeaponLoadoutComponent::AddWeapon(AGun* Weapon, bool bEquip /*= false*/)
 		EquippedWeaponIndex = Index;
 	}
 	Weapon->SetVisibility(bEquip);;
+	OnWeaponAddedEvent.Broadcast(Weapon);
 }
 
 AGun* UWeaponLoadoutComponent::GetEquippedWeapon()

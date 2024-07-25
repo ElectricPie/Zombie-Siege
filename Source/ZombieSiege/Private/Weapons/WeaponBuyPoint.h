@@ -24,9 +24,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UInteractableComponent> InteractableComponent;
 
-	UPROPERTY(VisibleAnywhere, Category="Weapon")
+	UPROPERTY(EditAnywhere, Category="Weapon")
 	TSubclassOf<AGun> WeaponClass;
-	UPROPERTY(VisibleAnywhere, Category="Buy", meta=(ClampMin=0, UIMin=0))
+	UPROPERTY(EditAnywhere, Category="Buy", meta=(ClampMin=0, UIMin=0))
 	int32 Cost = 100;
 
 };

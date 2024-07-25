@@ -79,4 +79,6 @@ private:
 
 	void OnInteractionEntered(TWeakObjectPtr<UInteractableComponent> InteractableComponent);
 	void OnInteractionExited(TWeakObjectPtr<UInteractableComponent> InteractableComponent);
+
+	void OnWeaponAdded(AGun* Weapon);
 };
