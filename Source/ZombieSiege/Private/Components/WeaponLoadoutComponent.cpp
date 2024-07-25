@@ -19,13 +19,22 @@ void UWeaponLoadoutComponent::AddWeapon(AGun* Weapon, bool bEquip /*= false*/)
 {
 	if (Weapon == nullptr || Weapons.Contains(Weapon)) return;
 
+	// Force equip if there are no weapons
+	if (Weapons.IsEmpty())
+	{
+		bEquip = true;
+	}
 	const int32 Index = Weapons.Add(Weapon);
-	if (bEquip || Weapons.IsEmpty())
+	if (bEquip)
 	{
 		EquippedWeaponIndex = Index;
 		OnWeaponChangedEvent.Broadcast(Weapon);
+		Weapon->SetVisibility(true);
 	}
-	Weapon->SetVisibility(bEquip);;
+	else
+	{
+		Weapon->SetVisibility(false);
+	}
 	OnWeaponAddedEvent.Broadcast(Weapon);
 }
 
