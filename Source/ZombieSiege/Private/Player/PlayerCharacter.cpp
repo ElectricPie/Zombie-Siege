@@ -99,7 +99,7 @@ void APlayerCharacter::Fire(ATopDownPlayerController* Shooter)
 	
 	if (AGun* EquippedWeapon = GetEquippedWeapon())
 	{
-		EquippedWeapon->Fire(Shooter);
+		EquippedWeapon->StartFiring(Shooter, this);
 	}
 }
 

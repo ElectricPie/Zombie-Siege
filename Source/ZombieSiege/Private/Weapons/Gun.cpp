@@ -12,7 +12,7 @@
 AGun::AGun()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Root;
@@ -28,9 +28,9 @@ AGun::AGun()
 }
 
 // TODO: Aim direction is only set once so it always shoots the same direction
-void AGun::Fire(ATopDownPlayerController* Shooter)
+void AGun::StartFiring(AController* ShooterController, AActor* ShooterActor)
 {
-	if (Shooter == nullptr) return;
+	if (ShooterController == nullptr) return;
 	if (bIsFiring || bIsReloading) return;
 	if (CurrentAmmo <= 0) return;
 	if (GetGameTimeSinceCreation() - LastFiredTime < FireCooldownTime) return;
@@ -41,22 +41,22 @@ void AGun::Fire(ATopDownPlayerController* Shooter)
 	switch (FireRate)
 	{
 	case Single:
-		SpawnProjectile(Shooter);
+		SpawnProjectile(ShooterController, ShooterActor);
 		break;
 	case Burst:
 		{
-			SpawnProjectile(Shooter);
+			SpawnProjectile(ShooterController, ShooterActor);
 			BurstShotsFired = 1;
 			FTimerDelegate BurstDelegate;
-			BurstDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGun, BurstShot), Shooter);
+			BurstDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGun, BurstShot), ShooterController);
 			GetWorld()->GetTimerManager().SetTimer(BurstTimer, BurstDelegate, ShotIntervals, true);
 			break;
 		}
 	case FullAuto:
 		{
-			SpawnProjectile(Shooter);
+			SpawnProjectile(ShooterController, ShooterActor);
 			FTimerDelegate ShotDelegate;
-			ShotDelegate.BindUFunction(this,  GET_FUNCTION_NAME_CHECKED(AGun, SingleShot), Shooter);
+			ShotDelegate.BindUFunction(this,  GET_FUNCTION_NAME_CHECKED(AGun, SingleShot), ShooterController);
 			GetWorld()->GetTimerManager().SetTimer(ShotTimer, ShotDelegate, ShotIntervals, true);
 			break;
 		}
@@ -79,7 +79,6 @@ void AGun::SetVisibility(const bool bIsVisible)
 
 void AGun::Reload()
 {
-	// TODO: Implement Reload animation
 	bIsReloading = true;
 	OnReloadStateChangedEvent.Broadcast(true);
 	
@@ -89,7 +88,6 @@ void AGun::Reload()
 		ReloadTime = ReloadMontage->GetPlayLength();
 	}
 	GetWorldTimerManager().SetTimer(ReloadingTimerHandle, this, &AGun::FinishReload, ReloadTime, false);
-
 }
 
 // Called when the game starts or when spawned
@@ -100,13 +98,7 @@ void AGun::BeginPlay()
 	CurrentAmmo = MaxAmmo;
 }
 
-// Called every frame
-void AGun::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
-void AGun::SpawnProjectile(ATopDownPlayerController* Shooter)
+void AGun::SpawnProjectile(AController* ShooterController, AActor* ShooterActor)
 {
 	if (!ProjectileClass)
 	{
@@ -116,18 +108,28 @@ void AGun::SpawnProjectile(ATopDownPlayerController* Shooter)
 
 	const FActorSpawnParameters SpawnParameters;
 	const FVector SpawnLocation = ProjectileSpawn->GetComponentLocation();
-	FRotator SpawnRotation = Shooter->GetAimDirection().Rotation();
+
+	// Need to get the aim direction of the shooter at is changed between shots
+	FRotator SpawnRotation;
+	if (const ATopDownPlayerController* TopDownController = Cast<ATopDownPlayerController>(ShooterController))
+	{
+		SpawnRotation = TopDownController->GetAimDirection().Rotation();
+	}
+	else
+	{
+		SpawnRotation = ShooterActor->GetActorForwardVector().Rotation();
+	}
 	SpawnRotation.Pitch = 0.f;
 
 	AGunProjectile* Projectile = GetWorld()->SpawnActor<AGunProjectile>(ProjectileClass, SpawnLocation, SpawnRotation,
 	                                                                    SpawnParameters);
-	Projectile->Init(Shooter, Shooter->GetPawn(), ProjectileDamageType, ProjectileDamage);
+	Projectile->Init(ShooterController, ShooterActor, ProjectileDamageType, ProjectileDamage);
 	
 	CurrentAmmo--;
 	OnAmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
 }
 
-void AGun::SingleShot(ATopDownPlayerController* Shooter)
+void AGun::SingleShot(AController* ShooterController, AActor* ShooterActor)
 {
 	// Stop shooting if out of ammo
 	if (CurrentAmmo <= 0)
@@ -136,10 +138,10 @@ void AGun::SingleShot(ATopDownPlayerController* Shooter)
 		return;
 	}
 
-	SpawnProjectile(Shooter);
+	SpawnProjectile(ShooterController, ShooterActor);
 }
 
-void AGun::BurstShot(ATopDownPlayerController* Shooter)
+void AGun::BurstShot(AController* ShooterController, AActor* ShooterActor)
 {
 	// Stop burst if out of ammo
 	if (CurrentAmmo <= 0)
@@ -148,7 +150,7 @@ void AGun::BurstShot(ATopDownPlayerController* Shooter)
 		return;
 	}
 	
-	SpawnProjectile(Shooter);
+	SpawnProjectile(ShooterController, ShooterActor);
 	BurstShotsFired++;
 
 	// Stop the burst if finished
