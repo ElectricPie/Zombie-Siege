@@ -9,6 +9,7 @@
 class AGun;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChangedSignature, AGun*, NewWeapon);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponAddedSignature, AGun*);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UWeaponLoadoutComponent : public UActorComponent
@@ -25,10 +26,12 @@ public:
 	AGun* GetEquippedWeapon();
 	UFUNCTION()
 	void EquipNextWeapon();
+	int32 GetWeaponCount() const { return Weapons.Num(); }
 
 public:
 	UPROPERTY(BlueprintAssignable, Category=Weapon)
 	FOnWeaponChangedSignature OnWeaponChangedEvent;
+	FOnWeaponAddedSignature OnWeaponAddedEvent;
 
 protected:
 	virtual void BeginPlay() override;

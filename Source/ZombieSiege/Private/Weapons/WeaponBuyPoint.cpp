@@ -3,8 +3,10 @@
 
 #include "Weapons/WeaponBuyPoint.h"
 
+#include "Gun.h"
 #include "Components/InteractableComponent.h"
 #include "Components/MoneyStoreComponent.h"
+#include "Components/WeaponLoadoutComponent.h"
 
 // Sets default values
 AWeaponBuyPoint::AWeaponBuyPoint()
@@ -29,7 +31,12 @@ void AWeaponBuyPoint::BuyWeapon(TWeakObjectPtr<AController> InteractionInstigato
 		// Not enough money
 		if (!MoneyStoreComponent->TakeMoney(Cost)) return;
 
-		// TODO: Implement giving the weapon to the player
+		// Adds the weapon to the players loadout
+		if (UWeaponLoadoutComponent* WeaponLoadoutComponent = InteractionCauser->FindComponentByClass<UWeaponLoadoutComponent>())
+		{
+			AGun* NewWeapon = GetWorld()->SpawnActor<AGun>(WeaponClass, GetActorTransform());
+			WeaponLoadoutComponent->AddWeapon(NewWeapon, true);
+		}
 
 		// TODO: This is temporary until a it is decided how to handle the weapon ammo and multiplayer
 		Destroy();

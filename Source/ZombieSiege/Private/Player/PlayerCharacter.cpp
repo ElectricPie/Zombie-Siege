@@ -34,6 +34,7 @@ APlayerCharacter::APlayerCharacter()
 	InteractorComponent->OnExitInteractableEvent.AddUObject(this, &APlayerCharacter::OnInteractionExited);
 
 	WeaponLoadoutComponent = CreateDefaultSubobject<UWeaponLoadoutComponent>(TEXT("WeaponLoadout"));
+	WeaponLoadoutComponent->OnWeaponAddedEvent.AddUObject(this, &APlayerCharacter::OnWeaponAdded);
 }
 
 // Called when the game starts or when spawned
@@ -138,4 +139,12 @@ void APlayerCharacter::OnInteractionExited(TWeakObjectPtr<UInteractableComponent
 			GameHud->HideInteractText();
 		}
 	}
+}
+
+void APlayerCharacter::OnWeaponAdded(AGun* Weapon)
+{
+	if (Weapon == nullptr) return;
+
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+	Weapon->AttachToComponent(GetMesh(), AttachmentRules, FName("WeaponSocket"));
 }
