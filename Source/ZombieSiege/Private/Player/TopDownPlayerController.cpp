@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "PlayerCharacter.h"
 #include "Components/MoneyStoreComponent.h"
+#include "Components/WeaponLoadoutComponent.h"
 
 ATopDownPlayerController::ATopDownPlayerController()
 {
@@ -124,7 +125,10 @@ void ATopDownPlayerController::SwapWeapon()
 {
 	if (PlayerCharacter == nullptr) return;
 
-	PlayerCharacter->NextWeapon();
+	if (UWeaponLoadoutComponent* WeaponLoadoutComponent = PlayerCharacter->GetWeaponLoadoutComponent())
+	{
+		WeaponLoadoutComponent->EquipNextWeapon();
+	}
 }
 
 void ATopDownPlayerController::ReloadWeapon()

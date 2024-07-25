@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UWeaponLoadoutComponent;
 class UInteractorComponent;
 class AGun;
 class ATopDownPlayerController;
@@ -13,8 +14,6 @@ class UInteractableComponent;
 class UHealthComponent;
 class UCameraComponent;
 class USpringArmComponent;
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChangedSignature, AGun*, NewWeapon);
 
 UCLASS()
 class APlayerCharacter : public ACharacter
@@ -30,17 +29,12 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	UPROPERTY(BlueprintAssignable, Category=Weapon)
-	FOnWeaponChangedSignature OnWeaponChangedEvent;
-	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
-	AGun* GetEquippedWeapon();
 	
 	/**
 	 * @brief Gets the velocity relative to the direction they are facing
@@ -51,10 +45,11 @@ public:
 	
 	void Move(const FVector Direction);
 	void Interact();
-	
+
+	UFUNCTION(BlueprintSetter)
+	UWeaponLoadoutComponent* GetWeaponLoadoutComponent() const { return WeaponLoadoutComponent; }
 	void Fire(ATopDownPlayerController* Shooter);
 	void StopFiring();
-	void NextWeapon();
 	void ReloadWeapon();
 	
 protected:
@@ -64,13 +59,10 @@ protected:
     TObjectPtr<UCameraComponent> Camera;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UInteractorComponent> InteractorComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
+	TObjectPtr<UWeaponLoadoutComponent> WeaponLoadoutComponent;
 
 	float SpeedModifier = 0.8f;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon", meta=(ClampMin=0, UIMin=0))
-	int32 EquippedWeaponIndex;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Weapon")
-	TArray<AGun*> Weapons;
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Weapon", meta=(ToolTip="The time a reload takes if the equiped gun has no reload animation"))

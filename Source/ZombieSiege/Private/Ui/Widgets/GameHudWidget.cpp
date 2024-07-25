@@ -7,6 +7,7 @@
 #include "PlayerMoneyWidget.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Components/TextBlock.h"
+#include "Components/WeaponLoadoutComponent.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/TopDownPlayerController.h"
 #include "Weapons/Gun.h"
@@ -16,7 +17,10 @@ void UGameHudWidget::Setup(ATopDownPlayerController* PlayerController, APlayerCh
 {
 	if (PlayerCharacter)
 	{
-		PlayerCharacter->OnWeaponChangedEvent.AddUniqueDynamic(this, &UGameHudWidget::OnWeaponChanged);
+		if (UWeaponLoadoutComponent* WeaponLoadout = PlayerCharacter->GetComponentByClass<UWeaponLoadoutComponent>())
+		{
+			WeaponLoadout->OnWeaponChangedEvent.AddUniqueDynamic(this, &UGameHudWidget::OnWeaponChanged);
+		}
 	}
 
 	if (PlayerController)
@@ -26,11 +30,10 @@ void UGameHudWidget::Setup(ATopDownPlayerController* PlayerController, APlayerCh
 			MoneyStore->OnMoneyChangedEvent.AddUObject(this, &UGameHudWidget::OnMoneyChanged);
 			MoneyWidget->SetMoneyText(MoneyStore->GetMoney());
 		}
-		
 	}
 }
 
-void UGameHudWidget::UpdateInteractText(FText const & InteractText)
+void UGameHudWidget::UpdateInteractText(FText const& InteractText)
 {
 	InteractTextBlock->SetText(InteractText);
 }
@@ -60,7 +63,7 @@ void UGameHudWidget::OnAmmoChanged(int32 NewAmmoCount, int32 MaxAmmo)
 void UGameHudWidget::OnWeaponChanged(AGun* NewWeapon)
 {
 	if (NewWeapon == nullptr) return;
-	
+
 	if (CurrentWeapon.IsValid())
 	{
 		if (AmmoChangeHandle.IsValid())
@@ -72,11 +75,12 @@ void UGameHudWidget::OnWeaponChanged(AGun* NewWeapon)
 			CurrentWeapon->OnReloadStateChangedEvent.Remove(WeaponReloadHandle);
 		}
 	}
-	
+
 	CurrentWeapon = NewWeapon;
 	AmmoCounterWidget->UpdateAmmoText(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
 	AmmoChangeHandle = NewWeapon->OnAmmoChangedEvent.AddUObject(this, &UGameHudWidget::OnAmmoChanged);
-	WeaponReloadHandle = NewWeapon->OnReloadStateChangedEvent.AddUObject(this, &UGameHudWidget::OnWeaponReloadStateChanged);
+	WeaponReloadHandle = NewWeapon->OnReloadStateChangedEvent.AddUObject(
+		this, &UGameHudWidget::OnWeaponReloadStateChanged);
 }
 
 void UGameHudWidget::OnWeaponReloadStateChanged(bool bIsReloading)
@@ -85,6 +89,6 @@ void UGameHudWidget::OnWeaponReloadStateChanged(bool bIsReloading)
 }
 
 void UGameHudWidget::OnMoneyChanged(const int32 NewMoneyAmount, const int32 AmountChanged)
-{	
+{
 	MoneyWidget->SetMoneyText(NewMoneyAmount, AmountChanged);
 }

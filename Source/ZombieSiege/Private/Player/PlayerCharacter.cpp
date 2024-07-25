@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InteractableComponent.h"
 #include "Components/InteractorComponent.h"
+#include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Ui/GameHud.h"
 #include "Weapons/Gun.h"
@@ -31,17 +32,14 @@ APlayerCharacter::APlayerCharacter()
 	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
 	InteractorComponent->OnEnterInteractableEvent.AddUObject(this, &APlayerCharacter::OnInteractionEntered);
 	InteractorComponent->OnExitInteractableEvent.AddUObject(this, &APlayerCharacter::OnInteractionExited);
+
+	WeaponLoadoutComponent = CreateDefaultSubobject<UWeaponLoadoutComponent>(TEXT("WeaponLoadout"));
 }
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
-	{
-		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
-	}
 }
 
 // Called every frame
@@ -64,13 +62,6 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	//UE_LOG(LogTemp, Warning, TEXT("TakeDamage"));
 	
 	return 0.f;
-}
-
-AGun* APlayerCharacter::GetEquippedWeapon()
-{
-	if (EquippedWeaponIndex >= Weapons.Num()) return nullptr;
-
-	return Weapons[EquippedWeaponIndex];
 }
 
 bool APlayerCharacter::IsMovingForward() const
@@ -97,7 +88,7 @@ void APlayerCharacter::Fire(ATopDownPlayerController* Shooter)
 {
 	if (bIsReloading) return;
 	
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	if (AGun* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
 	{
 		EquippedWeapon->StartFiring(Shooter, this);
 	}
@@ -105,43 +96,15 @@ void APlayerCharacter::Fire(ATopDownPlayerController* Shooter)
 
 void APlayerCharacter::StopFiring()
 {
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	if (AGun* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
 	{
 		EquippedWeapon->StopFiring();
 	}
 }
 
-void APlayerCharacter::NextWeapon()
-{
-	// Hide the current weapon
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
-	{
-		// Prevent changing weapons while reloading
-		if (EquippedWeapon->GetIsReloading()) return;
-		
-		EquippedWeapon->SetVisibility(false);
-	}
-	
-	if (EquippedWeaponIndex + 1 >= Weapons.Num())
-	{
-		EquippedWeaponIndex = 0;
-	}
-	else
-	{
-		EquippedWeaponIndex++;
-	}
-
-	// Show the new weapon
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
-	{
-		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
-		EquippedWeapon->SetVisibility(true);
-	}
-}
-
 void APlayerCharacter::ReloadWeapon()
 {
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	if (AGun* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
 	{
 		if (EquippedWeapon->GetIsReloading()) return;
 		
