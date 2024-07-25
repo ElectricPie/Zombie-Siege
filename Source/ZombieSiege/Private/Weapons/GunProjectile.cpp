@@ -6,14 +6,12 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/TopDownPlayerController.h"
-#include "Units/UnitCharacter.h"
 
 // Sets default values
 AGunProjectile::AGunProjectile()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	CollisionComponent->OnComponentHit.AddDynamic(this, &AGunProjectile::OnHit);
@@ -36,6 +34,14 @@ AGunProjectile::AGunProjectile()
 	ProjectileMovementComponent->bShouldBounce = false;
 }
 
+void AGunProjectile::Init(AController* Controller, AActor* Actor, TSubclassOf<UDamageType> NewDamageType, float NewDamage)
+{
+	ShooterController = Controller;
+	ShooterActor = Actor;
+	Damage = NewDamage;
+	DamageType = NewDamageType;
+}
+
 // Called when the game starts or when spawned
 void AGunProjectile::BeginPlay()
 {
@@ -45,12 +51,6 @@ void AGunProjectile::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(DestroyHandle, this, &AGunProjectile::DestroyProjectile, DestroyTime, false);
 }
 
-// Called every frame
-void AGunProjectile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 
 void AGunProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
@@ -59,10 +59,8 @@ void AGunProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 	ProjectileMesh->SetVisibility(false);
 	CollisionComponent->SetCollisionProfileName("NoCollision");
 	
-	if (AUnitCharacter* UnitCharacter = Cast<AUnitCharacter>(OtherActor))
-	{
-		UGameplayStatics::ApplyDamage(UnitCharacter, Damage, Shooter, Shooter->GetPawn(), nullptr);
-	}
+	UGameplayStatics::ApplyDamage(OtherActor, Damage, ShooterController.Get(), ShooterActor.Get(), nullptr);
+
 }
 
 void AGunProjectile::DestroyProjectile()

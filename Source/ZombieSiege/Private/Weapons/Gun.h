@@ -7,7 +7,6 @@
 #include "Gun.generated.h"
 
 class UArrowComponent;
-class ATopDownPlayerController;
 class AGunProjectile;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAmmoChangedSignature, int32 /*NewAmmoCount*/, int32 /*MaxAmmo*/);
@@ -37,13 +36,10 @@ public:
 	// Sets default values for this actor's properties
 	AGun();
 
-	FOnAmmoChangedSignature OnAmmoChangedEvent;
-	FOnReloadStateChanged OnReloadStateChangedEvent;
-
 	UFUNCTION(BlueprintPure)
 	EGunType GetGunType() const { return Type; }
 	
-	void Fire(ATopDownPlayerController* Shooter);
+	void StartFiring(AController* ShooterController, AActor* ShooterActor);
 	void StopFiring();
 	UFUNCTION(BlueprintCallable)
 	void SetVisibility(bool bIsVisible);
@@ -59,29 +55,38 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool GetIsReloading() { return bIsReloading; }
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+public:
+	FOnAmmoChangedSignature OnAmmoChangedEvent;
+	FOnReloadStateChanged OnReloadStateChangedEvent;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+protected:
+	virtual void PostInitProperties() override;
 
 private:
+	UFUNCTION()
+	void SpawnProjectile(AController* ShooterController, AActor* ShooterActor);
+	UFUNCTION()
+	void SingleShot(AController* ShooterController, AActor* ShooterActor);
+	UFUNCTION()
+	void BurstShot(AController* ShooterController, AActor* ShooterActor);
+	UFUNCTION()
+	void FinishReload();
+	
+private:
 	UPROPERTY(VisibleAnywhere, Category="Components")
-	USceneComponent* Root;
+	TObjectPtr<USceneComponent> Root;
 	UPROPERTY(VisibleAnywhere, Category="Components")
-	USkeletalMeshComponent* GunMesh;
+	TObjectPtr<USkeletalMeshComponent> GunMesh;
 	UPROPERTY(VisibleAnywhere, Category="Components")
-	UArrowComponent* FiringArrow;
+	TObjectPtr<UArrowComponent> FiringArrow;
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<USceneComponent> ProjectileSpawn;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ammo", meta=(ClampMin=1, UIMin=1))
 	uint32 MaxAmmo = 30;
 	UPROPERTY(VisibleAnywhere, Category="Ammo", meta=(ClampMin=1, UIMin=1))
 	uint32 CurrentAmmo = 0;	
 	
-	UPROPERTY(VisibleAnywhere, Category="Projectile")
-	USceneComponent* ProjectileSpawn;
 	UPROPERTY(EditAnywhere, Category="Projectile")
 	TSubclassOf<AGunProjectile> ProjectileClass;
 	UPROPERTY(EditAnywhere, Category="Projectile")
@@ -114,13 +119,4 @@ private:
 	FTimerHandle ShotTimer;
 	FTimerHandle BurstTimer;
 	int32 BurstShotsFired = 0;
-	
-	UFUNCTION()
-	void SpawnProjectile(ATopDownPlayerController* Shooter);
-	UFUNCTION()
-	void SingleShot(ATopDownPlayerController* Shooter);
-	UFUNCTION()
-	void BurstShot(ATopDownPlayerController* Shooter);
-	UFUNCTION()
-	void FinishReload();
 };
