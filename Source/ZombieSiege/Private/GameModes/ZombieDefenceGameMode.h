@@ -20,7 +20,9 @@ UCLASS()
 class AZombieDefenceGameMode : public AGameMode
 {
 	GENERATED_BODY()
-
+public:
+	void PlayerDeath(const AController* PlayerController);
+	
 public:
 	FOnRoundChangedSignature OnRoundChangedEvent;
 	
@@ -46,6 +48,8 @@ private:
 private:
 	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))
 	int32 StartingMoney = 500;
+	UPROPERTY(VisibleAnywhere, Category="Player")
+	int32 AlivePlayers = 0;
 
 	UPROPERTY(VisibleAnywhere, Category="Round")
 	int32 RoundNumber = 1;

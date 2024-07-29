@@ -7,9 +7,28 @@
 #include "Components/WeaponLoadoutComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Player/TopDownPlayerController.h"
 #include "Units/UnitSpawnPoint.h"
 #include "Units/UnitCharacter.h"
 #include "Weapons/Gun.h"
+void AZombieDefenceGameMode::PlayerDeath(const AController* PlayerController)
+{
+	// Game Over
+	if (AlivePlayers <= 0)
+	{
+		// Notify all players
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			if (ATopDownPlayerController* TopDownPlayerController = Cast<ATopDownPlayerController>(Iterator->Get()))
+			{
+				TopDownPlayerController->GameOver();
+			}
+		}
+
+		// Stop spawning units
+		GetWorld()->GetTimerManager().ClearTimer(RoundSpawnTimerHandle);
+	}
+}
 
 void AZombieDefenceGameMode::BeginPlay()
 {
@@ -56,6 +75,8 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 				WeaponLoadout->AddWeapon(NewWeapon);
 			}
 		}
+
+		AlivePlayers++;
 	}
 }
 
