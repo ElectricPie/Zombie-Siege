@@ -22,6 +22,8 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
+	virtual void PostInitProperties() override;
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
@@ -67,8 +69,9 @@ private:
 	FTimerHandle ReloadingTimerHandle;
 	
 	UPROPERTY(EditAnywhere, Category="Health", meta=(ClampMin=0.f, UIMin=0.f))
-	float MaxHealth = 100.f;
-	float CurrentHealth;
+	float MaxHealth = 30.f;
+	UPROPERTY(VisibleAnywhere, Category="Health")
+	float CurrentHealth = 30.f;
 
 	UPROPERTY(EditAnywhere, Category="Movement", meta=(ToolTip="How far from forward the character can move before they are considered to be moving backwards", ClampMin="-1.0", ClampMax="1.0", UIMin="-1.0", UIMax="1.0"))
 	float BackwardsThreshold = -0.5f;
