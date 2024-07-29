@@ -9,6 +9,7 @@
 #include "Components/InteractorComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameModes/ZombieDefenceGameMode.h"
 #include "Ui/GameHud.h"
 #include "Weapons/Gun.h"
 
@@ -58,9 +59,8 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	// Unit is killed
 	if (CurrentHealth <= 0.f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerDead"));
+		Die();
 	}
-	
 	
 	return 0.f;
 }
@@ -147,4 +147,16 @@ void APlayerCharacter::OnWeaponAdded(AGun* Weapon)
 
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 	Weapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
+}
+
+void APlayerCharacter::Die()
+{
+	// TODO: Update player state, this will handle the game over
+	if (AZombieDefenceGameMode* GameMode = Cast<AZombieDefenceGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player Dead"));
+		GameMode->PlayerDeath(GetController());
+	}
+	// TODO: Play death animation
+
 }

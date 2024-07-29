@@ -46,6 +46,17 @@ void AGameHud::HideInteractText()
 	GameHudWidget->ShowInteractText(false);
 }
 
+void AGameHud::ShowGameOver()
+{
+	GameHudWidget->SetVisibility(ESlateVisibility::Collapsed);
+	
+	if (GameOverWidgetClass)
+	{
+		GameOverWidget = CreateWidget<UUserWidget>(GetOwningPlayerController(), GameOverWidgetClass);
+		GameOverWidget->AddToViewport();
+	}
+}
+
 void AGameHud::OnRoundChanged(int32 RoundNumber)
 {
 	GameHudWidget->UpdateRoundNumber(RoundNumber);

@@ -61,6 +61,7 @@ private:
 	void OnInteractionExited(TWeakObjectPtr<UInteractableComponent> InteractableComponent);
 
 	void OnWeaponAdded(AGun* Weapon);
+	void Die();
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Weapon", meta=(ToolTip="The time a reload takes if the equiped gun has no reload animation"))

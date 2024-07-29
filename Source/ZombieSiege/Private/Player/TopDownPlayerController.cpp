@@ -8,10 +8,19 @@
 #include "PlayerCharacter.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
+#include "Ui/GameHud.h"
 
 ATopDownPlayerController::ATopDownPlayerController()
 {
 	MoneyStoreComponent = CreateDefaultSubobject<UMoneyStoreComponent>(TEXT("Money Store"));
+}
+
+void ATopDownPlayerController::GameOver()
+{
+	if (AGameHud* GameHud = Cast<AGameHud>(GetHUD()))
+	{
+		GameHud->ShowGameOver();
+	}
 }
 
 void ATopDownPlayerController::BeginPlay()

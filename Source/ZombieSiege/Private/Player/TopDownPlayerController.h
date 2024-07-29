@@ -24,6 +24,7 @@ public:
 	ATopDownPlayerController();
 	
 	FVector GetAimDirection() const { return AimDirection; }
+	void GameOver();
 	
 protected:
 	virtual void BeginPlay() override;
