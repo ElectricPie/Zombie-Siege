@@ -43,7 +43,7 @@ float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 void AUnitCharacter::SetTargetBarricade(TWeakObjectPtr<ABarricade> NewTargetBarricade)
 {
-	TargetBarricade = NewTargetBarricade; 
+	TargetBarricade = NewTargetBarricade;
 }
 
 void AUnitCharacter::BeginPlay()

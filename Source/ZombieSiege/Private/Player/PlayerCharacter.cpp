@@ -37,6 +37,13 @@ APlayerCharacter::APlayerCharacter()
 	WeaponLoadoutComponent->OnWeaponAddedEvent.AddUObject(this, &APlayerCharacter::OnWeaponAdded);
 }
 
+void APlayerCharacter::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	CurrentHealth = MaxHealth;
+}
+
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -47,7 +54,13 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("TakeDamage"));
+	CurrentHealth -= DamageAmount;
+	// Unit is killed
+	if (CurrentHealth <= 0.f)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PlayerDead"));
+	}
+	
 	
 	return 0.f;
 }
