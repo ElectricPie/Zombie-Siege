@@ -37,19 +37,6 @@ APlayerCharacter::APlayerCharacter()
 	WeaponLoadoutComponent->OnWeaponAddedEvent.AddUObject(this, &APlayerCharacter::OnWeaponAdded);
 }
 
-// Called when the game starts or when spawned
-void APlayerCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-// Called every frame
-void APlayerCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -85,7 +72,7 @@ void APlayerCharacter::Interact()
 	InteractorComponent->Interact();
 }
 
-void APlayerCharacter::Fire(ATopDownPlayerController* Shooter)
+void APlayerCharacter::Fire(AController* Shooter)
 {
 	if (bIsReloading) return;
 	
@@ -145,6 +132,6 @@ void APlayerCharacter::OnWeaponAdded(AGun* Weapon)
 {
 	if (Weapon == nullptr) return;
 
-	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
-	Weapon->AttachToComponent(GetMesh(), AttachmentRules, FName("WeaponSocket"));
+	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+	Weapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
 }
