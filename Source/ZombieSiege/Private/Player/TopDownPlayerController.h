@@ -65,4 +65,6 @@ private:
 	void StopFiring();
 	void SwapWeapon();
 	void ReloadWeapon();
+
+	void OnMoneyChanged(const int32 NewMoneyAmount, const int32 AmountChanged);
 };

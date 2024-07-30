@@ -92,16 +92,14 @@ void AZombieDefenceGameMode::OnUnitKilled(AUnitCharacter* UnitKilled, AControlle
 		StartNewRound();
 	}
 
-	int32 ScoreAwarded = 0;
 	if (UMoneyRewardComponent* MoneyRewardComponent = UnitKilled->GetMoneyRewardComponent())
 	{
-		ScoreAwarded = MoneyRewardComponent->RewardMoney(KillInstigator);
+		MoneyRewardComponent->RewardMoney(KillInstigator);
 	}
 
 	if (ADefencePlayerState* DefencePlayerState = KillInstigator->GetPlayerState<ADefencePlayerState>())
 	{
 		DefencePlayerState->AddKill();
-		DefencePlayerState->SetScore(DefencePlayerState->GetScore() + ScoreAwarded);
 	}
 }
 

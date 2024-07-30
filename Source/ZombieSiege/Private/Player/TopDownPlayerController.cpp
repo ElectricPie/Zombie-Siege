@@ -8,11 +8,13 @@
 #include "PlayerCharacter.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
+#include "GameFramework/PlayerState.h"
 #include "Ui/GameHud.h"
 
 ATopDownPlayerController::ATopDownPlayerController()
 {
 	MoneyStoreComponent = CreateDefaultSubobject<UMoneyStoreComponent>(TEXT("Money Store"));
+	MoneyStoreComponent->OnMoneyChangedEvent.AddUObject(this, &ATopDownPlayerController::OnMoneyChanged);
 }
 
 void ATopDownPlayerController::GameOver()
@@ -149,4 +151,14 @@ void ATopDownPlayerController::ReloadWeapon()
 	if (PlayerCharacter == nullptr) return;
 
 	PlayerCharacter->ReloadWeapon();
+}
+
+void ATopDownPlayerController::OnMoneyChanged(const int32 NewMoneyAmount, const int32 AmountChanged)
+{
+	// Update the player state with the new score, only want to add to the score if it is positive
+	if (PlayerState)
+	{
+		const int32 ScoreToAdd = AmountChanged > 0 ? AmountChanged : 0;
+		PlayerState->SetScore(PlayerState->GetScore() + ScoreToAdd);
+	}
 }
