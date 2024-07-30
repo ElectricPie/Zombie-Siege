@@ -151,12 +151,12 @@ void APlayerCharacter::OnWeaponAdded(AGun* Weapon)
 
 void APlayerCharacter::Die()
 {
-	// TODO: Update player state, this will handle the game over
 	if (AZombieDefenceGameMode* GameMode = Cast<AZombieDefenceGameMode>(GetWorld()->GetAuthGameMode()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player Dead"));
 		GameMode->PlayerDeath(GetController());
 	}
+	
 	// TODO: Play death animation
-
+	OnPlayerDeathEvent.Broadcast(this);
 }
