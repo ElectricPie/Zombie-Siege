@@ -3,6 +3,7 @@
 
 #include "GameModes/ZombieDefenceGameMode.h"
 
+#include "Ai/UnitAiController.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -22,21 +23,9 @@ void AZombieDefenceGameMode::PlayerDeath(const AController* PlayerController)
 		DefencePlayerState->AddDeath();
 	}
 	
-	// Game Over
 	if (AlivePlayers <= 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("All players dead, game over"));
-		// Notify all players
-		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-		{
-			if (ATopDownPlayerController* TopDownPlayerController = Cast<ATopDownPlayerController>(Iterator->Get()))
-			{
-				TopDownPlayerController->GameOver();
-			}
-		}
-
-		// Stop spawning units
-		GetWorld()->GetTimerManager().ClearTimer(RoundSpawnTimerHandle);
+		GameOver();
 	}
 }
 
@@ -218,6 +207,34 @@ void AZombieDefenceGameMode::OnSpawnPointActiveChanged(TWeakObjectPtr<AUnitSpawn
 		else if (!bNewActiveState && ActiveSpawnPoints.Contains(SpawnPoint))
 		{
 			ActiveSpawnPoints.Remove(SpawnPoint);
+		}
+	}
+}
+
+void AZombieDefenceGameMode::GameOver()
+{
+	UE_LOG(LogTemp, Warning, TEXT("All players dead, game over"));
+	// Notify all players
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		if (ATopDownPlayerController* TopDownPlayerController = Cast<ATopDownPlayerController>(Iterator->Get()))
+		{
+			TopDownPlayerController->GameOver();
+		}
+	}
+
+	// Stop spawning units
+	GetWorld()->GetTimerManager().ClearTimer(RoundSpawnTimerHandle);
+
+	// Disable all remaining units
+	for (const auto& Unit : ActiveUnits)
+	{
+		if (Unit.IsValid())
+		{
+			if (AUnitAiController* UnitAiController = Cast<AUnitAiController>(Unit.Get()->GetController()))
+			{
+				UnitAiController->StopBehaviorTree();
+			}
 		}
 	}
 }
