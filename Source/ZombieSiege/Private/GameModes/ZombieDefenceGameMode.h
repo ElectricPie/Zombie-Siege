@@ -10,9 +10,6 @@ class AGun;
 class AUnitSpawnPoint;
 class AUnitCharacter;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnRoundChangedSignature, int32 /*RoundNumber*/);
-
-
 /**
  * 
  */
@@ -20,9 +17,8 @@ UCLASS()
 class AZombieDefenceGameMode : public AGameMode
 {
 	GENERATED_BODY()
-
 public:
-	FOnRoundChangedSignature OnRoundChangedEvent;
+	void PlayerDeath(const AController* PlayerController);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -30,10 +26,10 @@ protected:
 	virtual void RestartPlayer(AController* NewPlayer) override;
 
 private:
-	void OnUnitKilled(TWeakObjectPtr<AUnitCharacter> UnitKilled, TWeakObjectPtr<AController> KillerInstigator, TWeakObjectPtr<AActor> KillCauser);
+	void OnUnitKilled(AUnitCharacter* UnitKilled, AController* KillInstigator, AActor* KillCauser);
 
-	int32 RoundUnitCountBelow20();
-	int32 RoundUnitCount20AndAbove();
+	int32 RoundUnitCountBelow20(int32 RoundNumber);
+	int32 RoundUnitCount20AndAbove(int32 RoundNumber);
 	
 	void GetActiveUnitSpawnPoints();
 	void SpawnUnit();
@@ -42,14 +38,15 @@ private:
 	void ResetRoundStats();
 
 	void OnSpawnPointActiveChanged(TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint, bool bNewActiveState);
+
+	void GameOver();
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))
 	int32 StartingMoney = 500;
+	UPROPERTY(VisibleAnywhere, Category="Player")
+	int32 AlivePlayers = 0;
 
-	UPROPERTY(VisibleAnywhere, Category="Round")
-	int32 RoundNumber = 1;
-	
 	UPROPERTY(EditAnywhere, Category="Spawning")
 	TSubclassOf<AUnitCharacter> UnitClass;
 	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=1, UIMin=1, ToolTip="The maximum amount of units that can be spawned in at one time"))

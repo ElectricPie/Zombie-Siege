@@ -33,8 +33,8 @@ float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	// Unit is killed
 	if (CurrentHealth <= 0.f)
 	{
-		MoneyRewardComponent->RewardMoney(EventInstigator);
 		OnKilledEvent.Broadcast(this, EventInstigator, DamageCauser);
+		
 		Destroy();
 	}
 	
@@ -43,7 +43,7 @@ float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 void AUnitCharacter::SetTargetBarricade(TWeakObjectPtr<ABarricade> NewTargetBarricade)
 {
-	TargetBarricade = NewTargetBarricade; 
+	TargetBarricade = NewTargetBarricade;
 }
 
 void AUnitCharacter::BeginPlay()

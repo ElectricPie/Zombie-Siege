@@ -20,13 +20,18 @@ public:
 
 	void SetInteractText(FText const & InteractText);
 	void HideInteractText();
+	void ShowGameOver();
 
 private:
 	void OnRoundChanged(int32 RoundNumber);
 	
 private:
-	UPROPERTY(EditAnywhere, Category=Widgets)
+	UPROPERTY(EditAnywhere, Category="Widgets")
 	TSubclassOf<UGameHudWidget> GameHudWidgetClass;
-	UPROPERTY(VisibleAnywhere, Category=Widgets)
+	UPROPERTY(EditAnywhere, Category="Widgets")
+	TSubclassOf<UUserWidget> GameOverWidgetClass;
+	UPROPERTY(VisibleAnywhere, Category="Widgets")
 	UGameHudWidget* GameHudWidget;
+	UPROPERTY(VisibleAnywhere, Category="Widgets")
+	TObjectPtr<UUserWidget> GameOverWidget;
 };

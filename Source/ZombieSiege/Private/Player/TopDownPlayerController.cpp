@@ -8,10 +8,23 @@
 #include "PlayerCharacter.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
+#include "GameFramework/PlayerState.h"
+#include "Ui/GameHud.h"
 
 ATopDownPlayerController::ATopDownPlayerController()
 {
 	MoneyStoreComponent = CreateDefaultSubobject<UMoneyStoreComponent>(TEXT("Money Store"));
+	MoneyStoreComponent->OnMoneyChangedEvent.AddUObject(this, &ATopDownPlayerController::OnMoneyChanged);
+}
+
+void ATopDownPlayerController::GameOver()
+{
+	if (AGameHud* GameHud = Cast<AGameHud>(GetHUD()))
+	{
+		SetShowMouseCursor(true);
+		GameHud->ShowGameOver();
+		SetInputMode(FInputModeUIOnly());
+	}
 }
 
 void ATopDownPlayerController::BeginPlay()
@@ -23,6 +36,7 @@ void ATopDownPlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(InputMappingContext, 0);
 	}
+	SetInputMode(FInputModeGameOnly());
 }
 
 void ATopDownPlayerController::Tick(float DeltaSeconds)
@@ -74,6 +88,7 @@ void ATopDownPlayerController::FaceMouse()
 {
 	const APlayerCharacter* PlayerActor = Cast<APlayerCharacter>(GetPawn());
 	if (PlayerActor == nullptr) return;
+	if (PlayerActor->GetIsDead()) return;
 
 	FIntVector2 ViewportSize;
 	GetViewportSize(ViewportSize.X, ViewportSize.Y);
@@ -136,4 +151,14 @@ void ATopDownPlayerController::ReloadWeapon()
 	if (PlayerCharacter == nullptr) return;
 
 	PlayerCharacter->ReloadWeapon();
+}
+
+void ATopDownPlayerController::OnMoneyChanged(const int32 NewMoneyAmount, const int32 AmountChanged)
+{
+	// Update the player state with the new score, only want to add to the score if it is positive
+	if (PlayerState)
+	{
+		const int32 ScoreToAdd = AmountChanged > 0 ? AmountChanged : 0;
+		PlayerState->SetScore(PlayerState->GetScore() + ScoreToAdd);
+	}
 }

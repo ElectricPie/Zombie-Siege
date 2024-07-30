@@ -4,9 +4,9 @@
 #include "Ui/GameHud.h"
 
 #include "Blueprint/UserWidget.h"
-#include "GameModes/ZombieDefenceGameMode.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/TopDownPlayerController.h"
+#include "States/DefenceGameState.h"
 #include "Widgets/GameHudWidget.h"
 
 void AGameHud::BeginPlay()
@@ -26,9 +26,9 @@ void AGameHud::BeginPlay()
 		}
 	}
 
-	if (AZombieDefenceGameMode* GameMode = GetWorld()->GetAuthGameMode<AZombieDefenceGameMode>())
+	if (ADefenceGameState* GameState = GetWorld()->GetGameState<ADefenceGameState>())
 	{
-		GameMode->OnRoundChangedEvent.AddUObject(this, &AGameHud::OnRoundChanged);
+		GameState->OnRoundChangedEvent.AddUObject(this, &AGameHud::OnRoundChanged);
 	}
 }
 
@@ -44,6 +44,17 @@ void AGameHud::SetInteractText(FText const& InteractText)
 void AGameHud::HideInteractText()
 {
 	GameHudWidget->ShowInteractText(false);
+}
+
+void AGameHud::ShowGameOver()
+{
+	GameHudWidget->SetVisibility(ESlateVisibility::Collapsed);
+	
+	if (GameOverWidgetClass)
+	{
+		GameOverWidget = CreateWidget<UUserWidget>(GetOwningPlayerController(), GameOverWidgetClass);
+		GameOverWidget->AddToViewport();
+	}
 }
 
 void AGameHud::OnRoundChanged(int32 RoundNumber)

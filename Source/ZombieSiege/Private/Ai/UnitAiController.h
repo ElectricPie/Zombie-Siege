@@ -13,7 +13,10 @@ UCLASS()
 class AUnitAiController : public AAIController
 {
 	GENERATED_BODY()
-
+	
+public:
+	void StopBehaviorTree();
+	
 protected:
 	virtual void BeginPlay() override;
 
