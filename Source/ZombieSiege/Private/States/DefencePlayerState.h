@@ -19,11 +19,18 @@ public:
 	void AddDeath();
 	void AddKill();
 
+	UFUNCTION(BlueprintPure, Category="Player")
+	int32 GetTotalScore() const { return TotalScore; }
+	UFUNCTION(BlueprintPure, Category="Player")
+	int32 GetTotalKills() const { return TotalKills; }
+	UFUNCTION(BlueprintPure, Category="Player")
+	int32 GetTotalDeaths() const { return TotalDeaths; }
+
 private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category="Player")
 	int32 TotalScore = 0;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category="Player")
 	int32 TotalKills = 0;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category="Player")
 	int32 TotalDeaths = 0;
 };
