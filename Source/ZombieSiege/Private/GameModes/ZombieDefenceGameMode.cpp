@@ -9,6 +9,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/TopDownPlayerController.h"
 #include "States/DefenceGameState.h"
+#include "States/DefencePlayerState.h"
 #include "Units/UnitSpawnPoint.h"
 #include "Units/UnitCharacter.h"
 #include "Weapons/Gun.h"
@@ -16,6 +17,10 @@
 void AZombieDefenceGameMode::PlayerDeath(const AController* PlayerController)
 {
 	AlivePlayers--;
+	if (ADefencePlayerState* DefencePlayerState = PlayerController->GetPlayerState<ADefencePlayerState>())
+	{
+		DefencePlayerState->AddDeath();
+	}
 	
 	// Game Over
 	if (AlivePlayers <= 0)
@@ -84,9 +89,9 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 	}
 }
 
-void AZombieDefenceGameMode::OnUnitKilled(TWeakObjectPtr<AUnitCharacter> UnitKilled,
-                                          TWeakObjectPtr<AController> KillerInstigator,
-                                          TWeakObjectPtr<AActor> KillCauser)
+void AZombieDefenceGameMode::OnUnitKilled(AUnitCharacter* UnitKilled,
+                                          AController* KillerInstigator,
+                                          AActor* KillCauser)
 {
 	if (!ActiveUnits.Contains(UnitKilled)) return;
 
@@ -97,6 +102,11 @@ void AZombieDefenceGameMode::OnUnitKilled(TWeakObjectPtr<AUnitCharacter> UnitKil
 	{
 		UE_LOG(LogTemp, Warning, TEXT("All units killed, starting new round"));
 		StartNewRound();
+	}
+
+	if (ADefencePlayerState* DefencePlayerState = KillerInstigator->GetPlayerState<ADefencePlayerState>())
+	{
+		DefencePlayerState->AddKill();
 	}
 }
 

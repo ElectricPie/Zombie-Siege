@@ -35,6 +35,7 @@ float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	{
 		MoneyRewardComponent->RewardMoney(EventInstigator);
 		OnKilledEvent.Broadcast(this, EventInstigator, DamageCauser);
+		
 		Destroy();
 	}
 	
