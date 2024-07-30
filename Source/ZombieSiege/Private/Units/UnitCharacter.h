@@ -10,7 +10,7 @@ class ABarricade;
 class UMoneyRewardComponent;
 class UBehaviorTree;
 
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnUnitKilledSingature, TWeakObjectPtr<AUnitCharacter> /*UnitKilled*/, TWeakObjectPtr<AController> /*KillerInstigator*/, TWeakObjectPtr<AActor> /*KillCauser*/)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnUnitKilledSingature, AUnitCharacter* /*UnitKilled*/, AController* /*KillerInstigator*/, AActor* /*KillCauser*/)
 
 UCLASS()
 class AUnitCharacter : public ACharacter
