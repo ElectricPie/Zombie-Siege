@@ -4,6 +4,7 @@
 #include "GameModes/ZombieDefenceGameMode.h"
 
 #include "Ai/UnitAiController.h"
+#include "Components/MoneyRewardComponent.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -78,9 +79,7 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 	}
 }
 
-void AZombieDefenceGameMode::OnUnitKilled(AUnitCharacter* UnitKilled,
-                                          AController* KillerInstigator,
-                                          AActor* KillCauser)
+void AZombieDefenceGameMode::OnUnitKilled(AUnitCharacter* UnitKilled, AController* KillInstigator, AActor* KillCauser)
 {
 	if (!ActiveUnits.Contains(UnitKilled)) return;
 
@@ -93,9 +92,16 @@ void AZombieDefenceGameMode::OnUnitKilled(AUnitCharacter* UnitKilled,
 		StartNewRound();
 	}
 
-	if (ADefencePlayerState* DefencePlayerState = KillerInstigator->GetPlayerState<ADefencePlayerState>())
+	int32 ScoreAwarded = 0;
+	if (UMoneyRewardComponent* MoneyRewardComponent = UnitKilled->GetMoneyRewardComponent())
+	{
+		ScoreAwarded = MoneyRewardComponent->RewardMoney(KillInstigator);
+	}
+
+	if (ADefencePlayerState* DefencePlayerState = KillInstigator->GetPlayerState<ADefencePlayerState>())
 	{
 		DefencePlayerState->AddKill();
+		DefencePlayerState->SetScore(DefencePlayerState->GetScore() + ScoreAwarded);
 	}
 }
 

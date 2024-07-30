@@ -16,7 +16,13 @@ public:
 	// Sets default values for this component's properties
 	UMoneyRewardComponent();
 
-	void RewardMoney(const AActor* ActorToReward);
+	
+	/**
+	 * @brief Gives the MoneyStoreComponent attached to the ActorToReward the AmountToGive
+	 * @param ActorToReward The actor to give the money to
+	 * @return The amount of money given to the store, 0 if the store is not found or the time between rewards has not passed
+	 */
+	int32 RewardMoney(const AActor* ActorToReward);
 	void SetAmountToGive(const int32 NewAmountToGive) { AmountToGive = NewAmountToGive; }
 	void SetTimeBetweenRewards(const float NewTimeBetweenRewards) { TimeBetweenRewards = NewTimeBetweenRewards; }
 

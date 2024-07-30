@@ -7,6 +7,7 @@
 #include "DefencePlayerState.generated.h"
 
 class UMoneyStoreComponent;
+
 /**
  * 
  */
@@ -16,19 +17,15 @@ class ADefencePlayerState : public APlayerState
 	GENERATED_BODY()
 
 public:
-	void AddDeath();
-	void AddKill();
+	void AddDeath() { TotalDeaths++; }
+	void AddKill() { TotalKills++; }
 
-	UFUNCTION(BlueprintPure, Category="Player")
-	int32 GetTotalScore() const { return TotalScore; }
 	UFUNCTION(BlueprintPure, Category="Player")
 	int32 GetTotalKills() const { return TotalKills; }
 	UFUNCTION(BlueprintPure, Category="Player")
 	int32 GetTotalDeaths() const { return TotalDeaths; }
 
 private:
-	UPROPERTY(VisibleAnywhere, Category="Player")
-	int32 TotalScore = 0;
 	UPROPERTY(VisibleAnywhere, Category="Player")
 	int32 TotalKills = 0;
 	UPROPERTY(VisibleAnywhere, Category="Player")

@@ -2,13 +2,3 @@
 
 
 #include "States/DefencePlayerState.h"
-
-void ADefencePlayerState::AddDeath()
-{
-	TotalDeaths++;
-}
-
-void ADefencePlayerState::AddKill()
-{
-	TotalKills++;
-}
