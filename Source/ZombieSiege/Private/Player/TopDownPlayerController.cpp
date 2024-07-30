@@ -19,7 +19,9 @@ void ATopDownPlayerController::GameOver()
 {
 	if (AGameHud* GameHud = Cast<AGameHud>(GetHUD()))
 	{
+		SetShowMouseCursor(true);
 		GameHud->ShowGameOver();
+		SetInputMode(FInputModeUIOnly());
 	}
 }
 
@@ -32,6 +34,7 @@ void ATopDownPlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(InputMappingContext, 0);
 	}
+	SetInputMode(FInputModeGameOnly());
 }
 
 void ATopDownPlayerController::Tick(float DeltaSeconds)
