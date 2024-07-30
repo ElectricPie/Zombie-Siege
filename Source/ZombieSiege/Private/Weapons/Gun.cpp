@@ -48,7 +48,7 @@ void AGun::StartFiring(AController* ShooterController, AActor* ShooterActor)
 			SpawnProjectile(ShooterController, ShooterActor);
 			BurstShotsFired = 1;
 			FTimerDelegate BurstDelegate;
-			BurstDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGun, BurstShot), ShooterController);
+			BurstDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGun, BurstShot), ShooterController, ShooterActor);
 			GetWorld()->GetTimerManager().SetTimer(BurstTimer, BurstDelegate, ShotIntervals, true);
 			break;
 		}
@@ -56,7 +56,7 @@ void AGun::StartFiring(AController* ShooterController, AActor* ShooterActor)
 		{
 			SpawnProjectile(ShooterController, ShooterActor);
 			FTimerDelegate ShotDelegate;
-			ShotDelegate.BindUFunction(this,  GET_FUNCTION_NAME_CHECKED(AGun, SingleShot), ShooterController);
+			ShotDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGun, SingleShot), ShooterController, ShooterActor);
 			GetWorld()->GetTimerManager().SetTimer(ShotTimer, ShotDelegate, ShotIntervals, true);
 			break;
 		}
