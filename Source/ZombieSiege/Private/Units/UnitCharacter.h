@@ -10,7 +10,7 @@ class ABarricade;
 class UMoneyRewardComponent;
 class UBehaviorTree;
 
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnUnitKilledSingature, TWeakObjectPtr<AUnitCharacter> /*UnitKilled*/, TWeakObjectPtr<AController> /*KillerInstigator*/, TWeakObjectPtr<AActor> /*KillCauser*/)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnUnitKilledSingature, AUnitCharacter* /*UnitKilled*/, AController* /*KillInstigator*/, AActor* /*KillCauser*/)
 
 UCLASS()
 class AUnitCharacter : public ACharacter
@@ -32,6 +32,8 @@ public:
 	UFUNCTION(BlueprintPure, Category="Target")
 	ABarricade* GetTargetBarricade() const { return TargetBarricade.Get(); }
 	void SetTargetBarricade(TWeakObjectPtr<ABarricade> NewTargetBarricade);
+
+	UMoneyRewardComponent* GetMoneyRewardComponent() const { return MoneyRewardComponent; }
 	
 public:
 	FOnUnitKilledSingature OnKilledEvent;
@@ -41,7 +43,7 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
-	float AttackDamage = 25.f;
+	float AttackDamage = 10.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
 	float AttackRange = 100.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))

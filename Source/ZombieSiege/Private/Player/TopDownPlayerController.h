@@ -24,6 +24,7 @@ public:
 	ATopDownPlayerController();
 	
 	FVector GetAimDirection() const { return AimDirection; }
+	void GameOver();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -64,4 +65,6 @@ private:
 	void StopFiring();
 	void SwapWeapon();
 	void ReloadWeapon();
+
+	void OnMoneyChanged(const int32 NewMoneyAmount, const int32 AmountChanged);
 };

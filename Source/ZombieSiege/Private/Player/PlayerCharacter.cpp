@@ -9,6 +9,7 @@
 #include "Components/InteractorComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameModes/ZombieDefenceGameMode.h"
 #include "Ui/GameHud.h"
 #include "Weapons/Gun.h"
 
@@ -37,6 +38,13 @@ APlayerCharacter::APlayerCharacter()
 	WeaponLoadoutComponent->OnWeaponAddedEvent.AddUObject(this, &APlayerCharacter::OnWeaponAdded);
 }
 
+void APlayerCharacter::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	CurrentHealth = MaxHealth;
+}
+
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -47,7 +55,12 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("TakeDamage"));
+	CurrentHealth -= DamageAmount;
+	// Unit is killed
+	if (CurrentHealth <= 0.f)
+	{
+		Die();
+	}
 	
 	return 0.f;
 }
@@ -134,4 +147,16 @@ void APlayerCharacter::OnWeaponAdded(AGun* Weapon)
 
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 	Weapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
+}
+
+void APlayerCharacter::Die()
+{
+	if (AZombieDefenceGameMode* GameMode = Cast<AZombieDefenceGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player Dead"));
+		GameMode->PlayerDeath(GetController());
+	}
+	
+	bIsDead = true;
+	OnPlayerDeathEvent.Broadcast(this);
 }

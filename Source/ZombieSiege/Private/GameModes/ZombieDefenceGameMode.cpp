@@ -3,13 +3,32 @@
 
 #include "GameModes/ZombieDefenceGameMode.h"
 
+#include "Ai/UnitAiController.h"
+#include "Components/MoneyRewardComponent.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Player/TopDownPlayerController.h"
+#include "States/DefenceGameState.h"
+#include "States/DefencePlayerState.h"
 #include "Units/UnitSpawnPoint.h"
 #include "Units/UnitCharacter.h"
 #include "Weapons/Gun.h"
+
+void AZombieDefenceGameMode::PlayerDeath(const AController* PlayerController)
+{
+	AlivePlayers--;
+	if (ADefencePlayerState* DefencePlayerState = PlayerController->GetPlayerState<ADefencePlayerState>())
+	{
+		DefencePlayerState->AddDeath();
+	}
+	
+	if (AlivePlayers <= 0)
+	{
+		GameOver();
+	}
+}
 
 void AZombieDefenceGameMode::BeginPlay()
 {
@@ -22,7 +41,6 @@ void AZombieDefenceGameMode::BeginPlay()
 
 		// Initial round setup
 		ResetRoundStats();
-		OnRoundChangedEvent.Broadcast(RoundNumber);
 		UnitsToBeSpawnedThisRound = InitialUnitCount;
 		GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
 										   RoundStartDelay, true, CurrentSpawnDelay);
@@ -56,12 +74,12 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 				WeaponLoadout->AddWeapon(NewWeapon);
 			}
 		}
+
+		AlivePlayers++;
 	}
 }
 
-void AZombieDefenceGameMode::OnUnitKilled(TWeakObjectPtr<AUnitCharacter> UnitKilled,
-                                          TWeakObjectPtr<AController> KillerInstigator,
-                                          TWeakObjectPtr<AActor> KillCauser)
+void AZombieDefenceGameMode::OnUnitKilled(AUnitCharacter* UnitKilled, AController* KillInstigator, AActor* KillCauser)
 {
 	if (!ActiveUnits.Contains(UnitKilled)) return;
 
@@ -70,17 +88,28 @@ void AZombieDefenceGameMode::OnUnitKilled(TWeakObjectPtr<AUnitCharacter> UnitKil
 
 	if (UnitsKilledThisRound >= UnitsToBeSpawnedThisRound)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("All units killed, starting new round"));
 		StartNewRound();
+	}
+
+	if (UMoneyRewardComponent* MoneyRewardComponent = UnitKilled->GetMoneyRewardComponent())
+	{
+		MoneyRewardComponent->RewardMoney(KillInstigator);
+	}
+
+	if (ADefencePlayerState* DefencePlayerState = KillInstigator->GetPlayerState<ADefencePlayerState>())
+	{
+		DefencePlayerState->AddKill();
 	}
 }
 
-int32 AZombieDefenceGameMode::RoundUnitCountBelow20()
+int32 AZombieDefenceGameMode::RoundUnitCountBelow20(int32 RoundNumber)
 {
 	return -1.091f + 6.312f * RoundNumber - 0.421f * (RoundNumber * RoundNumber) + 0.013 * (RoundNumber * RoundNumber *
 		RoundNumber);
 }
 
-int32 AZombieDefenceGameMode::RoundUnitCount20AndAbove()
+int32 AZombieDefenceGameMode::RoundUnitCount20AndAbove(int32 RoundNumber)
 {
 	return 0.09f * (RoundNumber * RoundNumber) - 0.0029f * RoundNumber + 23.9580;
 }
@@ -139,22 +168,30 @@ void AZombieDefenceGameMode::SpawnUnit()
 
 void AZombieDefenceGameMode::StartNewRound()
 {
-	RoundNumber++;
-	OnRoundChangedEvent.Broadcast(RoundNumber);
-	
-	ResetRoundStats();
-	// Get the number of units to be spawned this round
-	if (RoundNumber < 20)
+	if (ADefenceGameState* DefenceGameState = GetGameState<ADefenceGameState>())
 	{
-		UnitsToBeSpawnedThisRound = RoundUnitCountBelow20();
+		DefenceGameState->StartNextRound();
+		
+		ResetRoundStats();
+		const int32 CurrentRound = DefenceGameState->GetCurrentRound();
+		UE_LOG(LogTemp, Warning, TEXT("New Round %d"), CurrentRound);
+		// Get the number of units to be spawned this round
+		if (CurrentRound < 20)
+		{
+			UnitsToBeSpawnedThisRound = RoundUnitCountBelow20(CurrentRound);
+		}
+		else
+		{
+			UnitsToBeSpawnedThisRound = RoundUnitCount20AndAbove(CurrentRound);
+		}
+	
+		GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
+											   RoundStartDelay, true, CurrentSpawnDelay);
 	}
 	else
 	{
-		UnitsToBeSpawnedThisRound = RoundUnitCount20AndAbove();
+		UE_LOG(LogTemp, Warning, TEXT("Unable to get DefenceGameState"));
 	}
-	
-	GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
-										   RoundStartDelay, true, CurrentSpawnDelay);
 }
 
 void AZombieDefenceGameMode::ResetRoundStats()
@@ -174,6 +211,34 @@ void AZombieDefenceGameMode::OnSpawnPointActiveChanged(TWeakObjectPtr<AUnitSpawn
 		else if (!bNewActiveState && ActiveSpawnPoints.Contains(SpawnPoint))
 		{
 			ActiveSpawnPoints.Remove(SpawnPoint);
+		}
+	}
+}
+
+void AZombieDefenceGameMode::GameOver()
+{
+	UE_LOG(LogTemp, Warning, TEXT("All players dead, game over"));
+	// Notify all players
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		if (ATopDownPlayerController* TopDownPlayerController = Cast<ATopDownPlayerController>(Iterator->Get()))
+		{
+			TopDownPlayerController->GameOver();
+		}
+	}
+
+	// Stop spawning units
+	GetWorld()->GetTimerManager().ClearTimer(RoundSpawnTimerHandle);
+
+	// Disable all remaining units
+	for (const auto& Unit : ActiveUnits)
+	{
+		if (Unit.IsValid())
+		{
+			if (AUnitAiController* UnitAiController = Cast<AUnitAiController>(Unit.Get()->GetController()))
+			{
+				UnitAiController->StopBehaviorTree();
+			}
 		}
 	}
 }
