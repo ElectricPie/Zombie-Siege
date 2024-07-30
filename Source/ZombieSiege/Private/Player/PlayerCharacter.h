@@ -47,6 +47,9 @@ public:
 	void StopFiring();
 	void ReloadWeapon();
 
+	UFUNCTION(BlueprintPure)
+	bool GetIsDead() const { return bIsDead; }
+
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerDeath OnPlayerDeathEvent;
@@ -80,6 +83,8 @@ private:
 	float MaxHealth = 30.f;
 	UPROPERTY(VisibleAnywhere, Category="Health")
 	float CurrentHealth = 30.f;
+	UPROPERTY(VisibleAnywhere, Category="Health")
+	bool bIsDead = false;
 
 	UPROPERTY(EditAnywhere, Category="Movement", meta=(ToolTip="How far from forward the character can move before they are considered to be moving backwards", ClampMin="-1.0", ClampMax="1.0", UIMin="-1.0", UIMax="1.0"))
 	float BackwardsThreshold = -0.5f;

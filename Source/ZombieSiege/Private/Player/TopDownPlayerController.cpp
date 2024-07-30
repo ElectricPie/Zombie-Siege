@@ -86,6 +86,7 @@ void ATopDownPlayerController::FaceMouse()
 {
 	const APlayerCharacter* PlayerActor = Cast<APlayerCharacter>(GetPawn());
 	if (PlayerActor == nullptr) return;
+	if (PlayerActor->GetIsDead()) return;
 
 	FIntVector2 ViewportSize;
 	GetViewportSize(ViewportSize.X, ViewportSize.Y);
