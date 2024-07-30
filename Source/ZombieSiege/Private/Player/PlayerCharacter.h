@@ -7,11 +7,14 @@
 #include "PlayerCharacter.generated.h"
 
 class AGun;
+class UAnimMontage;
 class UCameraComponent;
 class UInteractableComponent;
 class UInteractorComponent;
 class USpringArmComponent;
 class UWeaponLoadoutComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDeath, APlayerCharacter*, PlayerCharacter);
 
 UCLASS()
 class APlayerCharacter : public ACharacter
@@ -43,6 +46,10 @@ public:
 	void Fire(AController* Shooter);
 	void StopFiring();
 	void ReloadWeapon();
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerDeath OnPlayerDeathEvent;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
