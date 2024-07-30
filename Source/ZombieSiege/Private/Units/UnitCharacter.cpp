@@ -33,7 +33,6 @@ float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	// Unit is killed
 	if (CurrentHealth <= 0.f)
 	{
-		MoneyRewardComponent->RewardMoney(EventInstigator);
 		OnKilledEvent.Broadcast(this, EventInstigator, DamageCauser);
 		
 		Destroy();

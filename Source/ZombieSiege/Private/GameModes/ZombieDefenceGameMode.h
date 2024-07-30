@@ -26,7 +26,7 @@ protected:
 	virtual void RestartPlayer(AController* NewPlayer) override;
 
 private:
-	void OnUnitKilled(AUnitCharacter* UnitKilled, AController* KillerInstigator, AActor* KillCauser);
+	void OnUnitKilled(AUnitCharacter* UnitKilled, AController* KillInstigator, AActor* KillCauser);
 
 	int32 RoundUnitCountBelow20(int32 RoundNumber);
 	int32 RoundUnitCount20AndAbove(int32 RoundNumber);

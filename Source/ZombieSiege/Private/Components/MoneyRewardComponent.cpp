@@ -15,26 +15,29 @@ UMoneyRewardComponent::UMoneyRewardComponent()
 
 }
 
-void UMoneyRewardComponent::RewardMoney(const AActor* ActorToReward)
+int32 UMoneyRewardComponent::RewardMoney(const AActor* ActorToReward)
 {
-	if (ActorToReward == nullptr) return;
-	if (GetWorld() == nullptr) return;
+	if (ActorToReward == nullptr) return 0;
+	if (GetWorld() == nullptr) return 0;
 
 	const double CurrentTime = UGameplayStatics::GetTimeSeconds(GetWorld());
 	if (TimeBetweenRewards != 0.f)
 	{
 		if (CurrentTime - LastRewardAt < TimeBetweenRewards)
 		{
-			return;
+			return 0;
 		}
 	}
-	
+
 	if (UMoneyStoreComponent* MoneyStore = ActorToReward->GetComponentByClass<UMoneyStoreComponent>())
 	{
 		MoneyStore->AddMoney(AmountToGive);	
-
 		LastRewardAt = CurrentTime;
+		
+		return AmountToGive;
 	}
+
+	return 0;
 }
 
 void UMoneyRewardComponent::BeginPlay()
