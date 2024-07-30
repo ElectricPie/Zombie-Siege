@@ -157,6 +157,6 @@ void APlayerCharacter::Die()
 		GameMode->PlayerDeath(GetController());
 	}
 	
-	// TODO: Play death animation
+	bIsDead = true;
 	OnPlayerDeathEvent.Broadcast(this);
 }
