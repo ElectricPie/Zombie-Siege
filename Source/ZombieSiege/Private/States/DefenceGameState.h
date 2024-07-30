@@ -17,6 +17,7 @@ class ADefenceGameState : public AGameState
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintPure, Category="Round")
 	int32 GetCurrentRound() const { return CurrentRound; }
 	void StartNextRound();
 

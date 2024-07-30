@@ -15,9 +15,12 @@
 
 void AZombieDefenceGameMode::PlayerDeath(const AController* PlayerController)
 {
+	AlivePlayers--;
+	
 	// Game Over
 	if (AlivePlayers <= 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("All players dead, game over"));
 		// Notify all players
 		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 		{
