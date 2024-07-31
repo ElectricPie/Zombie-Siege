@@ -3,7 +3,7 @@
 
 #include "Leaderboards/LeaderboardsSaveGame.h"
 
-void ULeaderboardsSaveGame::PrintLeaderboardData(FLeaderboardData Data) const
+void ULeaderboardsSaveGame::PrintLeaderboardData(FLeaderboardData Data)
 {
 	UE_LOG(LogTemp, Warning, TEXT("PlayerName: %s"), *Data.PlayerName);
 	UE_LOG(LogTemp, Warning, TEXT("RoundsSurvived: %d"), Data.RoundsSurvived);
