@@ -38,5 +38,5 @@ public:
 	TArray<FLeaderboardData> LeaderboardData;
 	
 	UFUNCTION(BlueprintCallable)
-	void PrintLeaderboardData(FLeaderboardData Data) const;
+	static void PrintLeaderboardData(FLeaderboardData Data);
 };
