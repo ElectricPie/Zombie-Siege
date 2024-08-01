@@ -34,9 +34,6 @@ class ULeaderboardsSaveGame : public USaveGame
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY()
 	TArray<FLeaderboardData> LeaderboardData;
-	
-	UFUNCTION(BlueprintCallable)
-	static void PrintLeaderboardData(FLeaderboardData Data);
 };

@@ -6,6 +6,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "GameSaveSubsystem.generated.h"
 
+struct FLeaderboardData;
 class ULeaderboardsSaveGame;
 /**
  * 
@@ -16,18 +17,22 @@ class UGameSaveSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, Category="Game Save")
+	void AddLeaderboardEntry(const FLeaderboardData& Data);
 	/**
 	 * @brief Load the leaderboards save game to this subsystem
-	 * @return The leaderboards save game, nullptr if not found
+	 * @return True if the leaderboards were loaded successfully
 	 */
-	UFUNCTION(BlueprintCallable, Category="Game Save", meta=(ReturnDisplayName="Save Game"))
-	ULeaderboardsSaveGame* LoadLeaderboards();
+	UFUNCTION(BlueprintCallable, Category="Game Save", meta=(ReturnDisplayName="Save Was Loaded"))
+	bool LoadLeaderboards(bool bOverwriteCurrent = false);
 	UFUNCTION(BlueprintCallable, Category="Game Save")
-	void SaveLeaderboards(ADefenceGameState* GameState, ADefencePlayerState* PlayerState);
+	void SaveLeaderboards();
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Game Save")
 	FString SaveSlotName = TEXT("Leaderboards");
-	
-	TObjectPtr<ULeaderboardsSaveGame> LeaderboardsSaveGame = nullptr;
+
+	TArray<FLeaderboardData> LeaderboardData;
+
+	bool bLeaderboardsLoadAttempted = false;
 };
