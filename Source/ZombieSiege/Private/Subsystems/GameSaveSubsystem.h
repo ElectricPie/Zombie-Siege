@@ -27,11 +27,15 @@ public:
 	bool LoadLeaderboards(bool bOverwriteCurrent = false);
 	UFUNCTION(BlueprintCallable, Category="Game Save")
 	void SaveLeaderboards();
+
+	UFUNCTION(BlueprintGetter, Category="Game Save")
+	const TArray<FLeaderboardData>& GetLeaderboardData() const { return LeaderboardData; }
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Game Save")
 	FString SaveSlotName = TEXT("Leaderboards");
 
+	UPROPERTY(BLueprintGetter=GetLeaderboardData)
 	TArray<FLeaderboardData> LeaderboardData;
 
 	bool bLeaderboardsLoadAttempted = false;
