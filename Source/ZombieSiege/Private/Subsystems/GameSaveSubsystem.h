@@ -23,7 +23,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Game Save", meta=(ReturnDisplayName="Save Game"))
 	ULeaderboardsSaveGame* LoadLeaderboards();
 	UFUNCTION(BlueprintCallable, Category="Game Save")
-	void SaveLeaderboards();
+	void SaveLeaderboards(ADefenceGameState* GameState, ADefencePlayerState* PlayerState);
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Game Save")
