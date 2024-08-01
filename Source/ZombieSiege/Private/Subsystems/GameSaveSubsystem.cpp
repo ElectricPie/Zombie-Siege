@@ -6,30 +6,60 @@
 #include "Kismet/GameplayStatics.h"
 #include "Leaderboards/LeaderboardsSaveGame.h"
 #include "States/DefenceGameState.h"
-#include "States/DefencePlayerState.h"
 
-ULeaderboardsSaveGame* UGameSaveSubsystem::LoadLeaderboards()
+void UGameSaveSubsystem::AddLeaderboardEntry(const FLeaderboardData& Data)
 {
-	USaveGame* SaveGame = UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0);
-	LeaderboardsSaveGame = Cast<ULeaderboardsSaveGame>(SaveGame);
-	if (LeaderboardsSaveGame)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Save Found"));
-	}
-
-	return LeaderboardsSaveGame;
+	LeaderboardData.Add(Data);
 }
 
-void UGameSaveSubsystem::SaveLeaderboards(ADefenceGameState* GameState, ADefencePlayerState* PlayerState)
+bool UGameSaveSubsystem::LoadLeaderboards(bool bOverwriteCurrent)
 {
-	FLeaderboardData Data = {
-		"None",
-	    GameState->GetCurrentRound(),
-	    PlayerState->GetTotalKills(),
-	    FMath::FloorToInt32(PlayerState->GetScore()) ,
-	    PlayerState->GetTotalDeaths(),
-	    FDateTime::Now()
-	};
+	// Ignore check if we are overwriting the current data
+	if (!bOverwriteCurrent)
+	{
+		// Dont load if there are already entries
+		if (LeaderboardData.Num() > 0)
+			return false;
+	}
+	
+	bLeaderboardsLoadAttempted = true;
+	
+	USaveGame* SaveGame = UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0);
+	if (const ULeaderboardsSaveGame* LeaderboardsSaveGame = Cast<ULeaderboardsSaveGame>(SaveGame))
+	{
+		LeaderboardData = LeaderboardsSaveGame->LeaderboardData;
+		return true;
+	}
 
-	ULeaderboardsSaveGame::PrintLeaderboardData(Data);
+	return false;
+}
+
+void UGameSaveSubsystem::SaveLeaderboards()
+{
+	// if the leaderboards are empty try to load them
+	if (!bLeaderboardsLoadAttempted)
+	{
+		// Save the current leaderboard data to be added back after loading
+		const TArray<FLeaderboardData> TempLeaderboardData = LeaderboardData;
+		UE_LOG(LogTemp, Warning, TEXT("SaveLeaderboards: have not been loaded, loading from save"));
+		LoadLeaderboards(true);
+		LeaderboardData.Append(TempLeaderboardData);
+	}
+	
+	ULeaderboardsSaveGame* LeaderboardsSaveGame = Cast<ULeaderboardsSaveGame>(UGameplayStatics::CreateSaveGameObject(ULeaderboardsSaveGame::StaticClass()));
+	if (LeaderboardsSaveGame == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to create save game object"));
+		return;
+	}
+
+	LeaderboardsSaveGame->LeaderboardData = LeaderboardData;
+	if (UGameplayStatics::SaveGameToSlot(LeaderboardsSaveGame, SaveSlotName, 0))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Saved leaderboards"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to save leaderboards"));
+	}
 }
