@@ -5,6 +5,8 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Leaderboards/LeaderboardsSaveGame.h"
+#include "States/DefenceGameState.h"
+#include "States/DefencePlayerState.h"
 
 ULeaderboardsSaveGame* UGameSaveSubsystem::LoadLeaderboards()
 {
@@ -18,6 +20,16 @@ ULeaderboardsSaveGame* UGameSaveSubsystem::LoadLeaderboards()
 	return LeaderboardsSaveGame;
 }
 
-void UGameSaveSubsystem::SaveLeaderboards()
+void UGameSaveSubsystem::SaveLeaderboards(ADefenceGameState* GameState, ADefencePlayerState* PlayerState)
 {
+	FLeaderboardData Data = {
+		"None",
+	    GameState->GetCurrentRound(),
+	    PlayerState->GetTotalKills(),
+	    FMath::FloorToInt32(PlayerState->GetScore()) ,
+	    PlayerState->GetTotalDeaths(),
+	    FDateTime::Now()
+	};
+
+	ULeaderboardsSaveGame::PrintLeaderboardData(Data);
 }
