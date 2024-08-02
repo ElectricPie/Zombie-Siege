@@ -17,6 +17,10 @@ class UGameSaveSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	/**
+	 * @brief Adds the leaderboard entry to the leaderboard data, sorting it by rounds survived
+	 * @param Data The data to add to the leaderboard
+	 */
 	UFUNCTION(BlueprintCallable, Category="Game Save")
 	void AddLeaderboardEntry(const FLeaderboardData& Data);
 	/**

@@ -9,7 +9,19 @@
 
 void UGameSaveSubsystem::AddLeaderboardEntry(const FLeaderboardData& Data)
 {
-	LeaderboardData.Add(Data);
+	const int32 InsertIndex = LeaderboardData.IndexOfByPredicate([&Data](const FLeaderboardData& LeaderboardData)
+	{
+		return LeaderboardData.RoundsSurvived < Data.RoundsSurvived;
+	});
+
+	if (InsertIndex == INDEX_NONE)
+	{
+		LeaderboardData.Add(Data);
+	}
+	else
+	{
+		LeaderboardData.Insert(Data, InsertIndex);
+	}
 }
 
 bool UGameSaveSubsystem::LoadLeaderboards(bool bOverwriteCurrent)
