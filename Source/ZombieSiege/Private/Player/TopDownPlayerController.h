@@ -33,6 +33,26 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	
 private:
+	void Move(const FInputActionValue& Value);
+	void FaceMouse();
+	
+	void Interact();
+	
+	void Fire();
+	void StopFiring();
+	void SwapWeapon();
+	void ReloadWeapon();
+
+	void OnMoneyChanged(const int32 NewMoneyAmount, const int32 AmountChanged);
+
+	/**
+	 * @brief Check if the player can do any action, this includes checking if the game is over or if the player
+	 * character is valid and dead
+	 * @return True if the player can do any action, false otherwise
+	 */
+	bool CanDoAction() const;
+	
+private:
 	UPROPERTY(VisibleAnywhere, Category="Money")
 	UMoneyStoreComponent* MoneyStoreComponent;
 	
@@ -55,16 +75,6 @@ private:
 	TWeakObjectPtr<APlayerCharacter> PlayerCharacter;
 	
 	FVector AimDirection = FVector(0.f);
-	
-	void Move(const FInputActionValue& Value);
-	void FaceMouse();
-	
-	void Interact();
-	
-	void Fire();
-	void StopFiring();
-	void SwapWeapon();
-	void ReloadWeapon();
 
-	void OnMoneyChanged(const int32 NewMoneyAmount, const int32 AmountChanged);
+	bool bIsGameOver = false;
 };

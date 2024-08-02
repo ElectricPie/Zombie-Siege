@@ -19,6 +19,7 @@ ATopDownPlayerController::ATopDownPlayerController()
 
 void ATopDownPlayerController::GameOver()
 {
+	bIsGameOver = true;
 	if (AGameHud* GameHud = Cast<AGameHud>(GetHUD()))
 	{
 		SetShowMouseCursor(true);
@@ -78,7 +79,8 @@ void ATopDownPlayerController::OnPossess(APawn* InPawn)
 
 void ATopDownPlayerController::Move(const FInputActionValue& Value)
 {
-	if (PlayerCharacter == nullptr) return;
+	if (!CanDoAction())
+		return;
 
 	const FVector2D Direction = Value.Get<FVector2D>();
 	PlayerCharacter->Move(FVector(Direction.X, Direction.Y, 0.f).GetSafeNormal());
@@ -86,9 +88,8 @@ void ATopDownPlayerController::Move(const FInputActionValue& Value)
 
 void ATopDownPlayerController::FaceMouse()
 {
-	const APlayerCharacter* PlayerActor = Cast<APlayerCharacter>(GetPawn());
-	if (PlayerActor == nullptr) return;
-	if (PlayerActor->GetIsDead()) return;
+	if (!CanDoAction())
+		return;
 
 	FIntVector2 ViewportSize;
 	GetViewportSize(ViewportSize.X, ViewportSize.Y);
@@ -108,8 +109,8 @@ void ATopDownPlayerController::FaceMouse()
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldPosition, RayEnd, ECC_Visibility, QueryParams))
 		{
 			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 20.f, 8, FColor::Red);
-			AimDirection = (HitResult.ImpactPoint - PlayerActor->GetActorLocation()).GetSafeNormal();
-			AimDirection.Z = PlayerActor->GetActorLocation().X;
+			AimDirection = (HitResult.ImpactPoint - PlayerCharacter->GetActorLocation()).GetSafeNormal();
+			AimDirection.Z = PlayerCharacter->GetActorLocation().X;
 			ClientSetRotation(AimDirection.Rotation());
 		}
 	}
@@ -117,29 +118,33 @@ void ATopDownPlayerController::FaceMouse()
 
 void ATopDownPlayerController::Interact()
 {
-	if (PlayerCharacter == nullptr) return;
+	if (!CanDoAction())
+		return;
 
 	PlayerCharacter->Interact();
 }
 
 void ATopDownPlayerController::Fire()
 {
-	if (PlayerCharacter == nullptr) return;
+	if (!CanDoAction())
+		return;
 
 	PlayerCharacter->Fire(this);
 }
 
 void ATopDownPlayerController::StopFiring()
 {
-	if (PlayerCharacter == nullptr) return;
+	if (!CanDoAction())
+		return;
 
 	PlayerCharacter->StopFiring();
 }
 
 void ATopDownPlayerController::SwapWeapon()
 {
-	if (PlayerCharacter == nullptr) return;
-
+	if (!CanDoAction())
+		return;
+	
 	if (UWeaponLoadoutComponent* WeaponLoadoutComponent = PlayerCharacter->GetWeaponLoadoutComponent())
 	{
 		WeaponLoadoutComponent->EquipNextWeapon();
@@ -148,7 +153,8 @@ void ATopDownPlayerController::SwapWeapon()
 
 void ATopDownPlayerController::ReloadWeapon()
 {
-	if (PlayerCharacter == nullptr) return;
+	if (!CanDoAction())
+		return;
 
 	PlayerCharacter->ReloadWeapon();
 }
@@ -161,4 +167,16 @@ void ATopDownPlayerController::OnMoneyChanged(const int32 NewMoneyAmount, const 
 		const int32 ScoreToAdd = AmountChanged > 0 ? AmountChanged : 0;
 		PlayerState->SetScore(PlayerState->GetScore() + ScoreToAdd);
 	}
+}
+
+bool ATopDownPlayerController::CanDoAction() const
+{
+	if (bIsGameOver)
+		return false;
+	if (PlayerCharacter == nullptr)
+		return false;
+	if (PlayerCharacter->GetIsDead())
+		return false;
+
+	return true;
 }
