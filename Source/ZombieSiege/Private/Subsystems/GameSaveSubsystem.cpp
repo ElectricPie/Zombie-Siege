@@ -55,9 +55,12 @@ void UGameSaveSubsystem::SaveLeaderboards()
 		const TArray<FLeaderboardData> TempLeaderboardData = LeaderboardData;
 		UE_LOG(LogTemp, Warning, TEXT("SaveLeaderboards: have not been loaded, loading from save"));
 		LoadLeaderboards(true);
-		LeaderboardData.Append(TempLeaderboardData);
+		for (auto& Data : TempLeaderboardData)
+		{
+			AddLeaderboardEntry(Data);
+		}
 	}
-	
+
 	ULeaderboardsSaveGame* LeaderboardsSaveGame = Cast<ULeaderboardsSaveGame>(UGameplayStatics::CreateSaveGameObject(ULeaderboardsSaveGame::StaticClass()));
 	if (LeaderboardsSaveGame == nullptr)
 	{
