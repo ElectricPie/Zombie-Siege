@@ -20,14 +20,14 @@ public:
 	void AddDeath() { TotalDeaths++; }
 	void AddKill() { TotalKills++; }
 
-	UFUNCTION(BlueprintPure, Category="Player")
+	UFUNCTION(BlueprintGetter, Category="Player")
 	int32 GetTotalKills() const { return TotalKills; }
-	UFUNCTION(BlueprintPure, Category="Player")
+	UFUNCTION(BlueprintGetter, Category="Player")
 	int32 GetTotalDeaths() const { return TotalDeaths; }
 
 private:
-	UPROPERTY(VisibleAnywhere, Category="Player")
+	UPROPERTY(VisibleAnywhere, Category="Player", BlueprintGetter=GetTotalKills)
 	int32 TotalKills = 0;
-	UPROPERTY(VisibleAnywhere, Category="Player")
+	UPROPERTY(VisibleAnywhere, Category="Player", BlueprintGetter=GetTotalDeaths)
 	int32 TotalDeaths = 0;
 };
