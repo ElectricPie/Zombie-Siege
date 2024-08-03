@@ -116,6 +116,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Sound")
 	UFMODEvent* FireSound;
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* ReloadSound;
 	
 	bool bIsFiring = false;
 	float LastFiredTime = 0.f;

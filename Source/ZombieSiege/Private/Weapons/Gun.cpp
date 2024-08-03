@@ -82,6 +82,11 @@ void AGun::Reload()
 {
 	bIsReloading = true;
 	OnReloadStateChangedEvent.Broadcast(true);
+
+	if (ReloadSound)
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(this, ReloadSound, GetActorTransform(), true);
+	}
 	
 	float ReloadTime = DefaultReloadTime;
 	if (ReloadMontage)
