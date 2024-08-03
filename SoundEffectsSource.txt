@@ -9,3 +9,6 @@ single-pistol-gunshot-33-37187 - https://pixabay.com/sound-effects/single-pistol
 
 Reloads
 mag-reload-81594 - https://pixabay.com/sound-effects/mag-reload-81594/
+
+Gun Empty
+ - https://pixabay.com/sound-effects/rifle-clip-empty-98832/

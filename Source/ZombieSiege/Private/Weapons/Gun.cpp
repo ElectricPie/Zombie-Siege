@@ -31,14 +31,21 @@ AGun::AGun()
 // TODO: Aim direction is only set once so it always shoots the same direction
 void AGun::StartFiring(AController* ShooterController, AActor* ShooterActor)
 {
-	if (ShooterController == nullptr) return;
-	if (bIsFiring || bIsReloading) return;
-	if (CurrentAmmo <= 0) return;
-	if (GetGameTimeSinceCreation() - LastFiredTime < FireCooldownTime) return;
+	if (ShooterController == nullptr)
+		return;
+	if (bIsFiring || bIsReloading)
+		return;
+	if (CurrentAmmo <= 0)
+	{
+		MagEmpty();
+		return;
+	}
+	if (GetGameTimeSinceCreation() - LastFiredTime < FireCooldownTime)
+		return;
 	
 	bIsFiring = true;
 	LastFiredTime = GetGameTimeSinceCreation();
-
+	
 	switch (FireRate)
 	{
 	case Single:
@@ -145,6 +152,7 @@ void AGun::SingleShot(AController* ShooterController, AActor* ShooterActor)
 	// Stop shooting if out of ammo
 	if (CurrentAmmo <= 0)
 	{
+		MagEmpty();
 		GetWorld()->GetTimerManager().ClearTimer(ShotTimer);
 		return;
 	}
@@ -157,6 +165,7 @@ void AGun::BurstShot(AController* ShooterController, AActor* ShooterActor)
 	// Stop burst if out of ammo
 	if (CurrentAmmo <= 0)
 	{
+		MagEmpty();
 		GetWorld()->GetTimerManager().ClearTimer(BurstTimer);
 		return;
 	}
@@ -177,4 +186,12 @@ void AGun::FinishReload()
 	OnAmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
 	OnReloadStateChangedEvent.Broadcast(false);
 	bIsReloading = false;
+}
+
+void AGun::MagEmpty()
+{
+	if (EmptySound)
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(this, EmptySound, GetActorTransform(), true);
+	}
 }

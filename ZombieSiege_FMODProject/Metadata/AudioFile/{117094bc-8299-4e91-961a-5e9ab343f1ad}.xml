@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{117094bc-8299-4e91-961a-5e9ab343f1ad}">
+		<property name="assetPath">
+			<value>GunMisc/rifle-clip-empty-98832.mp3</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>0.86204081632653062</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{c0b760ca-e47e-4260-be54-b57ef777b209}</destination>
+		</relationship>
+	</object>
+</objects>
