@@ -3,6 +3,7 @@
 
 #include "Weapons/Gun.h"
 
+#include "FMODBlueprintStatics.h"
 #include "GunProjectile.h"
 #include "Components/ArrowComponent.h"
 #include "Player/PlayerCharacter.h"
@@ -104,6 +105,11 @@ void AGun::SpawnProjectile(AController* ShooterController, AActor* ShooterActor)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s is missing projectile class"), *GetActorNameOrLabel());
 		return;
+	}
+
+	if (FireSound)
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(this, FireSound, GetActorTransform(), true);
 	}
 
 	const FActorSpawnParameters SpawnParameters;
