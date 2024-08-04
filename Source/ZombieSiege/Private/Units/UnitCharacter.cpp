@@ -3,6 +3,7 @@
 
 #include "Units/UnitCharacter.h"
 
+#include "FMODBlueprintStatics.h"
 #include "Components/MoneyRewardComponent.h"
 #include "Rooms/Barricade.h"
 #include "Kismet/GameplayStatics.h"
@@ -33,9 +34,7 @@ float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	// Unit is killed
 	if (CurrentHealth <= 0.f)
 	{
-		OnKilledEvent.Broadcast(this, EventInstigator, DamageCauser);
-		
-		Destroy();
+		Die(EventInstigator, DamageCauser);
 	}
 	
 	return DamageAmount;
@@ -52,3 +51,15 @@ void AUnitCharacter::BeginPlay()
 
 	CurrentHealth = MaxHealth;
 }
+
+void AUnitCharacter::Die(AController* KillInstigator, AActor* KillCauser)
+{
+	if (DeathSound)
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), DeathSound, GetActorTransform(), true);
+	}
+	
+	OnKilledEvent.Broadcast(this, KillInstigator, KillCauser);
+	Destroy();
+}
+
