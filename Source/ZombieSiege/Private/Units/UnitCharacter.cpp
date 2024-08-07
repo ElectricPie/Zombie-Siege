@@ -24,7 +24,16 @@ void AUnitCharacter::Attack(AActor* Target)
 	if (GetGameTimeSinceCreation() - LastAttackTime < AttackDelay) return;
 	UGameplayStatics::ApplyDamage(Target, AttackDamage, GetController(), this, UDamageType::StaticClass());
 	LastAttackTime = GetGameTimeSinceCreation();
-	PlayAnimMontage(AttackMontage);
+
+	if (AttackSound)
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), AttackSound, GetActorTransform(), true);
+	}
+	
+	if (AttackMontage)
+	{
+		PlayAnimMontage(AttackMontage);
+	}
 }
 
 float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
