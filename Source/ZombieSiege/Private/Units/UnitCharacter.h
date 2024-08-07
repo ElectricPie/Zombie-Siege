@@ -71,4 +71,6 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="Sound")
 	UFMODEvent* DeathSound;
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* AttackSound;
 };
