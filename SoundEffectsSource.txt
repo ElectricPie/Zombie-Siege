@@ -16,4 +16,5 @@ Gun Empty
 Zombie
 zombie-death-2-95167 - https://pixabay.com/sound-effects/zombie-death-2-95167/
 monster-death-grunt-131480 - https://pixabay.com/sound-effects/monster-death-grunt-131480/
+zombie-attack-6419 - https://pixabay.com/sound-effects/zombie-attack-6419/
 zombie-growls-and-roars-filter-effect - https://sounddino.com/en/effects/zombies/  -  (Zombie growls and roars (filter effect))

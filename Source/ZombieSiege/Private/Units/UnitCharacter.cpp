@@ -45,6 +45,14 @@ float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	{
 		Die(EventInstigator, DamageCauser);
 	}
+	else
+	{
+		// Only player take damage sound if the unit is not killed as it will play the death sound
+		if (TakeDamageSound)
+		{
+			UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), TakeDamageSound, GetActorTransform(), true);
+		}
+	}
 	
 	return DamageAmount;
 }

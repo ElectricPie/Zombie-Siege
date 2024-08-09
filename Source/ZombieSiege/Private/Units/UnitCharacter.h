@@ -73,4 +73,7 @@ private:
 	UFMODEvent* DeathSound;
 	UPROPERTY(EditAnywhere, Category="Sound")
 	UFMODEvent* AttackSound;
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* TakeDamageSound;
+
 };
