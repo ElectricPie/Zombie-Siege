@@ -174,6 +174,11 @@ void APlayerCharacter::Die()
 		UE_LOG(LogTemp, Warning, TEXT("Player Dead"));
 		GameMode->PlayerDeath(GetController());
 	}
+
+	if (DeathSound)
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), DeathSound, GetActorTransform(), true);
+	}
 	
 	bIsDead = true;
 	OnPlayerDeathEvent.Broadcast(this);
