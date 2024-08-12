@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "MoneyStoreComponent.generated.h"
 
+class UFMODEvent;
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnMoneyChangedSinganture, int32 /*NewMoneyAmount*/, int32 /*AmountChanged*/);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -45,4 +46,9 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere, Category="Money")
 	int32 Money = 0;
+
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* MoneyGetSound;
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* MoneySpendSound;
 };

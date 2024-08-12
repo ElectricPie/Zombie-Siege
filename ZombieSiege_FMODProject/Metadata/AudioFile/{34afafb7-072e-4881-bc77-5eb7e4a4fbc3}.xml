@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{34afafb7-072e-4881-bc77-5eb7e4a4fbc3}">
+		<property name="assetPath">
+			<value>Money/coins-falling-013-36967.mp3</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>24</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>0.71999999999999997</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{c0b760ca-e47e-4260-be54-b57ef777b209}</destination>
+		</relationship>
+	</object>
+</objects>
