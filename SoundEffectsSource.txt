@@ -21,3 +21,11 @@ zombie-growls-and-roars-filter-effect - https://sounddino.com/en/effects/zombies
 
 Player
 male-hurt7-48124 - https://pixabay.com/sound-effects/male-hurt7-48124/
+male-death-sound-128357 - https://pixabay.com/sound-effects/male-death-sound-128357/
+
+Game Over
+tubular-bell-of-death-89485 - https://pixabay.com/sound-effects/tubular-bell-of-death-89485/
+
+Money
+cash-register-purchase-87313 - https://pixabay.com/sound-effects/cash-register-purchase-87313/
+coins-falling-013-36967 - https://pixabay.com/sound-effects/coins-falling-013-36967/
