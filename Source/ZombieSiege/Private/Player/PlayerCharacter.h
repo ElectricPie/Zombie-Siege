@@ -6,9 +6,11 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UFMODAudioComponent;
 class AGun;
 class UAnimMontage;
 class UCameraComponent;
+class UFMODEvent;
 class UInteractableComponent;
 class UInteractorComponent;
 class USpringArmComponent;
@@ -91,4 +93,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Animation")
 	FName WeaponSocketName = TEXT("WeaponSocket");
+
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* HitSound;
+	TWeakObjectPtr<UFMODAudioComponent> HitSoundComponent = nullptr;
 };
