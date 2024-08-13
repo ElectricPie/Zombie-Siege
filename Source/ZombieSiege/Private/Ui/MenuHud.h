@@ -22,11 +22,18 @@ class AMenuHud : public AHUD
 	GENERATED_BODY()
 
 public:
-	// UFUNCTION(BLueprintCallable)
-	// void SwitchHud(EMenuWidget WidgetToDisplay);
+	UFUNCTION(BLueprintCallable)
+	void SwitchActiveWidget(EMenuWidget WidgetToActivate);
 
 protected:
 	virtual void BeginPlay() override;
+
+protected:
+	UPROPERTY(BlueprintReadOnly, Category="Widgets")
+	TObjectPtr<UUserWidget> MenuWidget;
+	UPROPERTY(BLueprintReadOnly, Category="Widgets")
+	TObjectPtr<UUserWidget> OptionsWidget;
+
 	
 private:
 	UPROPERTY(EditAnywhere, Category = "Widgets")
@@ -34,6 +41,5 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Widgets")
 	TSubclassOf<UUserWidget> OptionsWidgetClass;
 
-	TObjectPtr<UUserWidget> MenuWidget;
-	TObjectPtr<UUserWidget> OptionsWidget;
+	TArray<TWeakObjectPtr<UUserWidget>> Widgets;
 };
