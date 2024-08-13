@@ -6,14 +6,39 @@
 #include "Blueprint/UserWidget.h"
 #include "Subsystems/GameSaveSubsystem.h"
 
-//
-// void AMenuHud::SwitchHud(EMenuWidget WidgetToDisplay)
-// {
-// }
+void AMenuHud::SwitchActiveWidget(EMenuWidget WidgetToActivate)
+{
+	for (const auto& Widget : Widgets)
+	{
+		if (Widget.IsValid())
+		{
+			Widget->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+
+	switch (WidgetToActivate)
+	{
+		case MainMenu:
+			if (MenuWidget)
+			{
+				MenuWidget->SetVisibility(ESlateVisibility::Visible);
+			}
+			break;
+		case Options:
+			if (OptionsWidget)
+			{
+				OptionsWidget->SetVisibility(ESlateVisibility::Visible);
+			}
+			break;
+		default: ;
+	}
+}
 
 void AMenuHud::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Warning, TEXT("Hud C++ BeginPlay"));
 
 	if (APlayerController* PlayerController = GetOwningPlayerController())
 	{
@@ -26,6 +51,7 @@ void AMenuHud::BeginPlay()
 		if (MenuWidget)
 		{
 			MenuWidget->AddToViewport();
+			Widgets.Add(MenuWidget);
 		}
 	}
 
@@ -36,6 +62,7 @@ void AMenuHud::BeginPlay()
 		{
 			OptionsWidget->AddToViewport();
 			OptionsWidget->SetVisibility(ESlateVisibility::Collapsed);
+			Widgets.Add(OptionsWidget);
 		}
 	}
 
