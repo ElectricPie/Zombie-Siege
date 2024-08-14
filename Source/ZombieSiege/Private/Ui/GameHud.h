@@ -6,6 +6,14 @@
 #include "GameFramework/HUD.h"
 #include "GameHud.generated.h"
 
+UENUM(BlueprintType)
+enum EGameWidget
+{
+	Hud UMETA(DisplayName = "Hud"),
+	Menu UMETA(DisplayName = "Menu")
+};
+
+
 class UGameHudWidget;
 /**
  * 
@@ -22,6 +30,8 @@ public:
 	void HideInteractText();
 	void ShowGameOver();
 
+	void SwitchActiveWidget(EGameWidget WidgetToActivate);
+
 private:
 	void OnRoundChanged(int32 RoundNumber);
 	
@@ -29,9 +39,16 @@ private:
 	UPROPERTY(EditAnywhere, Category="Widgets")
 	TSubclassOf<UGameHudWidget> GameHudWidgetClass;
 	UPROPERTY(EditAnywhere, Category="Widgets")
+	TSubclassOf<UUserWidget> MenuWidgetClass;
+	UPROPERTY(EditAnywhere, Category="Widgets")
 	TSubclassOf<UUserWidget> GameOverWidgetClass;
+	
 	UPROPERTY(VisibleAnywhere, Category="Widgets")
-	UGameHudWidget* GameHudWidget;
+	TObjectPtr<UGameHudWidget> GameHudWidget;
+	UPROPERTY(VisibleAnywhere, Category="Widgets")
+	TObjectPtr<UUserWidget> MenuWidget;
 	UPROPERTY(VisibleAnywhere, Category="Widgets")
 	TObjectPtr<UUserWidget> GameOverWidget;
+
+	TArray<TWeakObjectPtr<UUserWidget>> Widgets; 
 };
