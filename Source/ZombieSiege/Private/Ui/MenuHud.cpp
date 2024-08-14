@@ -38,8 +38,6 @@ void AMenuHud::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Hud C++ BeginPlay"));
-
 	if (APlayerController* PlayerController = GetOwningPlayerController())
 	{
 		PlayerController->bShowMouseCursor = true;

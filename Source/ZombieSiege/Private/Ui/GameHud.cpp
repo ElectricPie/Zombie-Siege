@@ -19,11 +19,20 @@ void AGameHud::BeginPlay()
 		{
 			GameHudWidget = CreateWidget<UGameHudWidget>(PlayerController, GameHudWidgetClass);
 			GameHudWidget->AddToViewport();
+			Widgets.Add(GameHudWidget);
 			if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetPawn()))
 			{
 				GameHudWidget->Setup(PlayerController, PlayerCharacter);
 			}
 		}
+	}
+
+	if (MenuWidgetClass)
+	{
+		MenuWidget = CreateWidget<UUserWidget>(GetOwningPlayerController(), MenuWidgetClass);
+		MenuWidget->AddToViewport();
+		MenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+		Widgets.Add(MenuWidget);
 	}
 
 	if (ADefenceGameState* GameState = GetWorld()->GetGameState<ADefenceGameState>())
@@ -49,7 +58,7 @@ void AGameHud::HideInteractText()
 void AGameHud::ShowGameOver()
 {
 	GameHudWidget->SetVisibility(ESlateVisibility::Collapsed);
-	
+
 	if (GameOverWidgetClass)
 	{
 		GameOverWidget = CreateWidget<UUserWidget>(GetOwningPlayerController(), GameOverWidgetClass);
@@ -57,8 +66,35 @@ void AGameHud::ShowGameOver()
 	}
 }
 
+void AGameHud::SwitchActiveWidget(const EGameWidget WidgetToActivate)
+{
+	for (const auto& Widget : Widgets)
+	{
+		if (Widget.IsValid())
+		{
+			Widget->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+
+	switch (WidgetToActivate)
+	{
+		case Hud:
+			if (GameHudWidget)
+			{
+				GameHudWidget->SetVisibility(ESlateVisibility::Visible);
+			}
+			break;
+		case Menu:
+			if (MenuWidget)
+			{
+				MenuWidget->SetVisibility(ESlateVisibility::Visible);
+			}
+			break;
+		default: ;
+	}
+}
+
 void AGameHud::OnRoundChanged(int32 RoundNumber)
 {
 	GameHudWidget->UpdateRoundNumber(RoundNumber);
 }
-
