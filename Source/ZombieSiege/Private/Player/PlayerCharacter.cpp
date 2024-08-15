@@ -3,6 +3,7 @@
 
 #include "Player/PlayerCharacter.h"
 
+#include "FMODBlueprintStatics.h"
 #include "TopDownPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InteractableComponent.h"
@@ -60,6 +61,23 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	if (CurrentHealth <= 0.f)
 	{
 		Die();
+	}
+	else
+	{
+		if (HitSound)
+		{
+			if (!HitSoundComponent.IsValid())
+			{
+				HitSoundComponent = UFMODBlueprintStatics::PlayEventAttached(HitSound,
+					GetRootComponent(),
+					NAME_None,
+					FVector::ZeroVector,
+					EAttachLocation::KeepRelativeOffset,
+					true,
+					true ,
+					true);
+			}
+		}
 	}
 	
 	return 0.f;
@@ -155,6 +173,11 @@ void APlayerCharacter::Die()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player Dead"));
 		GameMode->PlayerDeath(GetController());
+	}
+
+	if (DeathSound)
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), DeathSound, GetActorTransform(), true);
 	}
 	
 	bIsDead = true;

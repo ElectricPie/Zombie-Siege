@@ -3,6 +3,8 @@
 
 #include "Components/MoneyStoreComponent.h"
 
+#include "FMODBlueprintStatics.h"
+
 // Sets default values for this component's properties
 UMoneyStoreComponent::UMoneyStoreComponent()
 {
@@ -21,9 +23,13 @@ void UMoneyStoreComponent::AddMoney(const int32 AmountToAdd)
 {
 	Money += AmountToAdd;
 	OnMoneyChangedEvent.Broadcast(Money, AmountToAdd);
+	if (MoneyGetSound)
+	{
+		UFMODBlueprintStatics::PlayEvent2D(GetWorld(), MoneyGetSound, true);
+	}
 }
 
-bool UMoneyStoreComponent::TakeMoney(int32 AmountToTake)
+bool UMoneyStoreComponent::TakeMoney(const int32 AmountToTake)
 {
 	if (AmountToTake < 0) return false;
 	
@@ -31,6 +37,12 @@ bool UMoneyStoreComponent::TakeMoney(int32 AmountToTake)
 	{
 		Money -= AmountToTake;
 		OnMoneyChangedEvent.Broadcast(Money, -AmountToTake);
+
+		if (MoneySpendSound)
+		{
+			UFMODBlueprintStatics::PlayEvent2D(GetWorld(), MoneySpendSound, true);
+		}
+		
 		return true;
 	}
 
