@@ -19,6 +19,7 @@ void AGameHud::BeginPlay()
 		{
 			GameHudWidget = CreateWidget<UGameHudWidget>(PlayerController, GameHudWidgetClass);
 			GameHudWidget->AddToViewport();
+			ActiveWidget = EGameWidget::Hud;
 			Widgets.Add(GameHudWidget);
 			if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetPawn()))
 			{
@@ -57,8 +58,8 @@ void AGameHud::HideInteractText()
 
 void AGameHud::ShowGameOver()
 {
-	GameHudWidget->SetVisibility(ESlateVisibility::Collapsed);
-
+	CollapseAllWidgets();
+	
 	if (GameOverWidgetClass)
 	{
 		GameOverWidget = CreateWidget<UUserWidget>(GetOwningPlayerController(), GameOverWidgetClass);
@@ -66,16 +67,11 @@ void AGameHud::ShowGameOver()
 	}
 }
 
+
 void AGameHud::SwitchActiveWidget(const EGameWidget WidgetToActivate)
 {
-	for (const auto& Widget : Widgets)
-	{
-		if (Widget.IsValid())
-		{
-			Widget->SetVisibility(ESlateVisibility::Collapsed);
-		}
-	}
-
+	CollapseAllWidgets();
+	
 	switch (WidgetToActivate)
 	{
 		case Hud:
@@ -94,7 +90,35 @@ void AGameHud::SwitchActiveWidget(const EGameWidget WidgetToActivate)
 	}
 }
 
+void AGameHud::ToggleMenu()
+{
+	if (ActiveWidget != EGameWidget::Menu)
+	{
+		LastWidget = ActiveWidget;
+		SwitchActiveWidget(EGameWidget::Menu);
+		ActiveWidget = EGameWidget::Menu;
+	}
+	else
+	{
+		SwitchActiveWidget(LastWidget);
+		ActiveWidget = LastWidget;
+	}
+
+	OnPauseMenuToggledEvent.Broadcast(ActiveWidget == EGameWidget::Menu);
+}
+
 void AGameHud::OnRoundChanged(int32 RoundNumber)
 {
 	GameHudWidget->UpdateRoundNumber(RoundNumber);
+}
+
+void AGameHud::CollapseAllWidgets()
+{
+	for (const auto& Widget : Widgets)
+	{
+		if (Widget.IsValid())
+		{
+			Widget->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
 }
