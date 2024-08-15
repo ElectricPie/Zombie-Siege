@@ -7,13 +7,15 @@
 #include "Player/PlayerCharacter.h"
 #include "GameHud.generated.h"
 
+class UOptionsWidget;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPauseMenuToggledSignature, bool /*bMenuIsOpen*/);
 
 UENUM(BlueprintType)
 enum EGameWidget
 {
-	Hud UMETA(DisplayName = "Hud"),
-	Menu UMETA(DisplayName = "Menu")
+	GameHud UMETA(DisplayName = "Hud"),
+	PauseMenu UMETA(DisplayName = "Menu"),
+	PauseGameOptions UMETA(DisplayName = "Options")
 };
 
 class APlayerCharacter;
@@ -37,8 +39,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SwitchActiveWidget(EGameWidget WidgetToActivate);
 
-	EGameWidget GetActiveWidget() const { return ActiveWidget; }
-
 	UFUNCTION(BlueprintCallable)
 	void ToggleMenu();
 
@@ -49,6 +49,9 @@ private:
 	void OnRoundChanged(int32 RoundNumber);
 	
 	void CollapseAllWidgets();
+	UFUNCTION()
+	void OnOptionsClosed();
+	void SetActiveWidget(UUserWidget* Widget, const bool bUpdateActiveWidget = true);
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Widgets")
@@ -57,16 +60,15 @@ private:
 	TSubclassOf<UUserWidget> MenuWidgetClass;
 	UPROPERTY(EditAnywhere, Category="Widgets")
 	TSubclassOf<UUserWidget> GameOverWidgetClass;
+	UPROPERTY(EditAnywhere, Category="Widgets")
+	TSubclassOf<UOptionsWidget> OptionsWidgetClass;
 	
-	UPROPERTY(VisibleAnywhere, Category="Widgets")
 	TObjectPtr<UGameHudWidget> GameHudWidget;
-	UPROPERTY(VisibleAnywhere, Category="Widgets")
 	TObjectPtr<UUserWidget> MenuWidget;
-	UPROPERTY(VisibleAnywhere, Category="Widgets")
 	TObjectPtr<UUserWidget> GameOverWidget;
+	TObjectPtr<UOptionsWidget> OptionsWidget;
 
 	TArray<TWeakObjectPtr<UUserWidget>> Widgets;
 
-	EGameWidget ActiveWidget = EGameWidget::Hud;
-	EGameWidget LastWidget = EGameWidget::Hud;
+	bool bMenuIsOpen = false;
 };
