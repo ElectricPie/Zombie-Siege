@@ -6,11 +6,13 @@
 #include "GameFramework/HUD.h"
 #include "MenuHud.generated.h"
 
+class UOptionsWidget;
+
 UENUM(BlueprintType)
 enum EMenuWidget
 {
 	MainMenu UMETA(DisplayName = "Main Menu"),
-	Options UMETA(DisplayName = "Options")
+	MainOptions UMETA(DisplayName = "Options")
 };
 
 /**
@@ -32,14 +34,17 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category="Widgets")
 	TObjectPtr<UUserWidget> MenuWidget;
 	UPROPERTY(BLueprintReadOnly, Category="Widgets")
-	TObjectPtr<UUserWidget> OptionsWidget;
+	TObjectPtr<UOptionsWidget> OptionsWidget;
 
+private:
+	UFUNCTION()
+	void OnOptionsClosed();
 	
 private:
 	UPROPERTY(EditAnywhere, Category = "Widgets")
 	TSubclassOf<UUserWidget> MainMenuWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "Widgets")
-	TSubclassOf<UUserWidget> OptionsWidgetClass;
+	TSubclassOf<UOptionsWidget> OptionsWidgetClass;
 
 	TArray<TWeakObjectPtr<UUserWidget>> Widgets;
 };
