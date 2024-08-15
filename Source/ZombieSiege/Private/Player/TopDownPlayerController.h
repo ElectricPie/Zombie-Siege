@@ -25,6 +25,9 @@ public:
 	
 	FVector GetAimDirection() const { return AimDirection; }
 	void GameOver();
+
+public:
+	bool bIsPaused = false;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -51,6 +54,9 @@ private:
 	 * @return True if the player can do any action, false otherwise
 	 */
 	bool CanDoAction() const;
+
+	void ToggleMenu();
+	void OnPauseMenuChanged(const bool bMenuIsOpen);
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Money")
@@ -68,6 +74,8 @@ private:
 	UInputAction* SwapWeaponAction;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	UInputAction* ReloadWeaponAction;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UInputAction* MenuAction;
 
 	UPROPERTY(EditAnywhere, Category="Look")
 	float LookRaycastLimit = 3000.f;
