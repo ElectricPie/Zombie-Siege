@@ -38,6 +38,11 @@ void ATopDownPlayerController::BeginPlay()
 		Subsystem->AddMappingContext(InputMappingContext, 0);
 	}
 	SetInputMode(FInputModeGameOnly());
+
+	if (AGameHud* GameHud = Cast<AGameHud>(GetHUD()))
+	{
+		GameHud->OnPauseMenuToggledEvent.AddUObject(this, &ATopDownPlayerController::OnPauseMenuChanged);
+	}
 }
 
 void ATopDownPlayerController::Tick(float DeltaSeconds)
@@ -64,6 +69,9 @@ void ATopDownPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ATopDownPlayerController::StopFiring);
 		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::SwapWeapon);
 		EnhancedInputComponent->BindAction(ReloadWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::ReloadWeapon);
+
+		// Menu
+		EnhancedInputComponent->BindAction(MenuAction, ETriggerEvent::Completed, this, &ATopDownPlayerController::ToggleMenu);
 	}
 }
 
@@ -177,6 +185,44 @@ bool ATopDownPlayerController::CanDoAction() const
 		return false;
 	if (PlayerCharacter->GetIsDead())
 		return false;
+	if (bIsPaused)
+		return false;
 
 	return true;
+}
+
+void ATopDownPlayerController::ToggleMenu()
+{
+	if (AGameHud* GameHud = Cast<AGameHud>(GetHUD()))
+	{
+		GameHud->ToggleMenu();
+		// if (GameHud->GetActiveWidget() == EGameWidget::Menu)
+		// {
+		// 	UE_LOG(LogTemp, Warning, TEXT("Menu"));
+		// 	SetInputMode(FInputModeGameAndUI());
+		// 	SetShowMouseCursor(true);
+		// 	bIsPaused = true;
+		// }
+		// else
+		// {
+		// 	SetInputMode(FInputModeGameOnly());
+		// 	SetShowMouseCursor(false);
+		// 	bIsPaused = false;
+		// }
+	}
+}
+
+void ATopDownPlayerController::OnPauseMenuChanged(const bool bMenuIsOpen)
+{
+	bIsPaused = bMenuIsOpen;
+	SetShowMouseCursor(bIsPaused);
+
+	if (bIsPaused)
+	{
+		SetInputMode(FInputModeGameAndUI());
+	}
+	else
+	{
+		SetInputMode(FInputModeGameOnly());
+	}
 }

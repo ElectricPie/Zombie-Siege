@@ -3,6 +3,7 @@
 
 #include "Units/UnitCharacter.h"
 
+#include "FMODBlueprintStatics.h"
 #include "Components/MoneyRewardComponent.h"
 #include "Rooms/Barricade.h"
 #include "Kismet/GameplayStatics.h"
@@ -23,7 +24,16 @@ void AUnitCharacter::Attack(AActor* Target)
 	if (GetGameTimeSinceCreation() - LastAttackTime < AttackDelay) return;
 	UGameplayStatics::ApplyDamage(Target, AttackDamage, GetController(), this, UDamageType::StaticClass());
 	LastAttackTime = GetGameTimeSinceCreation();
-	PlayAnimMontage(AttackMontage);
+
+	if (AttackSound)
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), AttackSound, GetActorTransform(), true);
+	}
+	
+	if (AttackMontage)
+	{
+		PlayAnimMontage(AttackMontage);
+	}
 }
 
 float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -33,9 +43,15 @@ float AUnitCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	// Unit is killed
 	if (CurrentHealth <= 0.f)
 	{
-		OnKilledEvent.Broadcast(this, EventInstigator, DamageCauser);
-		
-		Destroy();
+		Die(EventInstigator, DamageCauser);
+	}
+	else
+	{
+		// Only player take damage sound if the unit is not killed as it will play the death sound
+		if (TakeDamageSound)
+		{
+			UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), TakeDamageSound, GetActorTransform(), true);
+		}
 	}
 	
 	return DamageAmount;
@@ -52,3 +68,15 @@ void AUnitCharacter::BeginPlay()
 
 	CurrentHealth = MaxHealth;
 }
+
+void AUnitCharacter::Die(AController* KillInstigator, AActor* KillCauser)
+{
+	if (DeathSound)
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), DeathSound, GetActorTransform(), true);
+	}
+	
+	OnKilledEvent.Broadcast(this, KillInstigator, KillCauser);
+	Destroy();
+}
+

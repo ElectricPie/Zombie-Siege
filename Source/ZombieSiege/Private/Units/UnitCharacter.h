@@ -7,8 +7,9 @@
 #include "UnitCharacter.generated.h"
 
 class ABarricade;
-class UMoneyRewardComponent;
 class UBehaviorTree;
+class UFMODEvent;
+class UMoneyRewardComponent;
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnUnitKilledSingature, AUnitCharacter* /*UnitKilled*/, AController* /*KillInstigator*/, AActor* /*KillCauser*/)
 
@@ -58,10 +59,21 @@ protected:
 	float MaxHealth = 40.f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Health")
 	float CurrentHealth = 40.f;
-	
+
+private:
+	void Die(AController* KillInstigator, AActor* KillCauser);
+
 private:
 	UPROPERTY(VisibleAnywhere, Category="Money")
 	UMoneyRewardComponent* MoneyRewardComponent;
 	UPROPERTY(VisibleAnywhere, Category="Target")
 	TWeakObjectPtr<ABarricade> TargetBarricade;
+	
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* DeathSound;
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* AttackSound;
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* TakeDamageSound;
+
 };

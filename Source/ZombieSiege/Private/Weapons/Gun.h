@@ -8,6 +8,7 @@
 
 class UArrowComponent;
 class AGunProjectile;
+class UFMODEvent;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAmmoChangedSignature, int32 /*NewAmmoCount*/, int32 /*MaxAmmo*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnReloadStateChanged, bool /*bIsReloading*/);
@@ -71,6 +72,8 @@ private:
 	void BurstShot(AController* ShooterController, AActor* ShooterActor);
 	UFUNCTION()
 	void FinishReload();
+
+	void MagEmpty();
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Components")
@@ -112,6 +115,13 @@ private:
 	float DefaultReloadTime = 2.f;
 	bool bIsReloading = false;
 	FTimerHandle ReloadingTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* FireSound;
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* ReloadSound;
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* EmptySound;
 	
 	bool bIsFiring = false;
 	float LastFiredTime = 0.f;
