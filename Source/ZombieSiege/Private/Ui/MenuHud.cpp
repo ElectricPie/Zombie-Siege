@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Subsystems/GameSaveSubsystem.h"
+#include "Widgets/OptionsWidget.h"
 
 void AMenuHud::SwitchActiveWidget(EMenuWidget WidgetToActivate)
 {
@@ -18,13 +19,13 @@ void AMenuHud::SwitchActiveWidget(EMenuWidget WidgetToActivate)
 
 	switch (WidgetToActivate)
 	{
-		case MainMenu:
+		case EMenuWidget::MainMenu:
 			if (MenuWidget)
 			{
 				MenuWidget->SetVisibility(ESlateVisibility::Visible);
 			}
 			break;
-		case Options:
+		case EMenuWidget::MainOptions:
 			if (OptionsWidget)
 			{
 				OptionsWidget->SetVisibility(ESlateVisibility::Visible);
@@ -55,11 +56,12 @@ void AMenuHud::BeginPlay()
 
 	if (OptionsWidgetClass)
 	{
-		OptionsWidget = CreateWidget<UUserWidget>(GetWorld(), OptionsWidgetClass);
+		OptionsWidget = CreateWidget<UOptionsWidget>(GetWorld(), OptionsWidgetClass.Get());
 		if (OptionsWidget)
 		{
 			OptionsWidget->AddToViewport();
 			OptionsWidget->SetVisibility(ESlateVisibility::Collapsed);
+			OptionsWidget->OnOptionsClosedEvent.AddDynamic(this, &AMenuHud::OnOptionsClosed);
 			Widgets.Add(OptionsWidget);
 		}
 	}
@@ -71,4 +73,9 @@ void AMenuHud::BeginPlay()
 			GameSaveSubsystem->LoadLeaderboards();
 		}
 	}
+}
+
+void AMenuHud::OnOptionsClosed()
+{
+	SwitchActiveWidget(EMenuWidget::MainMenu);
 }
