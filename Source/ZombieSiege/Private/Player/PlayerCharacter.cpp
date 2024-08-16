@@ -6,6 +6,7 @@
 #include "FMODBlueprintStatics.h"
 #include "TopDownPlayerController.h"
 #include "Camera/CameraComponent.h"
+#include "Component/HealthComponent.h"
 #include "Components/InteractableComponent.h"
 #include "Components/InteractorComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
@@ -37,13 +38,9 @@ APlayerCharacter::APlayerCharacter()
 
 	WeaponLoadoutComponent = CreateDefaultSubobject<UWeaponLoadoutComponent>(TEXT("WeaponLoadout"));
 	WeaponLoadoutComponent->OnWeaponAddedEvent.AddUObject(this, &APlayerCharacter::OnWeaponAdded);
-}
 
-void APlayerCharacter::PostInitProperties()
-{
-	Super::PostInitProperties();
-
-	CurrentHealth = MaxHealth;
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	HealthComponent->OnDeathEvent.AddDynamic(this, &APlayerCharacter::Die);
 }
 
 // Called to bind functionality to input
@@ -51,36 +48,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-}
-
-float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
-{
-	CurrentHealth -= DamageAmount;
-	// Unit is killed
-	if (CurrentHealth <= 0.f)
-	{
-		Die();
-	}
-	else
-	{
-		if (HitSound)
-		{
-			if (!HitSoundComponent.IsValid())
-			{
-				HitSoundComponent = UFMODBlueprintStatics::PlayEventAttached(HitSound,
-					GetRootComponent(),
-					NAME_None,
-					FVector::ZeroVector,
-					EAttachLocation::KeepRelativeOffset,
-					true,
-					true ,
-					true);
-			}
-		}
-	}
-	
-	return 0.f;
 }
 
 bool APlayerCharacter::IsMovingForward() const
