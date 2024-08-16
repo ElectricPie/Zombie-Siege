@@ -133,7 +133,7 @@ void APlayerCharacter::OnWeaponAdded(AGun* Weapon)
 	Weapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
 }
 
-void APlayerCharacter::Die()
+void APlayerCharacter::Die(AController* KillInstigator, AActor* KillCauser)
 {
 	if (AZombieDefenceGameMode* GameMode = Cast<AZombieDefenceGameMode>(GetWorld()->GetAuthGameMode()))
 	{
