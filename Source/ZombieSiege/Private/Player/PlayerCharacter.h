@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
-class UFMODAudioComponent;
+class UHealthComponent;
 class AGun;
 class UAnimMontage;
 class UCameraComponent;
@@ -27,11 +27,8 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
-	virtual void PostInitProperties() override;
-
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 	/**
 	 * @brief Gets the velocity relative to the direction they are facing
@@ -65,6 +62,8 @@ protected:
 	TObjectPtr<UInteractorComponent> InteractorComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	TObjectPtr<UWeaponLoadoutComponent> WeaponLoadoutComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	TObjectPtr<UHealthComponent> HealthComponent;
 
 	float SpeedModifier = 0.8f;
 
@@ -73,6 +72,7 @@ private:
 	void OnInteractionExited(TWeakObjectPtr<UInteractableComponent> InteractableComponent);
 
 	void OnWeaponAdded(AGun* Weapon);
+	UFUNCTION()
 	void Die();
 	
 private:
@@ -81,10 +81,6 @@ private:
 	bool bIsReloading = false;
 	FTimerHandle ReloadingTimerHandle;
 	
-	UPROPERTY(EditAnywhere, Category="Health", meta=(ClampMin=0.f, UIMin=0.f))
-	float MaxHealth = 30.f;
-	UPROPERTY(VisibleAnywhere, Category="Health")
-	float CurrentHealth = 30.f;
 	UPROPERTY(VisibleAnywhere, Category="Health")
 	bool bIsDead = false;
 
@@ -94,9 +90,6 @@ private:
 	UPROPERTY(EditAnywhere, Category="Animation")
 	FName WeaponSocketName = TEXT("WeaponSocket");
 
-	UPROPERTY(EditAnywhere, Category="Sound")
-	UFMODEvent* HitSound;
-	TWeakObjectPtr<UFMODAudioComponent> HitSoundComponent = nullptr;
 	UPROPERTY(EditAnywhere, Category="Sound")
 	UFMODEvent* DeathSound;
 };

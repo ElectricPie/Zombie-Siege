@@ -51,7 +51,6 @@ private:
 	void CollapseAllWidgets();
 	UFUNCTION()
 	void OnOptionsClosed();
-	void SetActiveWidget(UUserWidget* Widget, const bool bUpdateActiveWidget = true);
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Widgets")
