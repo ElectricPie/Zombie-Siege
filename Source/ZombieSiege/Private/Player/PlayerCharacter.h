@@ -72,7 +72,7 @@ private:
 
 	void OnWeaponAdded(AGun* Weapon);
 	UFUNCTION()
-	void Die();
+	void Die(AController* KillInstigator, AActor* KillCauser);
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Weapon", meta=(ToolTip="The time a reload takes if the equiped gun has no reload animation"))

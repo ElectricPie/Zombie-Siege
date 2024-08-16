@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "UnitCharacter.generated.h"
 
+class UHealthComponent;
 class ABarricade;
 class UBehaviorTree;
 class UFMODEvent;
@@ -27,8 +28,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category=Attack)
 	float GetAttackRange() const { return AttackRange; };
-
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintPure, Category="Target")
 	ABarricade* GetTargetBarricade() const { return TargetBarricade.Get(); }
@@ -61,11 +60,14 @@ protected:
 	float CurrentHealth = 40.f;
 
 private:
+	UFUNCTION()
 	void Die(AController* KillInstigator, AActor* KillCauser);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category="Money")
-	UMoneyRewardComponent* MoneyRewardComponent;
+	TObjectPtr<UMoneyRewardComponent> MoneyRewardComponent;
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<UHealthComponent> HealthComponent;
 	UPROPERTY(VisibleAnywhere, Category="Target")
 	TWeakObjectPtr<ABarricade> TargetBarricade;
 	

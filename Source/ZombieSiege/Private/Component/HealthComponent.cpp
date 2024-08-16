@@ -38,7 +38,7 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
 			UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), DeathSound, GetOwner()->GetActorTransform(), true);
 		}
 		
-		OnDeathEvent.Broadcast();
+		OnDeathEvent.Broadcast(InstigatedBy, DamageCauser);
 	}
 	else
 	{
