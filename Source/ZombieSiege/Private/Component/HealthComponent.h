@@ -38,4 +38,6 @@ private:
 	UPROPERTY(EditAnywhere, Category="Sound")
 	UFMODEvent* HitSound;
 	TWeakObjectPtr<UFMODAudioComponent> HitSoundComponent = nullptr;
+	UPROPERTY(EditAnywhere, Category="Sound")
+	UFMODEvent* DeathSound;
 };

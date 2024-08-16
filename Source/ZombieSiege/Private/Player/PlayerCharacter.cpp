@@ -3,7 +3,6 @@
 
 #include "Player/PlayerCharacter.h"
 
-#include "FMODBlueprintStatics.h"
 #include "TopDownPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Component/HealthComponent.h"
@@ -138,15 +137,9 @@ void APlayerCharacter::Die()
 {
 	if (AZombieDefenceGameMode* GameMode = Cast<AZombieDefenceGameMode>(GetWorld()->GetAuthGameMode()))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Player Dead"));
 		GameMode->PlayerDeath(GetController());
 	}
 
-	if (DeathSound)
-	{
-		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), DeathSound, GetActorTransform(), true);
-	}
-	
 	bIsDead = true;
 	OnPlayerDeathEvent.Broadcast(this);
 }
