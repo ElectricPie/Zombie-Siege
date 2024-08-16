@@ -33,6 +33,11 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
 
 	if (CurrentHealth <= 0.f)
 	{
+		if (DeathSound && GetOwner())
+		{
+			UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), DeathSound, GetOwner()->GetActorTransform(), true);
+		}
+		
 		OnDeathEvent.Broadcast();
 	}
 	else
