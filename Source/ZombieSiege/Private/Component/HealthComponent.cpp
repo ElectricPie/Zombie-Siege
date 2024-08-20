@@ -43,6 +43,8 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
 {
 	CurrentHealth -= Damage;
 
+	OnTakeDamageEvent.Broadcast(this, Damage);
+	
 	if (CurrentHealth <= 0.f)
 	{
 		if (DeathSound && GetOwner())
