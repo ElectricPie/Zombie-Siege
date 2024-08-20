@@ -22,6 +22,9 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(BlueprintCallable)
+	void SetEnableHealthRegen(const bool bEnable) { bEnableHealthRegen = bEnable; }
+	
 public:
 	FOnDeathSignature OnDeathEvent;
 	
@@ -39,6 +42,8 @@ private:
 	float CurrentHealth = 30.f;
 	UPROPERTY(EditAnywhere, Category="Health", meta=(ClampMin=0, UIMin=0, ToolTip="The rate at which health regenerates per second"))
 	float HealthRegenRate = 0.f;
+	UPROPERTY(EditAnywhere, Category="Health")
+	bool bEnableHealthRegen = false;
 	
 	UPROPERTY(EditAnywhere, Category="Sound")
 	TObjectPtr<UFMODEvent> HitSound;

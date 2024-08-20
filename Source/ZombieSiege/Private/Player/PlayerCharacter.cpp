@@ -141,5 +141,10 @@ void APlayerCharacter::Die(AController* KillInstigator, AActor* KillCauser)
 	}
 
 	bIsDead = true;
+	if (HealthComponent)
+	{
+		HealthComponent->SetEnableHealthRegen(false);
+	}
+	
 	OnPlayerDeathEvent.Broadcast(this);
 }
