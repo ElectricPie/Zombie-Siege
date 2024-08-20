@@ -5,7 +5,7 @@
 
 #include "TopDownPlayerController.h"
 #include "Camera/CameraComponent.h"
-#include "Component/HealthComponent.h"
+#include "Components/HealthComponent.h"
 #include "Components/InteractableComponent.h"
 #include "Components/InteractorComponent.h"
 #include "Components/WeaponLoadoutComponent.h"

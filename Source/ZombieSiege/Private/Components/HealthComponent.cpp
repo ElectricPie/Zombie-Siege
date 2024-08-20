@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Component/HealthComponent.h"
+#include "Components/HealthComponent.h"
 
 #include "FMODBlueprintStatics.h"
 

@@ -4,7 +4,7 @@
 #include "Units/UnitCharacter.h"
 
 #include "FMODBlueprintStatics.h"
-#include "Component/HealthComponent.h"
+#include "Components/HealthComponent.h"
 #include "Components/MoneyRewardComponent.h"
 #include "Rooms/Barricade.h"
 #include "Kismet/GameplayStatics.h"
