@@ -20,7 +20,7 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (HealthRegenRate != 0)
+	if (bEnableHealthRegen)
 	{
 		const float NewHealth = FMath::Clamp(CurrentHealth + HealthRegenRate * DeltaTime, 0.f, MaxHealth);
 		CurrentHealth = NewHealth;
