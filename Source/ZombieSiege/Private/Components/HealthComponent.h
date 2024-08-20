@@ -7,7 +7,7 @@
 #include "Windows/AllowWindowsPlatformTypes.h"
 #include "HealthComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTakeDamageSignature, UHealthComponent*, HealthComponent, float, DamageAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTakeDamageSignature, UHealthComponent*, ChangedHealthComponent, float, DamageAmount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDeathSignature, AController*, KillInstigator, AActor*, KillCauser);
 
 class UFMODEvent;
@@ -28,9 +28,9 @@ public:
 	void SetEnableHealthRegen(const bool bEnable) { bEnableHealthRegen = bEnable; }
 
 	UFUNCTION(BlueprintCallable, Category="Health")
-	int32 GetMaxHealth() const { return MaxHealth; }
+	float GetMaxHealth() const { return MaxHealth; }
 	UFUNCTION(BlueprintPure, Category="Health")
-	int32 GetCurrentHealth() const { return CurrentHealth; }
+	float GetCurrentHealth() const { return CurrentHealth; }
 	
 public:
 	UPROPERTY(BlueprintAssignable)
