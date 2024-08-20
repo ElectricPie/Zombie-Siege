@@ -20,10 +20,13 @@ public:
 	// Sets default values for this component's properties
 	UHealthComponent();
 
-	virtual void BeginPlay() override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
 	FOnDeathSignature OnDeathEvent;
+	
+protected:
+	virtual void BeginPlay() override;
 
 private:
 	UFUNCTION()
@@ -34,10 +37,12 @@ private:
 	float MaxHealth = 30.f;
 	UPROPERTY(VisibleAnywhere, Category="Health")
 	float CurrentHealth = 30.f;
+	UPROPERTY(EditAnywhere, Category="Health", meta=(ClampMin=0, UIMin=0, ToolTip="The rate at which health regenerates per second"))
+	float HealthRegenRate = 0.f;
 	
 	UPROPERTY(EditAnywhere, Category="Sound")
-	UFMODEvent* HitSound;
+	TObjectPtr<UFMODEvent> HitSound;
 	TWeakObjectPtr<UFMODAudioComponent> HitSoundComponent = nullptr;
 	UPROPERTY(EditAnywhere, Category="Sound")
-	UFMODEvent* DeathSound;
+	TObjectPtr<UFMODEvent> DeathSound;
 };
