@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Windows/AllowWindowsPlatformTypes.h"
 #include "HealthComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTakeDamageSignature, UHealthComponent*, HealthComponent, float, DamageAmount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDeathSignature, AController*, KillInstigator, AActor*, KillCauser);
 
 class UFMODEvent;
@@ -22,10 +24,18 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Health")
 	void SetEnableHealthRegen(const bool bEnable) { bEnableHealthRegen = bEnable; }
+
+	UFUNCTION(BlueprintCallable, Category="Health")
+	int32 GetMaxHealth() const { return MaxHealth; }
+	UFUNCTION(BlueprintPure, Category="Health")
+	int32 GetCurrentHealth() const { return CurrentHealth; }
 	
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnTakeDamageSignature OnTakeDamageEvent;
+	UPROPERTY(BlueprintAssignable)
 	FOnDeathSignature OnDeathEvent;
 	
 protected:
