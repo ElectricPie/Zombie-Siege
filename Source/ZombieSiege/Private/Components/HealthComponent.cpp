@@ -25,6 +25,13 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		const float NewHealth = FMath::Clamp(CurrentHealth + HealthRegenRate * DeltaTime, 0.f, MaxHealth);
 		CurrentHealth = NewHealth;
 	}
+
+	// Health Sound
+	if (HealthSoundComponent)
+	{
+		const float HealthPercentage = GetHealthPercentage();
+		HealthSoundComponent->SetParameter(HealthSoundParameterName, HealthPercentage * 100.f);
+	}
 }
 
 void UHealthComponent::BeginPlay()
@@ -36,6 +43,18 @@ void UHealthComponent::BeginPlay()
 	{
 		Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OnTakeAnyDamage);
 	}
+
+	if (HealthSound)
+	{
+		HealthSoundComponent = UFMODBlueprintStatics::PlayEventAttached(HealthSound,
+			GetOwner()->GetRootComponent(),
+			NAME_None,
+			FVector::ZeroVector,
+			EAttachLocation::KeepRelativeOffset,
+			true,
+			true,
+			true);
+	}
 }
 
 void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
@@ -44,9 +63,10 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
 	CurrentHealth -= Damage;
 
 	OnTakeDamageEvent.Broadcast(this, Damage);
-	
+
 	if (CurrentHealth <= 0.f)
 	{
+		// Death
 		if (DeathSound && GetOwner())
 		{
 			UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), DeathSound, GetOwner()->GetActorTransform(), true);
