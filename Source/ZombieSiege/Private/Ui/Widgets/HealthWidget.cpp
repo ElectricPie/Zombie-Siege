@@ -39,7 +39,7 @@ void UHealthWidget::UpdateHealthBar()
 	if (!HealthComponent.IsValid())
 		return;
 	
-	const float HealthPercentage = HealthComponent->GetCurrentHealth() / HealthComponent->GetMaxHealth();
+	const float HealthPercentage = HealthComponent->GetHealthPercentage();
 	HealthBar->SetPercent(HealthPercentage);
 }
 

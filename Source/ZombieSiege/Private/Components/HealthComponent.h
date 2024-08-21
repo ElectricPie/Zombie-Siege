@@ -31,6 +31,8 @@ public:
 	float GetMaxHealth() const { return MaxHealth; }
 	UFUNCTION(BlueprintPure, Category="Health")
 	float GetCurrentHealth() const { return CurrentHealth; }
+	UFUNCTION(BlueprintPure, Category="Health")
+	float GetHealthPercentage() const { return CurrentHealth / MaxHealth; }
 	
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -60,4 +62,9 @@ private:
 	TWeakObjectPtr<UFMODAudioComponent> HitSoundComponent = nullptr;
 	UPROPERTY(EditAnywhere, Category="Sound")
 	TObjectPtr<UFMODEvent> DeathSound;
+	UPROPERTY(EditAnywhere, Category="Sound")
+	TObjectPtr<UFMODEvent> HealthSound;
+	UPROPERTY(EditAnywhere, Category="Sound")
+	FName HealthSoundParameterName = TEXT("Health");
+	TObjectPtr<UFMODAudioComponent> HealthSoundComponent = nullptr;
 };
