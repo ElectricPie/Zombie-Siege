@@ -34,6 +34,20 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 }
 
+void UHealthComponent::SetMaxHealth(const float NewMaxHealth, const bool bKeepHealthPercentage /*=true*/)
+{
+	if (bKeepHealthPercentage)
+	{
+		const float HealthPercentage = GetHealthPercentage();
+		MaxHealth = NewMaxHealth;
+		CurrentHealth = MaxHealth * HealthPercentage;
+	}
+	else
+	{
+		MaxHealth = NewMaxHealth;
+	}
+}
+
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();

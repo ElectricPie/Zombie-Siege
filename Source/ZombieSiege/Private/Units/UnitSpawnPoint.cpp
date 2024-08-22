@@ -47,7 +47,7 @@ TWeakObjectPtr<AUnitCharacter> AUnitSpawnPoint::SpawnUnit(const TSubclassOf<AUni
 
 	// Select barricade for unit
 	const int32 BarricadeIndex = FMath::RandRange(0, ActiveBarricades.Num() - 1);
-	TWeakObjectPtr<ABarricade> TargetBarricade = ActiveBarricades[BarricadeIndex];
+	const TWeakObjectPtr<ABarricade> TargetBarricade = ActiveBarricades[BarricadeIndex];
 	if (!TargetBarricade.IsValid()) return nullptr;
 
 	const AActor* ActorToFit = UnitClass->GetDefaultObject<AActor>();
@@ -58,7 +58,7 @@ TWeakObjectPtr<AUnitCharacter> AUnitSpawnPoint::SpawnUnit(const TSubclassOf<AUni
 
 	// Spawn the unit
 	FActorSpawnParameters SpawnParameters;
-	TWeakObjectPtr<AUnitCharacter> SpawnedUnit = GetWorld()->SpawnActor<AUnitCharacter>(UnitClass, GetActorLocation(), GetActorRotation());
+	const TWeakObjectPtr<AUnitCharacter> SpawnedUnit = GetWorld()->SpawnActor<AUnitCharacter>(UnitClass, GetActorLocation(), GetActorRotation());
 	SpawnedUnit->SetTargetBarricade(TargetBarricade);
 	
 	return SpawnedUnit;

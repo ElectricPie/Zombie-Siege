@@ -4,6 +4,7 @@
 #include "GameModes/ZombieDefenceGameMode.h"
 
 #include "Ai/UnitAiController.h"
+#include "Components/HealthComponent.h"
 #include "Components/MoneyRewardComponent.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
@@ -128,7 +129,8 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 			{
 				if (UnitSpawnPoint->GetIsActive() && !UnitSpawnPoint->GetIsForceDeactivated())
 				{
-					ActiveSpawnPoints.Add(UnitSpawnPoint);
+					FWeightedSpawnPoint* NewWeightedSpawnPoint = new FWeightedSpawnPoint(UnitSpawnPoint, 0.f);
+					ActiveSpawnPoints.Add(NewWeightedSpawnPoint);
 				}
 				else
 				{
@@ -149,14 +151,25 @@ void AZombieDefenceGameMode::SpawnUnit()
 		return;
 	}
 
-	// TODO: Need a weighted spawn point selector as theres is a decent chance with low active spawn points to keep
-	// spawning at the same one 
-	const int32 SelectedSpawnPoint = UKismetMathLibrary::RandomInteger(ActiveSpawnPoints.Num());
-	TWeakObjectPtr<AUnitCharacter> NewUnit = ActiveSpawnPoints[SelectedSpawnPoint]->SpawnUnit(UnitClass);
+	// Select pawn point
+	const TWeakObjectPtr<AUnitSpawnPoint> SelectedSpawnPoint = GetWeightedRandomSpawnPoint();
+	if (!SelectedSpawnPoint.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Selected Spawn Point is invalid"));
+		return;
+	}
 	
+	// Setup newly spawned unit
+	const TWeakObjectPtr<AUnitCharacter> NewUnit = SelectedSpawnPoint->SpawnUnit(UnitClass);
 	if (NewUnit.IsValid())
 	{
 		ActiveUnits.Add(NewUnit);
+
+		if (UHealthComponent* HealthComponent = NewUnit->GetHealthComponent())
+		{
+			HealthComponent->SetMaxHealth(HealthIncreasePerRound * GetGameState<ADefenceGameState>()->GetCurrentRound());
+		}
+		
 		NewUnit.Get()->OnKilledEvent.AddUObject(this, &AZombieDefenceGameMode::OnUnitKilled);
 		UnitsSpawnedThisRound++;
 		if (UnitsSpawnedThisRound >= UnitsToBeSpawnedThisRound)
@@ -204,13 +217,19 @@ void AZombieDefenceGameMode::OnSpawnPointActiveChanged(TWeakObjectPtr<AUnitSpawn
 {
 	if (SpawnPoint.IsValid())
 	{
-		if (bNewActiveState && !ActiveSpawnPoints.Contains(SpawnPoint))
+		const int32 FoundIndex = ActiveSpawnPoints.IndexOfByPredicate([SpawnPoint](const FWeightedSpawnPoint* SpawnPointWeight)
 		{
-			ActiveSpawnPoints.Add(SpawnPoint);
+			return SpawnPointWeight->SpawnPoint == SpawnPoint;
+		});
+		
+		if (bNewActiveState && FoundIndex == INDEX_NONE)
+		{
+			FWeightedSpawnPoint* NewSpawnPointWeight = new FWeightedSpawnPoint(SpawnPoint, 0.f);
+			ActiveSpawnPoints.Add(NewSpawnPointWeight);
 		}
-		else if (!bNewActiveState && ActiveSpawnPoints.Contains(SpawnPoint))
+		else if (!bNewActiveState && FoundIndex != INDEX_NONE)
 		{
-			ActiveSpawnPoints.Remove(SpawnPoint);
+			ActiveSpawnPoints.RemoveAt(FoundIndex);
 		}
 	}
 }
@@ -241,4 +260,44 @@ void AZombieDefenceGameMode::GameOver()
 			}
 		}
 	}
+}
+
+TWeakObjectPtr<AUnitSpawnPoint> AZombieDefenceGameMode::GetWeightedRandomSpawnPoint() const
+{
+	if (ActiveSpawnPoints.IsEmpty())
+	{
+		return nullptr;
+	}
+	
+	// Get total weight of all spawn points
+	float TotalWeight = 0.f;
+	for (const auto& WeightedSpawnPoint : ActiveSpawnPoints)
+	{
+		if (!WeightedSpawnPoint->SpawnPoint.IsValid())
+		{
+			continue;
+		}
+	
+		TotalWeight += GetWorld()->TimeSince(WeightedSpawnPoint->LastUsedTime); 
+	}
+	
+	// Get random spawn point
+	const float RandomWeight = UKismetMathLibrary::RandomFloatInRange(0.f, TotalWeight);
+	for (const auto& WeightedSpawnPoint : ActiveSpawnPoints)
+	{
+		if (!WeightedSpawnPoint->SpawnPoint.IsValid())
+		{
+			continue;
+		}
+	
+		TotalWeight -= GetWorld()->TimeSince(WeightedSpawnPoint->LastUsedTime);
+		if (TotalWeight <= RandomWeight)
+		{
+			WeightedSpawnPoint->LastUsedTime = GetWorld()->GetTimeSeconds();
+			return WeightedSpawnPoint->SpawnPoint;
+		}
+	}
+	
+	ActiveSpawnPoints[0]->LastUsedTime = GetWorld()->GetTimeSeconds();
+	return ActiveSpawnPoints[0]->SpawnPoint;
 }
