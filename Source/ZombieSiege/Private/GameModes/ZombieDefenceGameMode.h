@@ -10,6 +10,20 @@ class AGun;
 class AUnitSpawnPoint;
 class AUnitCharacter;
 
+struct FWeightedSpawnPoint
+{
+	TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint;
+	float LastUsedTime;
+
+	FWeightedSpawnPoint(): SpawnPoint(nullptr), LastUsedTime(0.f) {}
+		
+	FWeightedSpawnPoint(TWeakObjectPtr<AUnitSpawnPoint> InSpawnPoint, float InLastUsedTime)
+		: SpawnPoint(InSpawnPoint)
+		, LastUsedTime(InLastUsedTime)
+	{
+	}
+};
+
 /**
  * 
  */
@@ -17,7 +31,7 @@ UCLASS()
 class AZombieDefenceGameMode : public AGameMode
 {
 	GENERATED_BODY()
-	
+
 public:
 	void PlayerDeath(const AController* PlayerController);
 	
@@ -44,20 +58,6 @@ private:
 	TWeakObjectPtr<AUnitSpawnPoint> GetWeightedRandomSpawnPoint() const;
 	
 private:
-	struct FSpawnPointWeight
-	{
-		TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint;
-		float LastUsedTime;
-
-		FSpawnPointWeight(): SpawnPoint(nullptr), LastUsedTime(0.f) {}
-		
-		FSpawnPointWeight(TWeakObjectPtr<AUnitSpawnPoint> InSpawnPoint, float InLastUsedTime)
-			: SpawnPoint(InSpawnPoint)
-			, LastUsedTime(InLastUsedTime)
-		{
-		}
-	};
-	
 	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))
 	int32 StartingMoney = 500;
 	UPROPERTY(VisibleAnywhere, Category="Player")
@@ -85,7 +85,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The amount of health to add to the units each round"))
 	float HealthIncreasePerRound = 25.f;
 	
-	TArray<FSpawnPointWeight> ActiveSpawnPoints;
+	TArray<FWeightedSpawnPoint*> ActiveSpawnPoints;
 	
 	TSet<TWeakObjectPtr<AUnitCharacter>> ActiveUnits;
 
