@@ -33,6 +33,13 @@ public:
 	float GetCurrentHealth() const { return CurrentHealth; }
 	UFUNCTION(BlueprintPure, Category="Health")
 	float GetHealthPercentage() const { return CurrentHealth / MaxHealth; }
+	/**
+	 * @brief Sets the max health
+	 * @param NewMaxHealth The new maximum health value
+	 * @param bKeepHealthPercentage If true, the health percentage will be kept the same, otherwise the current health will remain the same
+	 */
+	UFUNCTION(BlueprintCallable, Category="Health")
+	void SetMaxHealth(const float NewMaxHealth, const bool bKeepHealthPercentage = true);
 	
 public:
 	UPROPERTY(BlueprintAssignable)

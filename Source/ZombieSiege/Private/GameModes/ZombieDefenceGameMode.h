@@ -66,6 +66,8 @@ private:
 	float CurrentSpawnDelay = 2.f;
 	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The minimum amount of time between units spawning"))
 	float MinSpawnDelay = 0.5f;
+	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The amount of health to add to the units each round"))
+	float HealthIncreasePerRound = 25.f;
 	
 	UPROPERTY(VisibleAnywhere)
 	TArray<TWeakObjectPtr<AUnitSpawnPoint>> ActiveSpawnPoints;
