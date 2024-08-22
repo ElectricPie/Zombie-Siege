@@ -4,6 +4,7 @@
 #include "GameModes/ZombieDefenceGameMode.h"
 
 #include "Ai/UnitAiController.h"
+#include "Components/HealthComponent.h"
 #include "Components/MoneyRewardComponent.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
@@ -152,11 +153,17 @@ void AZombieDefenceGameMode::SpawnUnit()
 	// TODO: Need a weighted spawn point selector as theres is a decent chance with low active spawn points to keep
 	// spawning at the same one 
 	const int32 SelectedSpawnPoint = UKismetMathLibrary::RandomInteger(ActiveSpawnPoints.Num());
-	TWeakObjectPtr<AUnitCharacter> NewUnit = ActiveSpawnPoints[SelectedSpawnPoint]->SpawnUnit(UnitClass);
+	const TWeakObjectPtr<AUnitCharacter> NewUnit = ActiveSpawnPoints[SelectedSpawnPoint]->SpawnUnit(UnitClass);
 	
 	if (NewUnit.IsValid())
 	{
 		ActiveUnits.Add(NewUnit);
+
+		if (UHealthComponent* HealthComponent = NewUnit->GetHealthComponent())
+		{
+			HealthComponent->SetMaxHealth(HealthIncreasePerRound * GetGameState<ADefenceGameState>()->GetCurrentRound());
+		}
+		
 		NewUnit.Get()->OnKilledEvent.AddUObject(this, &AZombieDefenceGameMode::OnUnitKilled);
 		UnitsSpawnedThisRound++;
 		if (UnitsSpawnedThisRound >= UnitsToBeSpawnedThisRound)

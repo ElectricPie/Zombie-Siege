@@ -33,7 +33,10 @@ public:
 	ABarricade* GetTargetBarricade() const { return TargetBarricade.Get(); }
 	void SetTargetBarricade(TWeakObjectPtr<ABarricade> NewTargetBarricade);
 
+	UFUNCTION(BlueprintPure, Category="Money")
 	UMoneyRewardComponent* GetMoneyRewardComponent() const { return MoneyRewardComponent; }
+	UFUNCTION(BlueprintPure, Category="Health")
+	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 	
 public:
 	FOnUnitKilledSingature OnKilledEvent;
