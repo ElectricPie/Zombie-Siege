@@ -17,6 +17,7 @@ UCLASS()
 class AZombieDefenceGameMode : public AGameMode
 {
 	GENERATED_BODY()
+	
 public:
 	void PlayerDeath(const AController* PlayerController);
 	
@@ -40,8 +41,23 @@ private:
 	void OnSpawnPointActiveChanged(TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint, bool bNewActiveState);
 
 	void GameOver();
+	TWeakObjectPtr<AUnitSpawnPoint> GetWeightedRandomSpawnPoint() const;
 	
 private:
+	struct FSpawnPointWeight
+	{
+		TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint;
+		float LastUsedTime;
+
+		FSpawnPointWeight(): SpawnPoint(nullptr), LastUsedTime(0.f) {}
+		
+		FSpawnPointWeight(TWeakObjectPtr<AUnitSpawnPoint> InSpawnPoint, float InLastUsedTime)
+			: SpawnPoint(InSpawnPoint)
+			, LastUsedTime(InLastUsedTime)
+		{
+		}
+	};
+	
 	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))
 	int32 StartingMoney = 500;
 	UPROPERTY(VisibleAnywhere, Category="Player")
@@ -69,8 +85,8 @@ private:
 	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The amount of health to add to the units each round"))
 	float HealthIncreasePerRound = 25.f;
 	
-	UPROPERTY(VisibleAnywhere)
-	TArray<TWeakObjectPtr<AUnitSpawnPoint>> ActiveSpawnPoints;
+	TArray<FSpawnPointWeight> ActiveSpawnPoints;
+	
 	TSet<TWeakObjectPtr<AUnitCharacter>> ActiveUnits;
 
 	UPROPERTY(EditAnywhere, Category="Weapon")
