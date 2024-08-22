@@ -129,7 +129,8 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 			{
 				if (UnitSpawnPoint->GetIsActive() && !UnitSpawnPoint->GetIsForceDeactivated())
 				{
-					ActiveSpawnPoints.Add(UnitSpawnPoint);
+					FSpawnPointWeight NewSpawnPoint(UnitSpawnPoint, 0.f);
+					ActiveSpawnPoints.Add(NewSpawnPoint);
 				}
 				else
 				{
@@ -151,10 +152,15 @@ void AZombieDefenceGameMode::SpawnUnit()
 	}
 
 	// TODO: Need a weighted spawn point selector as theres is a decent chance with low active spawn points to keep
-	// spawning at the same one 
-	const int32 SelectedSpawnPoint = UKismetMathLibrary::RandomInteger(ActiveSpawnPoints.Num());
-	const TWeakObjectPtr<AUnitCharacter> NewUnit = ActiveSpawnPoints[SelectedSpawnPoint]->SpawnUnit(UnitClass);
-	
+	// spawning at the same one
+	// Select pawn point
+	const int32 SelectedSpawnPointIndex = UKismetMathLibrary::RandomInteger(ActiveSpawnPoints.Num());
+	const TWeakObjectPtr<AUnitSpawnPoint> SelectedSpawnPoint = ActiveSpawnPoints[SelectedSpawnPointIndex].SpawnPoint;
+	if (!SelectedSpawnPoint.IsValid())
+		return;
+
+	// Setup newly spawned unit
+	const TWeakObjectPtr<AUnitCharacter> NewUnit = SelectedSpawnPoint->SpawnUnit(UnitClass);
 	if (NewUnit.IsValid())
 	{
 		ActiveUnits.Add(NewUnit);
@@ -211,13 +217,19 @@ void AZombieDefenceGameMode::OnSpawnPointActiveChanged(TWeakObjectPtr<AUnitSpawn
 {
 	if (SpawnPoint.IsValid())
 	{
-		if (bNewActiveState && !ActiveSpawnPoints.Contains(SpawnPoint))
+		const int32 FoundIndex = ActiveSpawnPoints.IndexOfByPredicate([SpawnPoint](const FSpawnPointWeight& SpawnPointWeight)
 		{
-			ActiveSpawnPoints.Add(SpawnPoint);
+			return SpawnPointWeight.SpawnPoint == SpawnPoint;
+		});
+		
+		if (bNewActiveState && FoundIndex == INDEX_NONE)
+		{
+			const FSpawnPointWeight NewSpawnPointWeight(SpawnPoint, 0.f);
+			ActiveSpawnPoints.Add(NewSpawnPointWeight);
 		}
-		else if (!bNewActiveState && ActiveSpawnPoints.Contains(SpawnPoint))
+		else if (!bNewActiveState && FoundIndex != INDEX_NONE)
 		{
-			ActiveSpawnPoints.Remove(SpawnPoint);
+			ActiveSpawnPoints.RemoveAt(FoundIndex);
 		}
 	}
 }
@@ -248,4 +260,12 @@ void AZombieDefenceGameMode::GameOver()
 			}
 		}
 	}
+}
+
+TWeakObjectPtr<AUnitSpawnPoint> AZombieDefenceGameMode::GetWeightedRandomSpawnPoint() const
+{
+	
+	
+
+	return nullptr;
 }
