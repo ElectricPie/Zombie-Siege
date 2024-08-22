@@ -10,6 +10,20 @@ class AGun;
 class AUnitSpawnPoint;
 class AUnitCharacter;
 
+struct FWeightedSpawnPoint
+{
+	TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint;
+	float LastUsedTime;
+
+	FWeightedSpawnPoint(): SpawnPoint(nullptr), LastUsedTime(0.f) {}
+		
+	FWeightedSpawnPoint(TWeakObjectPtr<AUnitSpawnPoint> InSpawnPoint, float InLastUsedTime)
+		: SpawnPoint(InSpawnPoint)
+		, LastUsedTime(InLastUsedTime)
+	{
+	}
+};
+
 /**
  * 
  */
@@ -17,6 +31,7 @@ UCLASS()
 class AZombieDefenceGameMode : public AGameMode
 {
 	GENERATED_BODY()
+
 public:
 	void PlayerDeath(const AController* PlayerController);
 	
@@ -40,6 +55,7 @@ private:
 	void OnSpawnPointActiveChanged(TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint, bool bNewActiveState);
 
 	void GameOver();
+	TWeakObjectPtr<AUnitSpawnPoint> GetWeightedRandomSpawnPoint() const;
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))
@@ -66,9 +82,11 @@ private:
 	float CurrentSpawnDelay = 2.f;
 	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The minimum amount of time between units spawning"))
 	float MinSpawnDelay = 0.5f;
+	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The amount of health to add to the units each round"))
+	float HealthIncreasePerRound = 25.f;
 	
-	UPROPERTY(VisibleAnywhere)
-	TArray<TWeakObjectPtr<AUnitSpawnPoint>> ActiveSpawnPoints;
+	TArray<FWeightedSpawnPoint*> ActiveSpawnPoints;
+	
 	TSet<TWeakObjectPtr<AUnitCharacter>> ActiveUnits;
 
 	UPROPERTY(EditAnywhere, Category="Weapon")
