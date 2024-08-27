@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+	
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "OptionsWidget.generated.h"
 
-class UButton;
+class UMenuButton;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOptionsClosedSignature);
 
@@ -31,5 +31,5 @@ private:
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
-	UButton* CloseButton; 
+	TObjectPtr<UMenuButton> CloseButton; 
 };
