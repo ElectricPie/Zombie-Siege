@@ -24,11 +24,12 @@ protected:
 	virtual void NativeConstruct() override;
 	
 private:
-	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
-	UOverlay* Overlay;
-	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
-	UTextBlock* MoneyText;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UOverlay> Overlay;
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> MoneyText;
+	
+	UPROPERTY(EditAnywhere, Category="Money")
 	FString TextPrefix = TEXT("£");
 	
 	UPROPERTY(EditDefaultsOnly, Category="Widgets")
@@ -36,5 +37,5 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Widgets", meta=(ClampMin=0, UIMin=0))
 	int32 ChangedWidgetCount = 5;
 
-	TQueue<UMoneyChangedWidget*> MoneyChangedWidgetPool;
+	TQueue<TObjectPtr<UMoneyChangedWidget>> MoneyChangedWidgetPool;
 };
