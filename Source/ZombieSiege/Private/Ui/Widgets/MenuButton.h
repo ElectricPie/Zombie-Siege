@@ -33,13 +33,13 @@ private:
 	void OnButtonClicked();
 	
 private:
-	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
+	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UButton> Button = nullptr;
-	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text = nullptr;
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> TextBlock = nullptr;
 
 	UPROPERTY(EditAnywhere, Category="MenuButton")
-	FText ButtonText = FText::FromString("Menu Button");
+	FText Text = FText::FromString("Menu Button");
 	UPROPERTY(EditAnywhere, Category="MenuButton")
 	FLinearColor ButtonColor = FLinearColor::White;
 };
