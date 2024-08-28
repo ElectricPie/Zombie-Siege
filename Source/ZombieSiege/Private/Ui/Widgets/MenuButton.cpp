@@ -11,7 +11,6 @@ void UMenuButton::NativePreConstruct()
 	Super::NativePreConstruct();
 	
 	TextBlock->SetText(Text);
-	Button->SetBackgroundColor(ButtonColor);
 }
 
 void UMenuButton::NativeConstruct()

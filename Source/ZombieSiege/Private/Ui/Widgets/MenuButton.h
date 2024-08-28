@@ -40,6 +40,4 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="MenuButton")
 	FText Text = FText::FromString("Menu Button");
-	UPROPERTY(EditAnywhere, Category="MenuButton")
-	FLinearColor ButtonColor = FLinearColor::White;
 };
