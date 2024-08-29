@@ -21,7 +21,7 @@ public:
 	UWeaponLoadoutComponent();
 
 	UFUNCTION(BlueprintCallable)
-	void AddWeapon(AGun* Weapon, bool bEquip = false);
+	void AddWeapon(AGun* NewWeapon, bool bEquip = false);
 	UFUNCTION(BlueprintCallable)
 	AGun* GetEquippedWeapon();
 	UFUNCTION()
@@ -29,7 +29,7 @@ public:
 	int32 GetWeaponCount() const { return Weapons.Num(); }
 
 public:
-	UPROPERTY(BlueprintAssignable, Category=Weapon)
+	UPROPERTY(BlueprintAssignable, Category="Weapon Loadout")
 	FOnWeaponChangedSignature OnWeaponChangedEvent;
 	FOnWeaponAddedSignature OnWeaponAddedEvent;
 
@@ -37,8 +37,8 @@ protected:
 	virtual void BeginPlay() override;
 	
 private:
-	UPROPERTY(EditAnywhere, Category="Weapon", meta=(ClampMin=0, UIMin=0))
+	UPROPERTY(EditAnywhere, Category="Weapon Loadout", meta=(ClampMin=0, UIMin=0))
 	int32 EquippedWeaponIndex;
-	UPROPERTY(VisibleAnywhere, Category="Weapon")
+	UPROPERTY(VisibleAnywhere, Category="Weapon Loadout")
 	TArray<TWeakObjectPtr<AGun>> Weapons;
 };

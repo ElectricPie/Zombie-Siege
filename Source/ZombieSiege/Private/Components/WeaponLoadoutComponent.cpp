@@ -15,27 +15,31 @@ UWeaponLoadoutComponent::UWeaponLoadoutComponent()
 	// ...
 }
 
-void UWeaponLoadoutComponent::AddWeapon(AGun* Weapon, bool bEquip /*= false*/)
+void UWeaponLoadoutComponent::AddWeapon(AGun* NewWeapon, bool bEquip /*= false*/)
 {
-	if (Weapon == nullptr || Weapons.Contains(Weapon)) return;
+	if (NewWeapon == nullptr || Weapons.Contains(NewWeapon)) return;
 
 	// Force equip if there are no weapons
 	if (Weapons.IsEmpty())
 	{
 		bEquip = true;
 	}
-	const int32 Index = Weapons.Add(Weapon);
+	
+	const int32 NewWeaponIndex = Weapons.Add(NewWeapon);
 	if (bEquip)
 	{
-		EquippedWeaponIndex = Index;
-		OnWeaponChangedEvent.Broadcast(Weapon);
-		Weapon->SetVisibility(true);
+		// Hide the current weapon
+		Weapons[EquippedWeaponIndex]->SetVisibility(false);
+		
+		EquippedWeaponIndex = NewWeaponIndex;
+		OnWeaponChangedEvent.Broadcast(NewWeapon);
+		NewWeapon->SetVisibility(true);
 	}
 	else
 	{
-		Weapon->SetVisibility(false);
+		NewWeapon->SetVisibility(false);
 	}
-	OnWeaponAddedEvent.Broadcast(Weapon);
+	OnWeaponAddedEvent.Broadcast(NewWeapon);
 }
 
 AGun* UWeaponLoadoutComponent::GetEquippedWeapon()
