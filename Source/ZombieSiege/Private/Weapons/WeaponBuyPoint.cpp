@@ -19,6 +19,11 @@ AWeaponBuyPoint::AWeaponBuyPoint()
 	InteractableComponent->SetCanInteract(true);
 	InteractableComponent->SetInteractMessage(FText::FromString("buy weapon"));
 	InteractableComponent->OnInteractEvent.AddUObject(this, &AWeaponBuyPoint::BuyWeapon);
+	
+	WeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh Component"));
+	WeaponMeshComponent->SetupAttachment(RootComponent);
+	WeaponMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponMeshComponent->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
 }
 
 void AWeaponBuyPoint::BuyWeapon(TWeakObjectPtr<AController> InteractionInstigator,

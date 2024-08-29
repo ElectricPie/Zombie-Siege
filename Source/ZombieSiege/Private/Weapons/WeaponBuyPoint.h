@@ -20,13 +20,16 @@ public:
 	
 private:
 	void BuyWeapon(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
+	
 private:
-	UPROPERTY(VisibleAnywhere, Category="Components")
+	UPROPERTY(VisibleInstanceOnly, Category="Components")
 	TObjectPtr<UInteractableComponent> InteractableComponent;
+	UPROPERTY(VisibleInstanceOnly, Category="Components")
+	TObjectPtr<USkeletalMeshComponent> WeaponMeshComponent;
 
-	UPROPERTY(EditAnywhere, Category="Weapon")
+	UPROPERTY(EditAnywhere, Category="Weapon Buy Point")
 	TSubclassOf<AGun> WeaponClass;
-	UPROPERTY(EditAnywhere, Category="Buy", meta=(ClampMin=0, UIMin=0))
+	UPROPERTY(EditAnywhere, Category="Weapon Buy Point", meta=(ClampMin=0, UIMin=0))
 	int32 Cost = 100;
 
 };
