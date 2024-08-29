@@ -17,7 +17,7 @@
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraArm"));
@@ -46,7 +46,6 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 bool APlayerCharacter::IsMovingForward() const
@@ -71,8 +70,9 @@ void APlayerCharacter::Interact()
 
 void APlayerCharacter::Fire(AController* Shooter)
 {
-	if (bIsReloading) return;
-	
+	if (bIsReloading)
+		return;
+
 	if (AGun* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
 	{
 		EquippedWeapon->StartFiring(Shooter, this);
@@ -92,7 +92,7 @@ void APlayerCharacter::ReloadWeapon()
 	if (AGun* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
 	{
 		if (EquippedWeapon->GetIsReloading()) return;
-		
+
 		EquippedWeapon->StopFiring();
 
 		EquippedWeapon->Reload();
@@ -127,9 +127,23 @@ void APlayerCharacter::OnInteractionExited(TWeakObjectPtr<UInteractableComponent
 
 void APlayerCharacter::OnWeaponAdded(AGun* Weapon)
 {
-	if (Weapon == nullptr) return;
+	if (Weapon == nullptr)
+		return;
 
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+
+	FName WeaponSocketName;
+	switch (Weapon->GetGunType())
+	{
+	case Pistol:
+		WeaponSocketName = PistolWeaponSocket;
+		break;
+	case Rifle:
+		WeaponSocketName = RifleWeaponSocket;
+		break;
+	default:
+		return;
+	}
 	Weapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
 }
 
@@ -145,6 +159,6 @@ void APlayerCharacter::Die(AController* KillInstigator, AActor* KillCauser)
 	{
 		HealthComponent->SetEnableHealthRegen(false);
 	}
-	
+
 	OnPlayerDeathEvent.Broadcast(this);
 }
