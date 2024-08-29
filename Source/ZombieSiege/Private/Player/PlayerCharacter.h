@@ -86,6 +86,8 @@ private:
 	UPROPERTY(EditAnywhere, Category="Movement", meta=(ToolTip="How far from forward the character can move before they are considered to be moving backwards", ClampMin="-1.0", ClampMax="1.0", UIMin="-1.0", UIMax="1.0"))
 	float BackwardsThreshold = -0.5f;
 
-	UPROPERTY(EditAnywhere, Category="Animation")
-	FName WeaponSocketName = TEXT("WeaponSocket");
+	UPROPERTY(EditAnywhere, Category="PlayerCharacter|Animation")
+	FName PistolWeaponSocket = TEXT("PistolSocket");
+	UPROPERTY(EditAnywhere, Category="PlayerCharacter|Animation")
+	FName RifleWeaponSocket = TEXT("RifleSocket");
 };

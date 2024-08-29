@@ -17,7 +17,8 @@ UWeaponLoadoutComponent::UWeaponLoadoutComponent()
 
 void UWeaponLoadoutComponent::AddWeapon(AGun* NewWeapon, bool bEquip /*= false*/)
 {
-	if (NewWeapon == nullptr || Weapons.Contains(NewWeapon)) return;
+	if (NewWeapon == nullptr || Weapons.Contains(NewWeapon))
+		return;
 
 	// Force equip if there are no weapons
 	if (Weapons.IsEmpty())
@@ -44,7 +45,8 @@ void UWeaponLoadoutComponent::AddWeapon(AGun* NewWeapon, bool bEquip /*= false*/
 
 AGun* UWeaponLoadoutComponent::GetEquippedWeapon()
 {
-	if (EquippedWeaponIndex >= Weapons.Num()) return nullptr;
+	if (EquippedWeaponIndex >= Weapons.Num())
+		return nullptr;
 
 	return Weapons[EquippedWeaponIndex].Get();
 }
@@ -52,13 +54,15 @@ AGun* UWeaponLoadoutComponent::GetEquippedWeapon()
 void UWeaponLoadoutComponent::EquipNextWeapon()
 {
 	// No need to change weapons if there is only one
-	if (Weapons.Num() <= 1) return; 
+	if (Weapons.Num() <= 1)
+		return; 
 	
 	// Hide the current weapon
 	if (AGun* EquippedWeapon = GetEquippedWeapon())
 	{
 		// Prevent changing weapons while reloading
-		if (EquippedWeapon->GetIsReloading()) return;
+		if (EquippedWeapon->GetIsReloading())
+			return;
 		
 		EquippedWeapon->SetVisibility(false);
 	}
