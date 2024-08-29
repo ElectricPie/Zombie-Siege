@@ -15,7 +15,9 @@ void UPlayerMoneyWidget::SetMoneyText(const int32 MoneyAmount, const int32 Amoun
 	
 	if (MoneyChangedWidgetClass && AmountChanged != 0)
 	{
-		if (UMoneyChangedWidget* MoneyChangedWidget; MoneyChangedWidgetPool.Dequeue(MoneyChangedWidget))
+		TObjectPtr<UMoneyChangedWidget> MoneyChangedWidget;
+		MoneyChangedWidgetPool.Dequeue(MoneyChangedWidget);
+		if (MoneyChangedWidget)
 		{
 			MoneyChangedWidget->SetAmount(AmountChanged);
 			MoneyChangedWidget->SetVisibility(ESlateVisibility::Visible);
@@ -36,7 +38,7 @@ void UPlayerMoneyWidget::NativeConstruct()
 	// Create Pool
 	for (int32 i = 0; i < ChangedWidgetCount; i++)
 	{
-		UMoneyChangedWidget* MoneyChangedWidget = CreateWidget<UMoneyChangedWidget>(this, MoneyChangedWidgetClass);
+		TObjectPtr<UMoneyChangedWidget> MoneyChangedWidget = CreateWidget<UMoneyChangedWidget>(this, MoneyChangedWidgetClass);
 		if (UOverlaySlot* MoneyChangedSlot = Cast<UOverlaySlot>(Overlay->AddChild(MoneyChangedWidget)))
 		{
 			const FVector2D Size = GetDesiredSize();
