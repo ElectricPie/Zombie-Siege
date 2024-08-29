@@ -28,12 +28,20 @@ AGun::AGun()
 	FiringArrow->SetupAttachment(RootComponent);
 }
 
+void AGun::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	CurrentAmmo = MaxAmmo;
+}
+
 void AGun::StartFiring(AController* ShooterController, AActor* ShooterActor)
 {
 	if (ShooterController == nullptr)
 		return;
 	if (bIsFiring || bIsReloading)
 		return;
+	
 	if (CurrentAmmo <= 0)
 	{
 		MagEmpty();
@@ -109,12 +117,11 @@ void AGun::Reload()
 	GetWorldTimerManager().SetTimer(ReloadingTimerHandle, this, &AGun::FinishReload, ReloadTime, false);
 }
 
-
-void AGun::PostInitProperties()
+void AGun::BeginPlay()
 {
-	Super::PostInitProperties();
+	Super::BeginPlay();
 
-	CurrentAmmo = MaxAmmo;
+	LastFiredTime = -FireCooldownTime;
 }
 
 void AGun::SpawnProjectile(AController* ShooterController, AActor* ShooterActor)
