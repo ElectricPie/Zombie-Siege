@@ -28,7 +28,6 @@ AGun::AGun()
 	FiringArrow->SetupAttachment(RootComponent);
 }
 
-// TODO: Aim direction is only set once so it always shoots the same direction
 void AGun::StartFiring(AController* ShooterController, AActor* ShooterActor)
 {
 	if (ShooterController == nullptr)
@@ -83,6 +82,13 @@ void AGun::StopFiring()
 void AGun::SetVisibility(const bool bIsVisible)
 {
 	GunMesh->SetVisibility(bIsVisible);
+	for (const auto& Child : GunMesh->GetAttachChildren())
+	{
+		if (Child == ProjectileSpawn)
+			continue;
+		
+		Child->SetVisibility(bIsVisible);
+	}
 }
 
 void AGun::Reload()
