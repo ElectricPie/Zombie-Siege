@@ -36,6 +36,8 @@ class AGun : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AGun();
+	
+	virtual void PostInitProperties() override;
 
 	UFUNCTION(BlueprintPure)
 	EGunType GetGunType() const { return Type; }
@@ -54,14 +56,14 @@ public:
 	UFUNCTION(BlueprintPure)
 	UAnimMontage* GetReloadAnimMontage() const { return ReloadMontage; }
 	UFUNCTION(BlueprintPure)
-	bool GetIsReloading() { return bIsReloading; }
+	bool GetIsReloading() const { return bIsReloading; }
 
 public:
 	FOnAmmoChangedSignature OnAmmoChangedEvent;
 	FOnReloadStateChanged OnReloadStateChangedEvent;
 
 protected:
-	virtual void PostInitProperties() override;
+	virtual void BeginPlay() override;
 
 private:
 	UFUNCTION()
