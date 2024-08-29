@@ -21,8 +21,8 @@ public:
 	void ShowReloadingMessage(bool bShowReloadingMessage);
 	
 private:
-	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
-	UTextBlock* AmmoTextBlock;
-	UPROPERTY(VisibleAnywhere, Category="Widgets", meta=(BindWidget))
-	UTextBlock* ReloadingTextBlock;
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> AmmoTextBlock;
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> ReloadingTextBlock;
 };

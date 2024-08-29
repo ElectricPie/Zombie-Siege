@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Ui/Widgets/OptionsWidget.h"
 
-#include "Components/Button.h"
+#include "MenuButton.h"
 
 void UOptionsWidget::NativeConstruct()
 {
@@ -14,6 +13,5 @@ void UOptionsWidget::NativeConstruct()
 
 void UOptionsWidget::OnCloseButtonClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Options Close"));
 	OnOptionsClosedEvent.Broadcast();
 }
