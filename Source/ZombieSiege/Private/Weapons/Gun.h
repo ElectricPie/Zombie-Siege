@@ -87,43 +87,43 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<USceneComponent> ProjectileSpawn;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Ammo", meta=(ClampMin=1, UIMin=1))
+	UPROPERTY(EditDefaultsOnly, Category="Gun|Ammo", meta=(ClampMin=1, UIMin=1))
 	uint32 MaxAmmo = 30;
-	UPROPERTY(VisibleAnywhere, Category="Ammo", meta=(ClampMin=1, UIMin=1))
+	UPROPERTY(VisibleInstanceOnly, Category="Gun|Ammo", meta=(ClampMin=1, UIMin=1))
 	uint32 CurrentAmmo = 0;	
 	
-	UPROPERTY(EditAnywhere, Category="Projectile")
+	UPROPERTY(EditAnywhere, Category="Gun|Projectile")
 	TSubclassOf<AGunProjectile> ProjectileClass;
-	UPROPERTY(EditAnywhere, Category="Projectile")
+	UPROPERTY(EditAnywhere, Category="Gun|Projectile")
 	TSubclassOf<UDamageType> ProjectileDamageType = UDamageType::StaticClass();
-	UPROPERTY(EditAnywhere, Category="Projectile", meta=(ClampMin=0.f, UIMin=0.f))
+	UPROPERTY(EditAnywhere, Category="Gun|Projectile", meta=(ClampMin=0.f, UIMin=0.f))
 	float ProjectileDamage = 20.f;
 
-	UPROPERTY(EditDefaultsOnly, Category="Weapon")
+	UPROPERTY(EditDefaultsOnly, Category="Gun|Weapon")
 	TEnumAsByte<EGunType> Type;
 	
-	UPROPERTY(EditDefaultsOnly, Category="FireRate")
+	UPROPERTY(EditDefaultsOnly, Category="Gun|FireRate")
 	TEnumAsByte<EGunFireRate> FireRate;
-	UPROPERTY(EditDefaultsOnly, Category="FireRate", meta=(ClampMin=0.1f, UIMin=0.1f, ToolTip="The time in seconds before the gun can be fired again after firing has started"))
+	UPROPERTY(EditDefaultsOnly, Category="Gun|FireRate", meta=(ClampMin=0.1f, UIMin=0.1f, ToolTip="The time in seconds before the gun can be fired again after firing has started"))
 	float FireCooldownTime = 1.f;
-	UPROPERTY(EditDefaultsOnly, Category="FireRate", meta=(ClampMin=0.1f, UIMin=0.1f, EditCondition="FireRate!=EGunFireRate::Single", ToolTip="The time between shots when Fire Rate is set to full auto or Burst"))
+	UPROPERTY(EditDefaultsOnly, Category="Gun|FireRate", meta=(ClampMin=0.1f, UIMin=0.1f, EditCondition="FireRate!=EGunFireRate::Single", ToolTip="The time between shots when Fire Rate is set to full auto or Burst"))
 	float ShotIntervals = 1.f;
-	UPROPERTY(EditDefaultsOnly, Category="FireRate", meta=(ClampMin=1, UIMin=1, EditCondition="FireRate==EGunFireRate::Burst", ToolTip="The number of shots in a burst when Fire Rate is set to Burst"))
+	UPROPERTY(EditDefaultsOnly, Category="Gun|FireRate", meta=(ClampMin=1, UIMin=1, EditCondition="FireRate==EGunFireRate::Burst", ToolTip="The number of shots in a burst when Fire Rate is set to Burst"))
 	int32 BurstShots = 3;
 
-	UPROPERTY(EditAnywhere, Category="Animation")
+	UPROPERTY(EditAnywhere, Category="Gun|Animation")
 	UAnimMontage* ReloadMontage;
-	UPROPERTY(EditAnywhere, Category="Animation", meta=(ToolTip="The time a reload takes if the there is no reload animation"))
+	UPROPERTY(EditAnywhere, Category="Gun|Animation", meta=(ToolTip="The time a reload takes if the there is no reload animation"))
 	float DefaultReloadTime = 2.f;
 	bool bIsReloading = false;
 	FTimerHandle ReloadingTimerHandle;
 
-	UPROPERTY(EditAnywhere, Category="Sound")
-	UFMODEvent* FireSound;
-	UPROPERTY(EditAnywhere, Category="Sound")
-	UFMODEvent* ReloadSound;
-	UPROPERTY(EditAnywhere, Category="Sound")
-	UFMODEvent* EmptySound;
+	UPROPERTY(EditAnywhere, Category="Gun|Sound")
+	TObjectPtr<UFMODEvent> FireSound;
+	UPROPERTY(EditAnywhere, Category="Gun|Sound")
+	TObjectPtr<UFMODEvent> ReloadSound;
+	UPROPERTY(EditAnywhere, Category="Gun|Sound")
+	TObjectPtr<UFMODEvent> EmptySound;
 	
 	bool bIsFiring = false;
 	float LastFiredTime = 0.f;
