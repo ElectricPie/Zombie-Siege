@@ -40,6 +40,8 @@ APlayerCharacter::APlayerCharacter()
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 	HealthComponent->OnDeathEvent.AddDynamic(this, &APlayerCharacter::Die);
+
+	GetMesh()->SetReceivesDecals(false);
 }
 
 // Called to bind functionality to input
