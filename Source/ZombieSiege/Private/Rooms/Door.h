@@ -11,6 +11,8 @@ class UNavModifierComponent;
 class UNavLinkComponent;
 class UInteractableComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoorOpenedSignature);
+
 UCLASS()
 class ADoor : public AActor
 {
@@ -19,6 +21,10 @@ class ADoor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ADoor();
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnDoorOpenedSignature OnDoorOpenedEvent;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
