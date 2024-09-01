@@ -44,6 +44,7 @@ void ADoor::OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakO
 		{
 			DoorPart->Destroy();
 			InteractableTrigger->SetCanInteract(false);
+			OnDoorOpenedEvent.Broadcast();
 
 			for (const auto& Room : ConnectedRooms)
 			{
