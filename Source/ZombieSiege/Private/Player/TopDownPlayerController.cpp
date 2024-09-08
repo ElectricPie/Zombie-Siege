@@ -9,6 +9,7 @@
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
 #include "Ui/GameHud.h"
 
 ATopDownPlayerController::ATopDownPlayerController()
@@ -24,8 +25,28 @@ void ATopDownPlayerController::GameOver()
 	{
 		SetShowMouseCursor(true);
 		GameHud->ShowGameOver();
-		SetInputMode(FInputModeUIOnly());
+		SetInputGameAndUI();
 	}
+}
+
+void ATopDownPlayerController::SetInputGameOnly()
+{
+	FInputModeGameOnly InputMode;
+	InputMode.SetConsumeCaptureMouseDown(false);
+	SetInputMode(InputMode);
+	CurrentMouseCursor = EMouseCursor::Crosshairs;
+	bShowMouseCursor = true;
+	UGameplayStatics::SetViewportMouseCaptureMode(GetWorld(), EMouseCaptureMode::CapturePermanently_IncludingInitialMouseDown);
+}
+
+void ATopDownPlayerController::SetInputGameAndUI()
+{
+	FInputModeGameAndUI InputMode;
+	// This is need as without it in GameOnly mode it locks the mouse when left clicking
+	InputMode.SetHideCursorDuringCapture(false);
+	SetInputMode(InputMode);
+	bShowMouseCursor = true;
+	CurrentMouseCursor = EMouseCursor::Default;
 }
 
 void ATopDownPlayerController::BeginPlay()
@@ -37,12 +58,14 @@ void ATopDownPlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(InputMappingContext, 0);
 	}
-	SetInputMode(FInputModeGameOnly());
 
 	if (AGameHud* GameHud = Cast<AGameHud>(GetHUD()))
 	{
 		GameHud->OnPauseMenuToggledEvent.AddUObject(this, &ATopDownPlayerController::OnPauseMenuChanged);
 	}
+
+	SetInputGameAndUI();
+	SetInputGameOnly();
 }
 
 void ATopDownPlayerController::Tick(float DeltaSeconds)
@@ -62,16 +85,21 @@ void ATopDownPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Move);
 
 		// Interaction
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Interact);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
+		                                   &ATopDownPlayerController::Interact);
 
 		// Weapons
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATopDownPlayerController::Fire);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ATopDownPlayerController::StopFiring);
-		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::SwapWeapon);
-		EnhancedInputComponent->BindAction(ReloadWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::ReloadWeapon);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this,
+		                                   &ATopDownPlayerController::StopFiring);
+		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this,
+		                                   &ATopDownPlayerController::SwapWeapon);
+		EnhancedInputComponent->BindAction(ReloadWeaponAction, ETriggerEvent::Triggered, this,
+		                                   &ATopDownPlayerController::ReloadWeapon);
 
 		// Menu
-		EnhancedInputComponent->BindAction(MenuAction, ETriggerEvent::Completed, this, &ATopDownPlayerController::ToggleMenu);
+		EnhancedInputComponent->BindAction(MenuAction, ETriggerEvent::Completed, this,
+		                                   &ATopDownPlayerController::ToggleMenu);
 	}
 }
 
@@ -116,7 +144,6 @@ void ATopDownPlayerController::FaceMouse()
 		const FVector RayEnd = WorldPosition + WorldDirection * LookRaycastLimit;
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldPosition, RayEnd, ECC_Visibility, QueryParams))
 		{
-			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 20.f, 8, FColor::Red);
 			AimDirection = (HitResult.ImpactPoint - PlayerCharacter->GetActorLocation()).GetSafeNormal();
 			AimDirection.Z = PlayerCharacter->GetActorLocation().X;
 			ClientSetRotation(AimDirection.Rotation());
@@ -152,7 +179,7 @@ void ATopDownPlayerController::SwapWeapon()
 {
 	if (!CanDoAction())
 		return;
-	
+
 	if (UWeaponLoadoutComponent* WeaponLoadoutComponent = PlayerCharacter->GetWeaponLoadoutComponent())
 	{
 		WeaponLoadoutComponent->EquipNextWeapon();
@@ -196,33 +223,19 @@ void ATopDownPlayerController::ToggleMenu()
 	if (AGameHud* GameHud = Cast<AGameHud>(GetHUD()))
 	{
 		GameHud->ToggleMenu();
-		// if (GameHud->GetActiveWidget() == EGameWidget::Menu)
-		// {
-		// 	UE_LOG(LogTemp, Warning, TEXT("Menu"));
-		// 	SetInputMode(FInputModeGameAndUI());
-		// 	SetShowMouseCursor(true);
-		// 	bIsPaused = true;
-		// }
-		// else
-		// {
-		// 	SetInputMode(FInputModeGameOnly());
-		// 	SetShowMouseCursor(false);
-		// 	bIsPaused = false;
-		// }
 	}
 }
 
 void ATopDownPlayerController::OnPauseMenuChanged(const bool bMenuIsOpen)
 {
 	bIsPaused = bMenuIsOpen;
-	SetShowMouseCursor(bIsPaused);
 
 	if (bIsPaused)
 	{
-		SetInputMode(FInputModeGameAndUI());
+		SetInputGameAndUI();
 	}
 	else
 	{
-		SetInputMode(FInputModeGameOnly());
+		SetInputGameOnly();
 	}
 }
