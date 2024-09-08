@@ -87,18 +87,30 @@ void AGameHud::SwitchActiveWidget(const EGameWidget WidgetToActivate)
 		if (GameHudWidget)
 		{
 			GameHudWidget->SetVisibility(ESlateVisibility::Visible);
+			if (ATopDownPlayerController* PlayerController = Cast<ATopDownPlayerController>(GetOwningPlayerController()))
+			{
+				PlayerController->SetInputGameOnly();
+			}
 		}
 		break;
 	case EGameWidget::PauseMenu:
 		if (MenuWidget)
 		{
 			MenuWidget->SetVisibility(ESlateVisibility::Visible);
+			if (ATopDownPlayerController* PlayerController = Cast<ATopDownPlayerController>(GetOwningPlayerController()))
+			{
+				PlayerController->SetInputGameAndUI();
+			}
 		}
 		break;
 	case PauseGameOptions:
 		if (OptionsWidget)
 		{
 			OptionsWidget->SetVisibility(ESlateVisibility::Visible);
+			if (ATopDownPlayerController* PlayerController = Cast<ATopDownPlayerController>(GetOwningPlayerController()))
+			{
+				PlayerController->SetInputGameAndUI();
+			}
 		}
 		break;
 	default: ;

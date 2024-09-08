@@ -8,9 +8,9 @@
 
 class UMoneyStoreComponent;
 class APlayerCharacter;
-struct FInputActionValue;
 class UInputMappingContext;
 class UInputAction;
+struct FInputActionValue;
 
 /**
  * 
@@ -25,6 +25,8 @@ public:
 	
 	FVector GetAimDirection() const { return AimDirection; }
 	void GameOver();
+	void SetInputGameOnly();
+	void SetInputGameAndUI();
 
 public:
 	bool bIsPaused = false;
@@ -60,22 +62,22 @@ private:
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Money")
-	UMoneyStoreComponent* MoneyStoreComponent;
+	TObjectPtr<UMoneyStoreComponent> MoneyStoreComponent;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Input")
-	UInputMappingContext* InputMappingContext;
+	TObjectPtr<UInputMappingContext> InputMappingContext;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
-	UInputAction* MoveAction;
+	TObjectPtr<UInputAction> MoveAction;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
-	UInputAction* InteractAction;
+	TObjectPtr<UInputAction> InteractAction;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
-	UInputAction* FireAction;
+	TObjectPtr<UInputAction> FireAction;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
-	UInputAction* SwapWeaponAction;
+	TObjectPtr<UInputAction> SwapWeaponAction;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
-	UInputAction* ReloadWeaponAction;
+	TObjectPtr<UInputAction> ReloadWeaponAction;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
-	UInputAction* MenuAction;
+	TObjectPtr<UInputAction> MenuAction;
 
 	UPROPERTY(EditAnywhere, Category="Look")
 	float LookRaycastLimit = 3000.f;
