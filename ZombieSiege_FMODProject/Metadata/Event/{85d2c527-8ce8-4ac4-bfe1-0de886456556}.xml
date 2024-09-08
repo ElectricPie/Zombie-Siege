@@ -5,7 +5,7 @@
 			<value>ARShot</value>
 		</property>
 		<property name="outputFormat">
-			<value>1</value>
+			<value>2</value>
 		</property>
 		<relationship name="folder">
 			<destination>{25b44456-97be-44a5-a867-6fa3c5cbc27d}</destination>
@@ -72,6 +72,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{d1437d37-fb53-4ced-a46a-8ca03830a9e4}">
+		<relationship name="modulators">
+			<destination>{7f753d4a-9ae1-4eb9-af68-8f1bd695bab1}</destination>
+		</relationship>
 		<relationship name="effectChain">
 			<destination>{a1ccb33b-b7cc-4dde-8531-4a40526fafb7}</destination>
 		</relationship>
@@ -116,6 +119,14 @@
 			<destination>{d1437d37-fb53-4ced-a46a-8ca03830a9e4}</destination>
 		</relationship>
 	</object>
+	<object class="RandomizerModulator" id="{7f753d4a-9ae1-4eb9-af68-8f1bd695bab1}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>pitch</value>
+		</property>
+		<property name="amount">
+			<value>8.33333397</value>
+		</property>
+	</object>
 	<object class="MixerBusEffectChain" id="{a1ccb33b-b7cc-4dde-8531-4a40526fafb7}">
 		<relationship name="effects">
 			<destination>{13f98b99-a936-46d2-a318-c2f4b85e3009}</destination>
@@ -126,9 +137,11 @@
 	<object class="MixerBusEffectChain" id="{2030fe5d-f145-4cca-8b56-0802f5729969}">
 		<relationship name="effects">
 			<destination>{e1379e9d-a8c7-44b7-9a5f-1a1ed88692b6}</destination>
+			<destination>{a1394f9a-df4a-4457-afba-c3ca6c6b583e}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{45ec9df9-5235-48cb-a147-f44bcea5720f}" />
 	<object class="MixerBusFader" id="{13f98b99-a936-46d2-a318-c2f4b85e3009}" />
 	<object class="MixerBusFader" id="{e1379e9d-a8c7-44b7-9a5f-1a1ed88692b6}" />
+	<object class="SpatialiserEffect" id="{a1394f9a-df4a-4457-afba-c3ca6c6b583e}" />
 </objects>
