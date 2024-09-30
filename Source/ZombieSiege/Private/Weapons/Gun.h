@@ -12,6 +12,7 @@ class UFMODEvent;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAmmoChangedSignature, int32 /*NewAmmoCount*/, int32 /*MaxAmmo*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnReloadStateChanged, bool /*bIsReloading*/);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGunFiredSignature);
 
 UENUM(BlueprintType)
 enum EGunType
@@ -57,6 +58,9 @@ public:
 	UAnimMontage* GetReloadAnimMontage() const { return ReloadMontage; }
 	UFUNCTION(BlueprintPure)
 	bool GetIsReloading() const { return bIsReloading; }
+
+	UPROPERTY(BlueprintAssignable)
+	FOnGunFiredSignature OnGunFiredEvent;
 
 public:
 	FOnAmmoChangedSignature OnAmmoChangedEvent;
