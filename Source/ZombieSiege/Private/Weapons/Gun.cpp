@@ -155,6 +155,8 @@ void AGun::SpawnProjectile(AController* ShooterController, AActor* ShooterActor)
 	AGunProjectile* Projectile = GetWorld()->SpawnActor<AGunProjectile>(ProjectileClass, SpawnLocation, SpawnRotation,
 	                                                                    SpawnParameters);
 	Projectile->Init(ShooterController, ShooterActor, ProjectileDamageType, ProjectileDamage);
+
+	OnGunFiredEvent.Broadcast();
 	
 	CurrentAmmo--;
 	OnAmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
