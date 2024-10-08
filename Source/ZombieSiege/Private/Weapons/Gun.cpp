@@ -117,6 +117,20 @@ void AGun::Reload()
 	GetWorldTimerManager().SetTimer(ReloadingTimerHandle, this, &AGun::FinishReload, ReloadTime, false);
 }
 
+void AGun::CancelReload()
+{
+	if (!bIsReloading)
+		return;
+
+	GetWorldTimerManager().ClearTimer(ReloadingTimerHandle);
+
+	UE_LOG(LogTemp, Warning, TEXT("Canceld Reload"));
+	
+	OnAmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
+	OnReloadStateChangedEvent.Broadcast(false);
+	bIsReloading = false;
+}
+
 void AGun::BeginPlay()
 {
 	Super::BeginPlay();
@@ -197,6 +211,8 @@ void AGun::BurstShot(AController* ShooterController, AActor* ShooterActor)
 
 void AGun::FinishReload()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Reload Finished"));
+	
 	CurrentAmmo = MaxAmmo;
 	OnAmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
 	OnReloadStateChangedEvent.Broadcast(false);

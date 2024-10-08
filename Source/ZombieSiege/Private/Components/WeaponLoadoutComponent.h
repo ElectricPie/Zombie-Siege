@@ -27,6 +27,12 @@ public:
 	UFUNCTION()
 	void EquipNextWeapon();
 	int32 GetWeaponCount() const { return Weapons.Num(); }
+	
+	/**
+	 * @brief 
+	 * @return 
+	 */
+	bool ReloadWeapon();
 
 public:
 	UPROPERTY(BlueprintAssignable, Category="Weapon Loadout")

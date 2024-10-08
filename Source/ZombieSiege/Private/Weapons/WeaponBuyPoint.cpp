@@ -29,7 +29,8 @@ AWeaponBuyPoint::AWeaponBuyPoint()
 void AWeaponBuyPoint::BuyWeapon(TWeakObjectPtr<AController> InteractionInstigator,
                                 TWeakObjectPtr<AActor> InteractionCauser)
 {
-	if (!InteractionInstigator.IsValid()) return;
+	if (!InteractionInstigator.IsValid())
+		return;
 
 	if (UMoneyStoreComponent* MoneyStoreComponent = InteractionInstigator->GetComponentByClass<UMoneyStoreComponent>())
 	{

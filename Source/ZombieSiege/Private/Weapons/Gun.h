@@ -54,6 +54,8 @@ public:
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Reload();
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	void CancelReload();
 	UFUNCTION(BlueprintPure)
 	UAnimMontage* GetReloadAnimMontage() const { return ReloadMontage; }
 	UFUNCTION(BlueprintPure)
