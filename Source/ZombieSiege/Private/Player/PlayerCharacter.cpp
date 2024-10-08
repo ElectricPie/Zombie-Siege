@@ -91,14 +91,9 @@ void APlayerCharacter::StopFiring()
 
 void APlayerCharacter::ReloadWeapon()
 {
-	if (AGun* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
+	if (WeaponLoadoutComponent->ReloadWeapon())
 	{
-		if (EquippedWeapon->GetIsReloading()) return;
-
-		EquippedWeapon->StopFiring();
-
-		EquippedWeapon->Reload();
-		if (UAnimMontage* ReloadAnimation = EquippedWeapon->GetReloadAnimMontage())
+		if (UAnimMontage* ReloadAnimation = WeaponLoadoutComponent->GetEquippedWeapon()->GetReloadAnimMontage())
 		{
 			PlayAnimMontage(ReloadAnimation);
 		}
