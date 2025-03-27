@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.02.00">
+<objects serializationModel="Studio.02.03.00">
 	<object class="Event" id="{2a2ec406-b8c8-4ba3-a7b1-2ac4fb719397}">
 		<property name="name">
 			<value>ZombieTakeDamage</value>

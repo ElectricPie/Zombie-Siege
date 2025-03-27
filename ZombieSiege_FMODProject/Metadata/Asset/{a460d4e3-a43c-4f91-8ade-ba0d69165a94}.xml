@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.02.00">
+<objects serializationModel="Studio.02.03.00">
 	<object class="EncodableAsset" id="{a460d4e3-a43c-4f91-8ade-ba0d69165a94}">
 		<property name="assetPath">
 			<value>Zombie/</value>

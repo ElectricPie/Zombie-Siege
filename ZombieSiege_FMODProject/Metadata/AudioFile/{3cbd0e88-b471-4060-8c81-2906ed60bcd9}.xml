@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.02.00">
+<objects serializationModel="Studio.02.03.00">
 	<object class="AudioFile" id="{3cbd0e88-b471-4060-8c81-2906ed60bcd9}">
 		<property name="assetPath">
 			<value>Zombie/Attacks/zombie-growls-and-roars-filter-effect - Trimmed 1.wav</value>

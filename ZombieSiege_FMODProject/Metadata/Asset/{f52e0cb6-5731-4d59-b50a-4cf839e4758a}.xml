@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.02.00">
+<objects serializationModel="Studio.02.03.00">
 	<object class="EncodableAsset" id="{f52e0cb6-5731-4d59-b50a-4cf839e4758a}">
 		<property name="assetPath">
 			<value>Ambiance/</value>
