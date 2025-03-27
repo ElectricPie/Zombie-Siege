@@ -1,4 +1,4 @@
-// Copyright (c), Firelight Technologies Pty, Ltd. 2012-2024.
+// Copyright (c), Firelight Technologies Pty, Ltd. 2012-2025.
 
 #include "FMODBlueprintStatics.h"
 #include "FMODAudioComponent.h"
@@ -259,10 +259,10 @@ TArray<FFMODEventInstance> UFMODBlueprintStatics::FindEventInstances(UObject *Wo
             if (Capacity > 0)
             {
                 TArray<FMOD::Studio::EventInstance *> InstancePointers;
-                InstancePointers.SetNum(Capacity, true);
+                InstancePointers.SetNum(Capacity, EAllowShrinking::Yes);
                 int Count = 0;
                 EventDesc->getInstanceList(InstancePointers.GetData(), Capacity, &Count);
-                Instances.SetNum(Count, true);
+                Instances.SetNum(Count, EAllowShrinking::Yes);
                 for (int i = 0; i < Count; ++i)
                 {
                     Instances[i].Instance = InstancePointers[i];

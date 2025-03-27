@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.02.00">
+<objects serializationModel="Studio.02.03.00">
 	<object class="AudioFile" id="{117094bc-8299-4e91-961a-5e9ab343f1ad}">
 		<property name="assetPath">
 			<value>GunMisc/rifle-clip-empty-98832.mp3</value>

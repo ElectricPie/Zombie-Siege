@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.02.00">
+<objects serializationModel="Studio.02.03.00">
 	<object class="AudioFile" id="{ef4b0f26-2d7a-49b4-8825-49e1368e4c55}">
 		<property name="assetPath">
 			<value>Zombie/zombie-attack-6419.mp3</value>

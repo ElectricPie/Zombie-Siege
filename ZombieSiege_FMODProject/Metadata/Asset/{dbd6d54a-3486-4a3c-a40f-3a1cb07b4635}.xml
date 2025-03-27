@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.02.00">
+<objects serializationModel="Studio.02.03.00">
 	<object class="EncodableAsset" id="{dbd6d54a-3486-4a3c-a40f-3a1cb07b4635}">
 		<property name="assetPath">
 			<value>Gunfire/</value>

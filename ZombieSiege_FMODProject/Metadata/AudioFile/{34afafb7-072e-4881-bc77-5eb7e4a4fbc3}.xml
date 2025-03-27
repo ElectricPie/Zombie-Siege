@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects serializationModel="Studio.02.02.00">
+<objects serializationModel="Studio.02.03.00">
 	<object class="AudioFile" id="{34afafb7-072e-4881-bc77-5eb7e4a4fbc3}">
 		<property name="assetPath">
 			<value>Money/coins-falling-013-36967.mp3</value>
