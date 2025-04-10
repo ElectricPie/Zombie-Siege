@@ -6,28 +6,12 @@
 #include "GameFramework/Actor.h"
 #include "Gun.generated.h"
 
+class UWeaponStatsDataAsset;
 class UArrowComponent;
-class AGunProjectile;
-class UFMODEvent;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAmmoChangedSignature, int32 /*NewAmmoCount*/, int32 /*MaxAmmo*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnReloadStateChanged, bool /*bIsReloading*/);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGunFiredSignature);
-
-UENUM(BlueprintType)
-enum EGunType
-{
-	Pistol UMETA(DisplayName="Pistol"),
-	Rifle UMETA(DisplayName="Rifle")
-};
-
-UENUM()
-enum EGunFireRate
-{
-	Single UMETA(DisplayName="Single"),
-	Burst UMETA(DisplayName="Burst"),
-	FullAuto UMETA(DisplayName="Full Auto")
-};
 
 UCLASS()
 class AGun : public AActor
@@ -37,11 +21,9 @@ class AGun : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AGun();
-	
-	virtual void PostInitProperties() override;
 
 	UFUNCTION(BlueprintPure)
-	EGunType GetGunType() const { return Type; }
+	const UWeaponStatsDataAsset* GetWeaponStats() const { return WeaponStats; }
 	
 	void StartFiring(AController* ShooterController, AActor* ShooterActor);
 	void StopFiring();
@@ -49,15 +31,11 @@ public:
 	void SetVisibility(bool bIsVisible);
 
 	UFUNCTION(BlueprintPure, Category="Weapon")
-	int32 GetMaxAmmo() const { return MaxAmmo; }
-	UFUNCTION(BlueprintPure, Category="Weapon")
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Reload();
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void CancelReload();
-	UFUNCTION(BlueprintPure)
-	UAnimMontage* GetReloadAnimMontage() const { return ReloadMontage; }
 	UFUNCTION(BlueprintPure)
 	bool GetIsReloading() const { return bIsReloading; }
 
@@ -92,44 +70,15 @@ private:
 	TObjectPtr<UArrowComponent> FiringArrow;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<USceneComponent> ProjectileSpawn;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Gun|Ammo", meta=(ClampMin=1, UIMin=1))
-	uint32 MaxAmmo = 30;
-	UPROPERTY(VisibleInstanceOnly, Category="Gun|Ammo", meta=(ClampMin=1, UIMin=1))
-	uint32 CurrentAmmo = 0;	
-	
-	UPROPERTY(EditAnywhere, Category="Gun|Projectile")
-	TSubclassOf<AGunProjectile> ProjectileClass;
-	UPROPERTY(EditAnywhere, Category="Gun|Projectile")
-	TSubclassOf<UDamageType> ProjectileDamageType = UDamageType::StaticClass();
-	UPROPERTY(EditAnywhere, Category="Gun|Projectile", meta=(ClampMin=0.f, UIMin=0.f))
-	float ProjectileDamage = 20.f;
 
-	UPROPERTY(EditDefaultsOnly, Category="Gun|Weapon")
-	TEnumAsByte<EGunType> Type;
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UWeaponStatsDataAsset> WeaponStats;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Gun|FireRate")
-	TEnumAsByte<EGunFireRate> FireRate;
-	UPROPERTY(EditDefaultsOnly, Category="Gun|FireRate", meta=(ClampMin=0.1f, UIMin=0.1f, ToolTip="The time in seconds before the gun can be fired again after firing has started"))
-	float FireCooldownTime = 1.f;
-	UPROPERTY(EditDefaultsOnly, Category="Gun|FireRate", meta=(ClampMin=0.1f, UIMin=0.1f, EditCondition="FireRate!=EGunFireRate::Single", ToolTip="The time between shots when Fire Rate is set to full auto or Burst"))
-	float ShotIntervals = 1.f;
-	UPROPERTY(EditDefaultsOnly, Category="Gun|FireRate", meta=(ClampMin=1, UIMin=1, EditCondition="FireRate==EGunFireRate::Burst", ToolTip="The number of shots in a burst when Fire Rate is set to Burst"))
-	int32 BurstShots = 3;
-
-	UPROPERTY(EditAnywhere, Category="Gun|Animation")
-	UAnimMontage* ReloadMontage;
-	UPROPERTY(EditAnywhere, Category="Gun|Animation", meta=(ToolTip="The time a reload takes if the there is no reload animation"))
-	float DefaultReloadTime = 2.f;
+	UPROPERTY(VisibleInstanceOnly, Category="Gun|Ammo")
+	int32 CurrentAmmo = 0;
+	
 	bool bIsReloading = false;
 	FTimerHandle ReloadingTimerHandle;
-
-	UPROPERTY(EditAnywhere, Category="Gun|Sound")
-	TObjectPtr<UFMODEvent> FireSound;
-	UPROPERTY(EditAnywhere, Category="Gun|Sound")
-	TObjectPtr<UFMODEvent> ReloadSound;
-	UPROPERTY(EditAnywhere, Category="Gun|Sound")
-	TObjectPtr<UFMODEvent> EmptySound;
 	
 	bool bIsFiring = false;
 	float LastFiredTime = 0.f;

@@ -11,6 +11,7 @@
 #include "Player/PlayerCharacter.h"
 #include "Player/TopDownPlayerController.h"
 #include "Weapons/Gun.h"
+#include "ZombieSiege/Public/Weapons/WeaponStatsDataAsset.h"
 
 
 void UGameHudWidget::Setup(ATopDownPlayerController* PlayerController, APlayerCharacter* PlayerCharacter)
@@ -77,7 +78,7 @@ void UGameHudWidget::OnWeaponChanged(AGun* NewWeapon)
 	}
 
 	CurrentWeapon = NewWeapon;
-	AmmoCounterWidget->UpdateAmmoText(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
+	AmmoCounterWidget->UpdateAmmoText(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetWeaponStats()->GetMaxAmmo());
 	AmmoChangeHandle = NewWeapon->OnAmmoChangedEvent.AddUObject(this, &UGameHudWidget::OnAmmoChanged);
 	WeaponReloadHandle = NewWeapon->OnReloadStateChangedEvent.AddUObject(
 		this, &UGameHudWidget::OnWeaponReloadStateChanged);
