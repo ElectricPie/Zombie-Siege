@@ -6,6 +6,7 @@
 void UWidgetController::SetWidgetControllerParams(const FWidgetControllerParams& InParams)
 {
 	PlayerController = InParams.PlayerController;
+	PlayerState = InParams.PlayerState;
 }
 
 void UWidgetController::BindCallbackToDependencies()

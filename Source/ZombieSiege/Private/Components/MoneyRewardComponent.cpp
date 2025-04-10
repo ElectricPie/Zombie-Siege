@@ -5,6 +5,7 @@
 
 #include "MoneyStoreComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "ZombieSiege/Public/Money/MoneyStoreInterface.h"
 
 // Sets default values for this component's properties
 UMoneyRewardComponent::UMoneyRewardComponent()
@@ -29,7 +30,7 @@ int32 UMoneyRewardComponent::RewardMoney(const AActor* ActorToReward)
 		}
 	}
 
-	if (UMoneyStoreComponent* MoneyStore = ActorToReward->GetComponentByClass<UMoneyStoreComponent>())
+	if (UMoneyStoreComponent* MoneyStore = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(ActorToReward))
 	{
 		MoneyStore->AddMoney(AmountToGive);	
 		LastRewardAt = CurrentTime;

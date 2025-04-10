@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "ZombieSiege/Public/Money/MoneyStoreInterface.h"
 #include "PlayerCharacter.generated.h"
 
 class UHealthComponent;
@@ -18,7 +19,7 @@ class UWeaponLoadoutComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDeath, APlayerCharacter*, PlayerCharacter);
 
 UCLASS()
-class APlayerCharacter : public ACharacter
+class APlayerCharacter : public ACharacter, public IMoneyStoreInterface
 {
 	GENERATED_BODY()
 
@@ -47,6 +48,10 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool GetIsDead() const { return bIsDead; }
+
+	/* MoneyStoreInterface */
+	virtual UMoneyStoreComponent* GetMoneyStoreComponent_Implementation() const override;
+	/* End MoneyStoreInterface */
 
 public:
 	UPROPERTY(BlueprintAssignable)

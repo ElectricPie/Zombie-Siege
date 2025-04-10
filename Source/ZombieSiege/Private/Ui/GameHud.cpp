@@ -4,10 +4,9 @@
 #include "Ui/GameHud.h"
 
 #include "Blueprint/UserWidget.h"
-#include "Player/PlayerCharacter.h"
 #include "Player/TopDownPlayerController.h"
 #include "States/DefenceGameState.h"
-#include "Widgets/GameHudWidget.h"
+#include "States/DefencePlayerState.h"
 #include "Widgets/OptionsWidget.h"
 #include "ZombieSiege/Public/Ui/WidgetControllers/OverlayWidgetController.h"
 #include "ZombieSiege/Public/Ui/Widgets/ZSiegeUserWidget.h"
@@ -33,7 +32,11 @@ void AGameHud::BeginPlay()
 	// Setup Overlay
 	checkf(OverlayWidgetClass, TEXT("Overlay Widget Class is null, please fill out in GameHud Blueprint"));
 	OverlayWidget = CreateWidget<UZSiegeUserWidget>(GetWorld(), OverlayWidgetClass);
-	const FWidgetControllerParams WidgetControllerParams(GetOwningPlayerController());
+
+	APlayerController* PlayerController = GetOwningPlayerController();
+	ADefencePlayerState* PlayerState = PlayerController->GetPlayerState<ADefencePlayerState>();
+	const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState);
+	
 	OverlayWidgetController = GetOverlayWidgetController(WidgetControllerParams);
 	OverlayWidgetController->BindCallbackToDependencies();
 	OverlayWidget->SetWidgetController(OverlayWidgetController);

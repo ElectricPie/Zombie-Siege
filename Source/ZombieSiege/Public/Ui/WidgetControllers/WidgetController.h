@@ -12,10 +12,12 @@ struct FWidgetControllerParams
 	GENERATED_BODY()
 
 	FWidgetControllerParams() {}
-	FWidgetControllerParams(APlayerController* InPlayerController) : PlayerController(InPlayerController) {}
+	FWidgetControllerParams(APlayerController* InPlayerController, APlayerState* InPlayerState) : PlayerController(InPlayerController), PlayerState(InPlayerState) {}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<APlayerController> PlayerController;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<APlayerState> PlayerState;
 };
 
 /**
@@ -36,5 +38,7 @@ public:
 protected:
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
 	TObjectPtr<APlayerController> PlayerController;
+	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
+	TObjectPtr<APlayerState> PlayerState;
 
 };

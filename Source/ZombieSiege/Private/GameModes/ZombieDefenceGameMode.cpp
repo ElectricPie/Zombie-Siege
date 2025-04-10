@@ -52,10 +52,18 @@ void AZombieDefenceGameMode::OnPostLogin(AController* NewPlayer)
 {
 	Super::OnPostLogin(NewPlayer);
 
-	if (UMoneyStoreComponent* MoneyStore = NewPlayer->GetComponentByClass<UMoneyStoreComponent>())
+	for (auto& PlayerState : GameState->PlayerArray)
 	{
-		MoneyStore->SetMoney(StartingMoney);
+		if (UMoneyStoreComponent* MoneyStore = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(PlayerState))
+		{
+			MoneyStore->SetMoney(StartingMoney);
+		}
 	}
+
+	// if (UMoneyStoreComponent* MoneyStore = NewPlayer->GetComponentByClass<UMoneyStoreComponent>())
+	// {
+	// 	MoneyStore->SetMoney(StartingMoney);
+	// }
 }
 
 void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "ZombieSiege/Public/Money/MoneyStoreInterface.h"
 #include "TopDownPlayerController.generated.h"
 
 class UMoneyStoreComponent;
@@ -16,7 +17,7 @@ struct FInputActionValue;
  * 
  */
 UCLASS()
-class ZOMBIESIEGE_API ATopDownPlayerController : public APlayerController
+class ZOMBIESIEGE_API ATopDownPlayerController : public APlayerController, public IMoneyStoreInterface
 {
 	GENERATED_BODY()
 
@@ -27,6 +28,10 @@ public:
 	void GameOver();
 	void SetInputGameOnly();
 	void SetInputGameAndUI();
+
+	/* MoneyStoreInterface */
+	virtual UMoneyStoreComponent* GetMoneyStoreComponent_Implementation() const override;
+	/* End MoneyStoreInterface */
 
 public:
 	bool bIsPaused = false;
@@ -48,8 +53,6 @@ private:
 	void SwapWeapon();
 	void ReloadWeapon();
 
-	void OnMoneyChanged(const int32 NewMoneyAmount, const int32 AmountChanged);
-
 	/**
 	 * @brief Check if the player can do any action, this includes checking if the game is over or if the player
 	 * character is valid and dead
@@ -61,8 +64,8 @@ private:
 	void OnPauseMenuChanged(const bool bMenuIsOpen);
 	
 private:
-	UPROPERTY(VisibleAnywhere, Category="Money")
-	TObjectPtr<UMoneyStoreComponent> MoneyStoreComponent;
+	// UPROPERTY(VisibleAnywhere, Category="Money")
+	// TObjectPtr<UMoneyStoreComponent> MoneyStoreComponent;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;

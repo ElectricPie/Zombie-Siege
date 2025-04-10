@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "ZombieSiege/Public/Money/MoneyStoreInterface.h"
 #include "DefencePlayerState.generated.h"
 
 class UMoneyStoreComponent;
@@ -11,12 +12,14 @@ class UMoneyStoreComponent;
 /**
  * 
  */
-UCLASS()
-class ADefencePlayerState : public APlayerState
+UCLASS(Abstract)
+class ADefencePlayerState : public APlayerState, public IMoneyStoreInterface
 {
 	GENERATED_BODY()
 
 public:
+	ADefencePlayerState();
+	
 	void AddDeath() { TotalDeaths++; }
 	void AddKill() { TotalKills++; }
 
@@ -25,7 +28,16 @@ public:
 	UFUNCTION(BlueprintGetter, Category="Player")
 	int32 GetTotalDeaths() const { return TotalDeaths; }
 
+	/* MoneyStoreInterface */
+	virtual UMoneyStoreComponent* GetMoneyStoreComponent_Implementation() const override;
+	/* End of MoneyStoreInterface */
+
+protected:
+	virtual void BeginPlay() override;
+
 private:
+	TObjectPtr<UMoneyStoreComponent> MoneyStoreComponent;
+	
 	UPROPERTY(VisibleAnywhere, Category="Player", BlueprintGetter=GetTotalKills)
 	int32 TotalKills = 0;
 	UPROPERTY(VisibleAnywhere, Category="Player", BlueprintGetter=GetTotalDeaths)
