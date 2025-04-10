@@ -26,5 +26,5 @@ public:
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Round")
-	int32 CurrentRound = 1;
+	int32 CurrentRound = 0;
 };
