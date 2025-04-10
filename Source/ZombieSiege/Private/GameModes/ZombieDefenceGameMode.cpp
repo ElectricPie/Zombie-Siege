@@ -104,17 +104,6 @@ void AZombieDefenceGameMode::OnUnitKilled(AUnitCharacter* UnitKilled, AControlle
 	}
 }
 
-int32 AZombieDefenceGameMode::RoundUnitCountBelow20(int32 RoundNumber)
-{
-	return -1.091f + 6.312f * RoundNumber - 0.421f * (RoundNumber * RoundNumber) + 0.013 * (RoundNumber * RoundNumber *
-		RoundNumber);
-}
-
-int32 AZombieDefenceGameMode::RoundUnitCount20AndAbove(int32 RoundNumber)
-{
-	return 0.09f * (RoundNumber * RoundNumber) - 0.0029f * RoundNumber + 23.9580;
-}
-
 void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 {
 	if (GetWorld())
@@ -188,15 +177,9 @@ void AZombieDefenceGameMode::StartNewRound()
 		ResetRoundStats();
 		const int32 CurrentRound = DefenceGameState->GetCurrentRound();
 		UE_LOG(LogTemp, Warning, TEXT("New Round %d"), CurrentRound);
-		// Get the number of units to be spawned this round
-		if (CurrentRound < 20)
-		{
-			UnitsToBeSpawnedThisRound = RoundUnitCountBelow20(CurrentRound);
-		}
-		else
-		{
-			UnitsToBeSpawnedThisRound = RoundUnitCount20AndAbove(CurrentRound);
-		}
+		check(ZombieStatsTable);
+		const FRealCurve* RoundSpawnCurve = ZombieStatsTable->FindCurve(FName(TEXT("SpawnPerRounds")), FString());
+		UnitsToBeSpawnedThisRound = RoundSpawnCurve->Eval(CurrentRound);
 	
 		GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
 											   RoundStartDelay, true, CurrentSpawnDelay);

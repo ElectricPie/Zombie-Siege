@@ -43,9 +43,6 @@ protected:
 private:
 	void OnUnitKilled(AUnitCharacter* UnitKilled, AController* KillInstigator, AActor* KillCauser);
 
-	int32 RoundUnitCountBelow20(int32 RoundNumber);
-	int32 RoundUnitCount20AndAbove(int32 RoundNumber);
-	
 	void GetActiveUnitSpawnPoints();
 	void SpawnUnit();
 
@@ -84,6 +81,9 @@ private:
 	float MinSpawnDelay = 0.5f;
 	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The amount of health to add to the units each round"))
 	float HealthIncreasePerRound = 25.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Spawning")
+	TObjectPtr<UCurveTable> ZombieStatsTable;
 	
 	TArray<FWeightedSpawnPoint*> ActiveSpawnPoints;
 	
