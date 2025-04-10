@@ -42,7 +42,7 @@ void AZombieDefenceGameMode::BeginPlay()
 
 		// Initial round setup
 		ResetRoundStats();
-		UnitsToBeSpawnedThisRound = InitialUnitCount;
+		StartNewRound();
 		GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
 										   RoundStartDelay, true, CurrentSpawnDelay);
 	}
@@ -176,11 +176,12 @@ void AZombieDefenceGameMode::StartNewRound()
 		
 		ResetRoundStats();
 		const int32 CurrentRound = DefenceGameState->GetCurrentRound();
-		UE_LOG(LogTemp, Warning, TEXT("New Round %d"), CurrentRound);
 		check(ZombieStatsTable);
 		const FRealCurve* RoundSpawnCurve = ZombieStatsTable->FindCurve(FName(TEXT("SpawnPerRounds")), FString());
 		UnitsToBeSpawnedThisRound = RoundSpawnCurve->Eval(CurrentRound);
 	
+		UE_LOG(LogTemp, Warning, TEXT("Started round %d | %d Zombies to kill"), CurrentRound, UnitsToBeSpawnedThisRound);
+
 		GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
 											   RoundStartDelay, true, CurrentSpawnDelay);
 	}
