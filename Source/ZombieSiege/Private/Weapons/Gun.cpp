@@ -4,10 +4,11 @@
 #include "Weapons/Gun.h"
 
 #include "FMODBlueprintStatics.h"
+#include "FMODEvent.h"
 #include "GunProjectile.h"
 #include "Components/ArrowComponent.h"
-#include "Player/PlayerCharacter.h"
 #include "Player/TopDownPlayerController.h"
+#include "ZombieSiege/Public/Weapons/WeaponStatsDataAsset.h"
 
 // Sets default values
 AGun::AGun()
@@ -28,13 +29,6 @@ AGun::AGun()
 	FiringArrow->SetupAttachment(RootComponent);
 }
 
-void AGun::PostInitProperties()
-{
-	Super::PostInitProperties();
-
-	CurrentAmmo = MaxAmmo;
-}
-
 void AGun::StartFiring(AController* ShooterController, AActor* ShooterActor)
 {
 	if (ShooterController == nullptr)
@@ -47,37 +41,37 @@ void AGun::StartFiring(AController* ShooterController, AActor* ShooterActor)
 		MagEmpty();
 		return;
 	}
-	if (GetGameTimeSinceCreation() - LastFiredTime < FireCooldownTime)
+	if (GetGameTimeSinceCreation() - LastFiredTime < WeaponStats->GetFireCooldownTime())
 		return;
 	
 	bIsFiring = true;
 	LastFiredTime = GetGameTimeSinceCreation();
-	
-	switch (FireRate)
+
+	// Handle different fire modes
+	switch (GetWeaponStats()->GetFireMode())
 	{
-	case Single:
-		SpawnProjectile(ShooterController, ShooterActor);
-		break;
-	case Burst:
-		{
+		case EGunFireMode::Single:
 			SpawnProjectile(ShooterController, ShooterActor);
-			BurstShotsFired = 1;
-			FTimerDelegate BurstDelegate;
-			BurstDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGun, BurstShot), ShooterController, ShooterActor);
-			GetWorld()->GetTimerManager().SetTimer(BurstTimer, BurstDelegate, ShotIntervals, true);
 			break;
-		}
-	case FullAuto:
-		{
-			SpawnProjectile(ShooterController, ShooterActor);
-			FTimerDelegate ShotDelegate;
-			ShotDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGun, SingleShot), ShooterController, ShooterActor);
-			GetWorld()->GetTimerManager().SetTimer(ShotTimer, ShotDelegate, ShotIntervals, true);
+		case EGunFireMode::Burst:
+			{
+				SpawnProjectile(ShooterController, ShooterActor);
+				BurstShotsFired = 1;
+				FTimerDelegate BurstDelegate;
+				BurstDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGun, BurstShot), ShooterController, ShooterActor);
+				GetWorld()->GetTimerManager().SetTimer(BurstTimer, BurstDelegate, WeaponStats->GetShotIntervals(), true);
+				break;
+			}
+		case EGunFireMode::FullAuto:
+			{
+				SpawnProjectile(ShooterController, ShooterActor);
+				FTimerDelegate ShotDelegate;
+				ShotDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGun, SingleShot), ShooterController, ShooterActor);
+				GetWorld()->GetTimerManager().SetTimer(ShotTimer, ShotDelegate, WeaponStats->GetShotIntervals(), true);
+				break;
+			}
+		default:
 			break;
-		}
-	default:
-		UE_LOG(LogTemp, Error, TEXT("%s is missing Fire Rate"), *GetActorNameOrLabel());
-		break;
 	}
 }
 
@@ -104,13 +98,13 @@ void AGun::Reload()
 	bIsReloading = true;
 	OnReloadStateChangedEvent.Broadcast(true);
 
-	if (ReloadSound)
+	if (UFMODEvent* ReloadSound = WeaponStats->GetReloadSound())
 	{
 		UFMODBlueprintStatics::PlayEventAtLocation(this, ReloadSound, GetActorTransform(), true);
 	}
 	
-	float ReloadTime = DefaultReloadTime;
-	if (ReloadMontage)
+	float ReloadTime = WeaponStats->GetReloadTime();
+	if (const UAnimMontage* ReloadMontage = WeaponStats->GetReloadAnimMontage())
 	{
 		ReloadTime = ReloadMontage->GetPlayLength();
 	}
@@ -124,9 +118,9 @@ void AGun::CancelReload()
 
 	GetWorldTimerManager().ClearTimer(ReloadingTimerHandle);
 
-	UE_LOG(LogTemp, Warning, TEXT("Canceld Reload"));
+	UE_LOG(LogTemp, Warning, TEXT("Canceled Reload"));
 	
-	OnAmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
+	OnAmmoChangedEvent.Broadcast(CurrentAmmo, WeaponStats->GetMaxAmmo());
 	OnReloadStateChangedEvent.Broadcast(false);
 	bIsReloading = false;
 }
@@ -135,18 +129,16 @@ void AGun::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LastFiredTime = -FireCooldownTime;
+	check(WeaponStats);
+	CurrentAmmo = WeaponStats->GetMaxAmmo();
+	
+	// Allow the gun to be fired immediately after spawning
+	LastFiredTime = -WeaponStats->GetFireCooldownTime();
 }
 
 void AGun::SpawnProjectile(AController* ShooterController, AActor* ShooterActor)
 {
-	if (!ProjectileClass)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s is missing projectile class"), *GetActorNameOrLabel());
-		return;
-	}
-
-	if (FireSound)
+	if (UFMODEvent* FireSound = WeaponStats->GetFireSound())
 	{
 		UFMODBlueprintStatics::PlayEventAtLocation(this, FireSound, GetActorTransform(), true);
 	}
@@ -166,14 +158,14 @@ void AGun::SpawnProjectile(AController* ShooterController, AActor* ShooterActor)
 	}
 	SpawnRotation.Pitch = 0.f;
 
-	AGunProjectile* Projectile = GetWorld()->SpawnActor<AGunProjectile>(ProjectileClass, SpawnLocation, SpawnRotation,
+	AGunProjectile* Projectile = GetWorld()->SpawnActor<AGunProjectile>(WeaponStats->GetProjectileClass(), SpawnLocation, SpawnRotation,
 	                                                                    SpawnParameters);
-	Projectile->Init(ShooterController, ShooterActor, ProjectileDamageType, ProjectileDamage);
+	Projectile->Init(ShooterController, ShooterActor, WeaponStats->GetProjectileDamageType(), WeaponStats->GetProjectileDamage());
 
 	OnGunFiredEvent.Broadcast();
 	
 	CurrentAmmo--;
-	OnAmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
+	OnAmmoChangedEvent.Broadcast(CurrentAmmo, WeaponStats->GetMaxAmmo());
 }
 
 void AGun::SingleShot(AController* ShooterController, AActor* ShooterActor)
@@ -203,7 +195,7 @@ void AGun::BurstShot(AController* ShooterController, AActor* ShooterActor)
 	BurstShotsFired++;
 
 	// Stop the burst if finished
-	if (BurstShotsFired >= BurstShots)
+	if (BurstShotsFired >= WeaponStats->GetBurstShots())
 	{
 		GetWorld()->GetTimerManager().ClearTimer(BurstTimer);
 	}
@@ -213,15 +205,15 @@ void AGun::FinishReload()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Reload Finished"));
 	
-	CurrentAmmo = MaxAmmo;
-	OnAmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
+	CurrentAmmo = WeaponStats->GetMaxAmmo();
+	OnAmmoChangedEvent.Broadcast(CurrentAmmo, WeaponStats->GetMaxAmmo());
 	OnReloadStateChangedEvent.Broadcast(false);
 	bIsReloading = false;
 }
 
 void AGun::MagEmpty()
 {
-	if (EmptySound)
+	if (UFMODEvent* EmptySound = WeaponStats->GetEmptySound())
 	{
 		UFMODBlueprintStatics::PlayEventAtLocation(this, EmptySound, GetActorTransform(), true);
 	}

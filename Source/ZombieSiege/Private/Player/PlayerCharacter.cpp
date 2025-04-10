@@ -13,6 +13,7 @@
 #include "GameModes/ZombieDefenceGameMode.h"
 #include "Ui/GameHud.h"
 #include "Weapons/Gun.h"
+#include "ZombieSiege/Public/Weapons/WeaponStatsDataAsset.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -93,7 +94,7 @@ void APlayerCharacter::ReloadWeapon()
 {
 	if (WeaponLoadoutComponent->ReloadWeapon())
 	{
-		if (UAnimMontage* ReloadAnimation = WeaponLoadoutComponent->GetEquippedWeapon()->GetReloadAnimMontage())
+		if (UAnimMontage* ReloadAnimation = WeaponLoadoutComponent->GetEquippedWeapon()->GetWeaponStats()->GetReloadAnimMontage())
 		{
 			PlayAnimMontage(ReloadAnimation);
 		}
@@ -130,12 +131,12 @@ void APlayerCharacter::OnWeaponAdded(AGun* Weapon)
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 
 	FName WeaponSocketName;
-	switch (Weapon->GetGunType())
+	switch (Weapon->GetWeaponStats()->GetGunType())
 	{
-	case Pistol:
+	case EGunType::Pistol:
 		WeaponSocketName = PistolWeaponSocket;
 		break;
-	case Rifle:
+	case EGunType::Rifle:
 		WeaponSocketName = RifleWeaponSocket;
 		break;
 	default:
