@@ -4,10 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
-#include "Player/PlayerCharacter.h"
 #include "GameHud.generated.h"
 
+struct FWidgetControllerParams;
+class UOverlay;
+class UOverlayWidgetController;
+class UZSiegeUserWidget;
 class UOptionsWidget;
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPauseMenuToggledSignature, bool /*bMenuIsOpen*/);
 
 UENUM(BlueprintType)
@@ -42,6 +46,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ToggleMenu();
 
+	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WidgetControllerParams);
+
 public:
 	FOnPauseMenuToggledSignature OnPauseMenuToggledEvent;
 
@@ -62,7 +68,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="Widgets")
 	TSubclassOf<UOptionsWidget> OptionsWidgetClass;
 	
-	TObjectPtr<UGameHudWidget> GameHudWidget;
+	//TObjectPtr<UGameHudWidget> GameHudWidget;
 	TObjectPtr<UUserWidget> MenuWidget;
 	TObjectPtr<UUserWidget> GameOverWidget;
 	TObjectPtr<UOptionsWidget> OptionsWidget;
@@ -70,4 +76,11 @@ private:
 	TArray<TWeakObjectPtr<UUserWidget>> Widgets;
 
 	bool bMenuIsOpen = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UZSiegeUserWidget> OverlayWidgetClass;
+	TObjectPtr<UZSiegeUserWidget> OverlayWidget;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass;
+	TObjectPtr<UOverlayWidgetController> OverlayWidgetController;
 };

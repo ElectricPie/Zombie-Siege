@@ -6,7 +6,7 @@
 #include "GameFramework/GameState.h"
 #include "DefenceGameState.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnRoundChangedSignature, int32 /*RoundNumber*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameModeRoundChangedSignature, const int32 /*RoundNumber*/);
 
 /**
  * 
@@ -22,7 +22,7 @@ public:
 	void StartNextRound();
 
 public:
-	FOnRoundChangedSignature OnRoundChangedEvent;
+	FOnGameModeRoundChangedSignature OnRoundChangedEvent;
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Round")
