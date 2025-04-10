@@ -6,8 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "GameHud.generated.h"
 
+class UAmmoCounterWidgetController;
 struct FWidgetControllerParams;
-class UOverlay;
 class UOverlayWidgetController;
 class UZSiegeUserWidget;
 class UOptionsWidget;
@@ -47,7 +47,8 @@ public:
 	void ToggleMenu();
 
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WidgetControllerParams);
-
+	UAmmoCounterWidgetController* GetAmmoCounterWidgetController(const FWidgetControllerParams& WidgetControllerParams);
+	
 public:
 	FOnPauseMenuToggledSignature OnPauseMenuToggledEvent;
 	
@@ -73,13 +74,15 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UZSiegeUserWidget> OverlayWidgetClass;
 	TObjectPtr<UZSiegeUserWidget> OverlayWidget;
+	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass;
 	TObjectPtr<UOverlayWidgetController> OverlayWidgetController;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UAmmoCounterWidgetController> AmmoCounterWidgetControllerClass;
+	TObjectPtr<UAmmoCounterWidgetController> AmmoCounterWidgetController;
 
-private:
-	void OnRoundChanged(int32 RoundNumber);
-	
+private:	
 	void CollapseAllWidgets();
 	UFUNCTION()
 	void OnOptionsClosed();

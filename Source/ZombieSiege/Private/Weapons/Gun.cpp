@@ -131,6 +131,7 @@ void AGun::BeginPlay()
 
 	check(WeaponStats);
 	CurrentAmmo = WeaponStats->GetMaxAmmo();
+	OnAmmoChangedEvent.Broadcast(CurrentAmmo, WeaponStats->GetMaxAmmo());
 	
 	// Allow the gun to be fired immediately after spawning
 	LastFiredTime = -WeaponStats->GetFireCooldownTime();
