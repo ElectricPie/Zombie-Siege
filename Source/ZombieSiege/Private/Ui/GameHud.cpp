@@ -5,8 +5,8 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Player/TopDownPlayerController.h"
-#include "States/DefenceGameState.h"
 #include "States/DefencePlayerState.h"
+#include "Ui/WidgetControllers/AmmoCounterWidgetController.h"
 #include "Widgets/OptionsWidget.h"
 #include "ZombieSiege/Public/Ui/WidgetControllers/OverlayWidgetController.h"
 #include "ZombieSiege/Public/Ui/Widgets/ZSiegeUserWidget.h"
@@ -14,20 +14,6 @@
 void AGameHud::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// if (GameHudWidgetClass)
-	// {
-	// 	if (ATopDownPlayerController* PlayerController = Cast<ATopDownPlayerController>(GetOwningPlayerController()))
-	// 	{
-	// 		GameHudWidget = CreateWidget<UGameHudWidget>(PlayerController, GameHudWidgetClass);
-	// 		GameHudWidget->AddToViewport();
-	// 		Widgets.Add(GameHudWidget);
-	// 		if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetPawn()))
-	// 		{
-	// 			GameHudWidget->Setup(PlayerController, PlayerCharacter);
-	// 		}
-	// 	}
-	// }
 
 	// Setup Overlay
 	checkf(OverlayWidgetClass, TEXT("Overlay Widget Class is null, please fill out in GameHud Blueprint"));
@@ -38,7 +24,6 @@ void AGameHud::BeginPlay()
 	const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState);
 	
 	OverlayWidgetController = GetOverlayWidgetController(WidgetControllerParams);
-	OverlayWidgetController->BindCallbackToDependencies();
 	OverlayWidget->SetWidgetController(OverlayWidgetController);
 	OverlayWidget->AddToViewport();
 	OverlayWidgetController->BroadcastInitialValues();
@@ -58,11 +43,6 @@ void AGameHud::BeginPlay()
 		OptionsWidget->SetVisibility(ESlateVisibility::Collapsed);
 		OptionsWidget->OnOptionsClosedEvent.AddDynamic(this, &AGameHud::OnOptionsClosed);
 		Widgets.Add(OptionsWidget);
-	}
-
-	if (ADefenceGameState* GameState = GetWorld()->GetGameState<ADefenceGameState>())
-	{
-		GameState->OnRoundChangedEvent.AddUObject(this, &AGameHud::OnRoundChanged);
 	}
 }
 
@@ -154,14 +134,23 @@ UOverlayWidgetController* AGameHud::GetOverlayWidgetController(const FWidgetCont
 	{
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
 		OverlayWidgetController->SetWidgetControllerParams(WidgetControllerParams);
+		OverlayWidgetController->BindCallbackToDependencies();
 	}
 
 	return OverlayWidgetController;
 }
 
-void AGameHud::OnRoundChanged(int32 RoundNumber)
+UAmmoCounterWidgetController* AGameHud::GetAmmoCounterWidgetController(
+	const FWidgetControllerParams& WidgetControllerParams)
 {
-	// GameHudWidget->UpdateRoundNumber(RoundNumber);
+	if (AmmoCounterWidgetController == nullptr)
+	{
+		AmmoCounterWidgetController = NewObject<UAmmoCounterWidgetController>(this, AmmoCounterWidgetControllerClass);
+		AmmoCounterWidgetController->SetWidgetControllerParams(WidgetControllerParams);
+		AmmoCounterWidgetController->BindCallbackToDependencies();
+	}
+
+	return AmmoCounterWidgetController;
 }
 
 void AGameHud::CollapseAllWidgets()
