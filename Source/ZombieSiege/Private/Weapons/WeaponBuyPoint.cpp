@@ -32,6 +32,7 @@ void AWeaponBuyPoint::BuyWeapon(TWeakObjectPtr<AController> InteractionInstigato
 	if (!InteractionInstigator.IsValid())
 		return;
 
+	// TODO: Update to work with new interface
 	if (UMoneyStoreComponent* MoneyStoreComponent = InteractionInstigator->GetComponentByClass<UMoneyStoreComponent>())
 	{
 		// Not enough money

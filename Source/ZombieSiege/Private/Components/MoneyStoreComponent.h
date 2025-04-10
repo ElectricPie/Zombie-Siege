@@ -7,18 +7,19 @@
 #include "MoneyStoreComponent.generated.h"
 
 class UFMODEvent;
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnMoneyChangedSinganture, int32 /*NewMoneyAmount*/, int32 /*AmountChanged*/);
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnMoneyChangedSignature, int32 /*NewMoneyAmount*/, int32 /*AmountChanged*/);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class UMoneyStoreComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
+	
 public:	
 	// Sets default values for this component's properties
 	UMoneyStoreComponent();
 	
-	FOnMoneyChangedSinganture OnMoneyChangedEvent;
+	FOnMoneyChangedSignature OnMoneyChangedEvent;
 	
 	/**
 	 * @brief Sets the players money to the provided amount

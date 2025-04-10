@@ -14,8 +14,8 @@
 
 ATopDownPlayerController::ATopDownPlayerController()
 {
-	MoneyStoreComponent = CreateDefaultSubobject<UMoneyStoreComponent>(TEXT("Money Store"));
-	MoneyStoreComponent->OnMoneyChangedEvent.AddUObject(this, &ATopDownPlayerController::OnMoneyChanged);
+	// MoneyStoreComponent = CreateDefaultSubobject<UMoneyStoreComponent>(TEXT("Money Store"));
+	// MoneyStoreComponent->OnMoneyChangedEvent.AddUObject(this, &ATopDownPlayerController::OnMoneyChanged);
 }
 
 void ATopDownPlayerController::GameOver()
@@ -47,6 +47,11 @@ void ATopDownPlayerController::SetInputGameAndUI()
 	SetInputMode(InputMode);
 	bShowMouseCursor = true;
 	CurrentMouseCursor = EMouseCursor::Default;
+}
+
+UMoneyStoreComponent* ATopDownPlayerController::GetMoneyStoreComponent_Implementation() const
+{
+	return IMoneyStoreInterface::Execute_GetMoneyStoreComponent(GetPlayerState<APlayerState>());
 }
 
 void ATopDownPlayerController::BeginPlay()
@@ -192,16 +197,6 @@ void ATopDownPlayerController::ReloadWeapon()
 		return;
 
 	PlayerCharacter->ReloadWeapon();
-}
-
-void ATopDownPlayerController::OnMoneyChanged(const int32 NewMoneyAmount, const int32 AmountChanged)
-{
-	// Update the player state with the new score, only want to add to the score if it is positive
-	if (PlayerState)
-	{
-		const int32 ScoreToAdd = AmountChanged > 0 ? AmountChanged : 0;
-		PlayerState->SetScore(PlayerState->GetScore() + ScoreToAdd);
-	}
 }
 
 bool ATopDownPlayerController::CanDoAction() const

@@ -101,6 +101,11 @@ void APlayerCharacter::ReloadWeapon()
 	}
 }
 
+UMoneyStoreComponent* APlayerCharacter::GetMoneyStoreComponent_Implementation() const
+{
+	return IMoneyStoreInterface::Execute_GetMoneyStoreComponent(GetController());
+}
+
 void APlayerCharacter::OnInteractionEntered(TWeakObjectPtr<UInteractableComponent> InteractableComponent)
 {
 	if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))

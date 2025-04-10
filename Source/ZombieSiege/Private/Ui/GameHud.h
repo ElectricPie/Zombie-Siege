@@ -50,13 +50,6 @@ public:
 
 public:
 	FOnPauseMenuToggledSignature OnPauseMenuToggledEvent;
-
-private:
-	void OnRoundChanged(int32 RoundNumber);
-	
-	void CollapseAllWidgets();
-	UFUNCTION()
-	void OnOptionsClosed();
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Widgets")
@@ -83,4 +76,11 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass;
 	TObjectPtr<UOverlayWidgetController> OverlayWidgetController;
+
+private:
+	void OnRoundChanged(int32 RoundNumber);
+	
+	void CollapseAllWidgets();
+	UFUNCTION()
+	void OnOptionsClosed();
 };
