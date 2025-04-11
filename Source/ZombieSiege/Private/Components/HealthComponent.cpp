@@ -24,6 +24,7 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	{
 		const float NewHealth = FMath::Clamp(CurrentHealth + HealthRegenRate * DeltaTime, 0.f, MaxHealth);
 		CurrentHealth = NewHealth;
+		OnHealthPercentageChangedEvent.Broadcast(GetHealthPercentage());
 	}
 
 	// Health Sound
@@ -76,7 +77,7 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
 {
 	CurrentHealth -= Damage;
 
-	OnTakeDamageEvent.Broadcast(this, Damage);
+	OnHealthPercentageChangedEvent.Broadcast(GetHealthPercentage());
 
 	if (CurrentHealth <= 0.f)
 	{

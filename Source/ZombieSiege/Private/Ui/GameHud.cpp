@@ -119,6 +119,7 @@ UOverlayWidgetController* AGameHud::GetOverlayWidgetController(const FWidgetCont
 {
 	if (OverlayWidgetController == nullptr)
 	{
+		checkf(OverlayWidgetControllerClass, TEXT("Overlay Widget Controller Class is null, please fill out in GameHud Blueprint"));
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
 		OverlayWidgetController->SetWidgetControllerParams(WidgetControllerParams);
 		OverlayWidgetController->BindCallbackToDependencies();
@@ -132,6 +133,7 @@ UAmmoCounterWidgetController* AGameHud::GetAmmoCounterWidgetController(
 {
 	if (AmmoCounterWidgetController == nullptr)
 	{
+		checkf(AmmoCounterWidgetControllerClass, TEXT("Ammo Counter Widget Controller Class is null, please fill out in GameHud Blueprint"));
 		AmmoCounterWidgetController = NewObject<UAmmoCounterWidgetController>(this, AmmoCounterWidgetControllerClass);
 		AmmoCounterWidgetController->SetWidgetControllerParams(WidgetControllerParams);
 		AmmoCounterWidgetController->BindCallbackToDependencies();
@@ -145,12 +147,26 @@ UInteractionWidgetController* AGameHud::GetInteractionWidgetController(
 {
 	if (InteractionWidgetController == nullptr)
 	{
+		checkf(InteractionWidgetControllerClass, TEXT("Interaction Widget Controller Class is null, please fill out in GameHud Blueprint"));
 		InteractionWidgetController = NewObject<UInteractionWidgetController>(this, InteractionWidgetControllerClass);
 		InteractionWidgetController->SetWidgetControllerParams(WidgetControllerParams);
 		InteractionWidgetController->BindCallbackToDependencies();
 	}
 
 	return InteractionWidgetController;
+}
+
+UHealthWidgetController* AGameHud::GetHealthWidgetController(const FWidgetControllerParams& WidgetControllerParams)
+{
+	if (HealthWidgetController == nullptr)
+	{
+		checkf(HealthWidgetControllerClass, TEXT("Health Widget Controller Class is null, please fill out in GameHud Blueprint"));
+		HealthWidgetController = NewObject<UHealthWidgetController>(this, HealthWidgetControllerClass);
+		HealthWidgetController->SetWidgetControllerParams(WidgetControllerParams);
+		HealthWidgetController->BindCallbackToDependencies();
+	}
+
+	return HealthWidgetController;
 }
 
 void AGameHud::CollapseAllWidgets()

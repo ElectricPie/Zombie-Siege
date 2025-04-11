@@ -31,8 +31,14 @@ class ZOMBIESIEGE_API UWidgetController : public UObject
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FWidgetControllerParams& InParams);
-	
+
+	/**
+	 * Called when the widget is created. This is where you should bind any events this controller needs to listen to.
+	 */
 	virtual void BindCallbackToDependencies();
+	/**
+	 * Called to do an initial broadcast of values to any listeners.
+	 */
 	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues();
 	

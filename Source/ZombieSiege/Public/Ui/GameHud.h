@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "WidgetControllers/HealthWidgetController.h"
 #include "GameHud.generated.h"
 
 class UInteractionWidgetController;
@@ -37,8 +38,6 @@ class AGameHud : public AHUD
 public:
 	virtual void BeginPlay() override;
 
-	void SetInteractText(FText const & InteractText);
-	void HideInteractText();
 	void ShowGameOver();
 
 	UFUNCTION(BlueprintCallable)
@@ -50,7 +49,8 @@ public:
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WidgetControllerParams);
 	UAmmoCounterWidgetController* GetAmmoCounterWidgetController(const FWidgetControllerParams& WidgetControllerParams);
 	UInteractionWidgetController* GetInteractionWidgetController(const FWidgetControllerParams& WidgetControllerParams);
-	
+	UHealthWidgetController* GetHealthWidgetController(const FWidgetControllerParams& WidgetControllerParams);
+
 public:
 	FOnPauseMenuToggledSignature OnPauseMenuToggledEvent;
 	
@@ -84,6 +84,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="WidgetControllers")
 	TSubclassOf<UInteractionWidgetController> InteractionWidgetControllerClass;
 	TObjectPtr<UInteractionWidgetController> InteractionWidgetController;
+	UPROPERTY(EditDefaultsOnly, Category="WidgetControllers")
+	TSubclassOf<UHealthWidgetController> HealthWidgetControllerClass;
+	TObjectPtr<UHealthWidgetController> HealthWidgetController;
 
 private:	
 	void CollapseAllWidgets();
