@@ -5,7 +5,7 @@
 
 #include "NavLinkComponent.h"
 #include "Components/ArrowComponent.h"
-#include "Components/InteractableComponent.h"
+#include "Interactions/InteractableComponent.h"
 #include "Components/MoneyRewardComponent.h"
 
 #define DEFAULT_BARRICADE_REWARD 40
@@ -127,8 +127,8 @@ void ABarricade::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ABarricade::OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser)
+void ABarricade::OnInteract(AController* InteractionInstigator, AActor* InteractionCauser)
 {
 	Repair();
-	MoneyRewardComponent->RewardMoney(InteractionInstigator.Get());
+	MoneyRewardComponent->RewardMoney(InteractionInstigator);
 }

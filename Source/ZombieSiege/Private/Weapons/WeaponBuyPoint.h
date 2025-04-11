@@ -19,7 +19,7 @@ public:
 	AWeaponBuyPoint();
 	
 private:
-	void BuyWeapon(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
+	void BuyWeapon(const AController* InteractionInstigator, const AActor* InteractionCauser);
 	
 private:
 	UPROPERTY(VisibleInstanceOnly, Category="Components")

@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "GameHud.generated.h"
 
+class UInteractionWidgetController;
 class UAmmoCounterWidgetController;
 struct FWidgetControllerParams;
 class UOverlayWidgetController;
@@ -48,13 +49,12 @@ public:
 
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WidgetControllerParams);
 	UAmmoCounterWidgetController* GetAmmoCounterWidgetController(const FWidgetControllerParams& WidgetControllerParams);
+	UInteractionWidgetController* GetInteractionWidgetController(const FWidgetControllerParams& WidgetControllerParams);
 	
 public:
 	FOnPauseMenuToggledSignature OnPauseMenuToggledEvent;
 	
 private:
-	UPROPERTY(EditAnywhere, Category="Widgets")
-	TSubclassOf<UGameHudWidget> GameHudWidgetClass;
 	UPROPERTY(EditAnywhere, Category="Widgets")
 	TSubclassOf<UUserWidget> MenuWidgetClass;
 	UPROPERTY(EditAnywhere, Category="Widgets")
@@ -75,12 +75,15 @@ private:
 	TSubclassOf<UZSiegeUserWidget> OverlayWidgetClass;
 	TObjectPtr<UZSiegeUserWidget> OverlayWidget;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="WidgetControllers")
 	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass;
 	TObjectPtr<UOverlayWidgetController> OverlayWidgetController;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="WidgetControllers")
 	TSubclassOf<UAmmoCounterWidgetController> AmmoCounterWidgetControllerClass;
 	TObjectPtr<UAmmoCounterWidgetController> AmmoCounterWidgetController;
+	UPROPERTY(EditDefaultsOnly, Category="WidgetControllers")
+	TSubclassOf<UInteractionWidgetController> InteractionWidgetControllerClass;
+	TObjectPtr<UInteractionWidgetController> InteractionWidgetController;
 
 private:	
 	void CollapseAllWidgets();

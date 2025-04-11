@@ -98,7 +98,7 @@ void AUnitSpawnPoint::BeginPlay()
 	}
 }
 
-void AUnitSpawnPoint::OnBarricadeActiveChanged(TWeakObjectPtr<ABarricade> BarricadeChanging, bool bNewActiveState)
+void AUnitSpawnPoint::OnBarricadeActiveChanged(ABarricade* BarricadeChanging, bool bNewActiveState)
 {
 	if (bNewActiveState)
 	{

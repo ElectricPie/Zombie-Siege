@@ -6,12 +6,10 @@
 #include "TopDownPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/HealthComponent.h"
-#include "Components/InteractableComponent.h"
-#include "Components/InteractorComponent.h"
+#include "Interactions/InteractorComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameModes/ZombieDefenceGameMode.h"
-#include "Ui/GameHud.h"
 #include "Weapons/Gun.h"
 #include "ZombieSiege/Public/Weapons/WeaponStatsDataAsset.h"
 
@@ -33,8 +31,6 @@ APlayerCharacter::APlayerCharacter()
 	Camera->bUsePawnControlRotation = false;
 
 	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
-	InteractorComponent->OnEnterInteractableEvent.AddUObject(this, &APlayerCharacter::OnInteractionEntered);
-	InteractorComponent->OnExitInteractableEvent.AddUObject(this, &APlayerCharacter::OnInteractionExited);
 
 	WeaponLoadoutComponent = CreateDefaultSubobject<UWeaponLoadoutComponent>(TEXT("WeaponLoadout"));
 	WeaponLoadoutComponent->OnWeaponAddedEvent.AddUObject(this, &APlayerCharacter::OnWeaponAdded);
@@ -104,28 +100,6 @@ void APlayerCharacter::ReloadWeapon()
 UMoneyStoreComponent* APlayerCharacter::GetMoneyStoreComponent_Implementation() const
 {
 	return IMoneyStoreInterface::Execute_GetMoneyStoreComponent(GetController());
-}
-
-void APlayerCharacter::OnInteractionEntered(TWeakObjectPtr<UInteractableComponent> InteractableComponent)
-{
-	if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
-	{
-		if (AGameHud* GameHud = Cast<AGameHud>(PlayerController->GetHUD()))
-		{
-			GameHud->SetInteractText(InteractableComponent->GetInteractMessage());
-		}
-	}
-}
-
-void APlayerCharacter::OnInteractionExited(TWeakObjectPtr<UInteractableComponent> InteractableComponent)
-{
-	if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
-	{
-		if (AGameHud* GameHud = Cast<AGameHud>(PlayerController->GetHUD()))
-		{
-			GameHud->HideInteractText();
-		}
-	}
 }
 
 void APlayerCharacter::OnWeaponAdded(AGun* Weapon)

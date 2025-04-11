@@ -8,7 +8,8 @@
 
 struct FNavigationLink;
 class UNavLinkComponent;
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnActiveChangedSignature, TWeakObjectPtr<ABarricade> /*BarricadeChanging*/,
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnActiveChangedSignature, ABarricade* /*BarricadeChanging*/,
                                      bool /*bNewActiveState*/);
 
 class UMoneyRewardComponent;
@@ -77,7 +78,7 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
+	void OnInteract(AController* InteractionInstigator, AActor* InteractionCauser);
 
 private:
 	UPROPERTY(EditAnywhere)

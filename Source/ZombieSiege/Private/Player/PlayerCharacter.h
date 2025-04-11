@@ -29,19 +29,20 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-	
+
 	/**
 	 * @brief Gets the velocity relative to the direction they are facing
 	 * @return Returns positive values if moving forward and negative for backwards
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsMovingForward() const;
-	
+
 	void Move(const FVector Direction);
 	void Interact();
 
 	UFUNCTION(BlueprintSetter)
 	UWeaponLoadoutComponent* GetWeaponLoadoutComponent() const { return WeaponLoadoutComponent; }
+
 	void Fire(AController* Shooter);
 	void StopFiring();
 	void ReloadWeapon();
@@ -53,15 +54,18 @@ public:
 	virtual UMoneyStoreComponent* GetMoneyStoreComponent_Implementation() const override;
 	/* End MoneyStoreInterface */
 
+	UFUNCTION(BlueprintPure)
+	UInteractorComponent* GetInteractorComponent() const { return InteractorComponent; }
+
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerDeath OnPlayerDeathEvent;
-	
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<USpringArmComponent> CameraArm;
 	UPROPERTY(VisibleAnywhere, Category="Components")
-    TObjectPtr<UCameraComponent> Camera;
+	TObjectPtr<UCameraComponent> Camera;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UInteractorComponent> InteractorComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
@@ -72,27 +76,27 @@ protected:
 	float SpeedModifier = 0.8f;
 
 private:
-	void OnInteractionEntered(TWeakObjectPtr<UInteractableComponent> InteractableComponent);
-	void OnInteractionExited(TWeakObjectPtr<UInteractableComponent> InteractableComponent);
-
-	void OnWeaponAdded(AGun* Weapon);
-	UFUNCTION()
-	void Die(AController* KillInstigator, AActor* KillCauser);
-	
-private:
-	UPROPERTY(EditAnywhere, Category="Weapon", meta=(ToolTip="The time a reload takes if the equiped gun has no reload animation"))
+	UPROPERTY(EditAnywhere, Category="Weapon",
+		meta=(ToolTip="The time a reload takes if the equiped gun has no reload animation"))
 	float DefaultReloadTime = 2.f;
 	bool bIsReloading = false;
 	FTimerHandle ReloadingTimerHandle;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Health")
 	bool bIsDead = false;
 
-	UPROPERTY(EditAnywhere, Category="Movement", meta=(ToolTip="How far from forward the character can move before they are considered to be moving backwards", ClampMin="-1.0", ClampMax="1.0", UIMin="-1.0", UIMax="1.0"))
+	UPROPERTY(EditAnywhere, Category="Movement",
+		meta=(ToolTip="How far from forward the character can move before they are considered to be moving backwards",
+			ClampMin="-1.0", ClampMax="1.0", UIMin="-1.0", UIMax="1.0"))
 	float BackwardsThreshold = -0.5f;
 
 	UPROPERTY(EditAnywhere, Category="PlayerCharacter|Animation")
 	FName PistolWeaponSocket = TEXT("PistolSocket");
 	UPROPERTY(EditAnywhere, Category="PlayerCharacter|Animation")
 	FName RifleWeaponSocket = TEXT("RifleSocket");
+
+private:
+	void OnWeaponAdded(AGun* Weapon);
+	UFUNCTION()
+	void Die(AController* KillInstigator, AActor* KillCauser);
 };

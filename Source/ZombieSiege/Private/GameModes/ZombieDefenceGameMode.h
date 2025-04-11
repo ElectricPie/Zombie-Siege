@@ -49,7 +49,7 @@ private:
 	void StartNewRound();
 	void ResetRoundStats();
 
-	void OnSpawnPointActiveChanged(TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint, bool bNewActiveState);
+	void OnSpawnPointActiveChanged(AUnitSpawnPoint* SpawnPoint, bool bNewActiveState);
 
 	void GameOver();
 	TWeakObjectPtr<AUnitSpawnPoint> GetWeightedRandomSpawnPoint() const;

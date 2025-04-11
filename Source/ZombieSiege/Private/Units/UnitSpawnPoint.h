@@ -11,7 +11,7 @@ class UArrowComponent;
 class AUnitCharacter;
 class ABarricade;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSpawnPointActiveChangedSignature, TWeakObjectPtr<AUnitSpawnPoint> /*BarricadeChanging*/, bool /*bNewActiveState*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSpawnPointActiveChangedSignature, AUnitSpawnPoint* /*BarricadeChanging*/, bool /*bNewActiveState*/);
 
 UCLASS()
 class AUnitSpawnPoint : public AActor
@@ -56,7 +56,7 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	bool bIsActive = false;
 
-	void OnBarricadeActiveChanged(TWeakObjectPtr<ABarricade> BarricadeChanging, bool bNewActiveState);
+	void OnBarricadeActiveChanged(ABarricade* BarricadeChanging, bool bNewActiveState);
 
 private:
 	TMap<TWeakObjectPtr<ABarricade>, FDelegateHandle> BarricadeChangedHandles;

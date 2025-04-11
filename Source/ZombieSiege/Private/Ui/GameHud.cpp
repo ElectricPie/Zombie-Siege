@@ -7,6 +7,7 @@
 #include "Player/TopDownPlayerController.h"
 #include "States/DefencePlayerState.h"
 #include "Ui/WidgetControllers/AmmoCounterWidgetController.h"
+#include "Ui/WidgetControllers/InteractionWidgetController.h"
 #include "Widgets/OptionsWidget.h"
 #include "ZombieSiege/Public/Ui/WidgetControllers/OverlayWidgetController.h"
 #include "ZombieSiege/Public/Ui/Widgets/ZSiegeUserWidget.h"
@@ -44,20 +45,6 @@ void AGameHud::BeginPlay()
 		OptionsWidget->OnOptionsClosedEvent.AddDynamic(this, &AGameHud::OnOptionsClosed);
 		Widgets.Add(OptionsWidget);
 	}
-}
-
-void AGameHud::SetInteractText(FText const& InteractText)
-{
-	// if (!GameHudWidget) return;
-	//
-	// FText const Message = FText::Format(FText::FromString("Press E to {0}"), InteractText);
-	// GameHudWidget->UpdateInteractText(Message);
-	// GameHudWidget->ShowInteractText(true);
-}
-
-void AGameHud::HideInteractText()
-{
-	// GameHudWidget->ShowInteractText(false);
 }
 
 void AGameHud::ShowGameOver()
@@ -151,6 +138,19 @@ UAmmoCounterWidgetController* AGameHud::GetAmmoCounterWidgetController(
 	}
 
 	return AmmoCounterWidgetController;
+}
+
+UInteractionWidgetController* AGameHud::GetInteractionWidgetController(
+	const FWidgetControllerParams& WidgetControllerParams)
+{
+	if (InteractionWidgetController == nullptr)
+	{
+		InteractionWidgetController = NewObject<UInteractionWidgetController>(this, InteractionWidgetControllerClass);
+		InteractionWidgetController->SetWidgetControllerParams(WidgetControllerParams);
+		InteractionWidgetController->BindCallbackToDependencies();
+	}
+
+	return InteractionWidgetController;
 }
 
 void AGameHud::CollapseAllWidgets()

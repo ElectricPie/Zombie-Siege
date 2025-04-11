@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Components/InteractableComponent.h"
-
-#include "InteractorComponent.h"
+#include "Interactions/InteractableComponent.h"
+#include "Interactions/InteractorComponent.h"
 
 UInteractableComponent::UInteractableComponent()
 {
@@ -11,7 +10,7 @@ UInteractableComponent::UInteractableComponent()
 	OnComponentEndOverlap.AddDynamic(this, &UInteractableComponent::OnOverlapEnd);
 }
 
-void UInteractableComponent::Interact(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser)
+void UInteractableComponent::Interact(AController* InteractionInstigator, AActor* InteractionCauser)
 {
 	if (!bCanInteract) return;
 	
