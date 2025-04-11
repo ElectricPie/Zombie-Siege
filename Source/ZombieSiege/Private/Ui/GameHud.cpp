@@ -19,32 +19,29 @@ void AGameHud::BeginPlay()
 	// Setup Overlay
 	checkf(OverlayWidgetClass, TEXT("Overlay Widget Class is null, please fill out in GameHud Blueprint"));
 	OverlayWidget = CreateWidget<UZSiegeUserWidget>(GetWorld(), OverlayWidgetClass);
+	Widgets.Add(OverlayWidget);
 
 	APlayerController* PlayerController = GetOwningPlayerController();
 	ADefencePlayerState* PlayerState = PlayerController->GetPlayerState<ADefencePlayerState>();
 	const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState);
-	
+
 	OverlayWidgetController = GetOverlayWidgetController(WidgetControllerParams);
 	OverlayWidget->SetWidgetController(OverlayWidgetController);
 	OverlayWidget->AddToViewport();
 	OverlayWidgetController->BroadcastInitialValues();
-	
-	if (MenuWidgetClass)
-	{
-		MenuWidget = CreateWidget<UUserWidget>(GetOwningPlayerController(), MenuWidgetClass);
-		MenuWidget->AddToViewport();
-		MenuWidget->SetVisibility(ESlateVisibility::Collapsed);
-		Widgets.Add(MenuWidget);
-	}
 
-	if (OptionsWidgetClass)
-	{
-		OptionsWidget = CreateWidget<UOptionsWidget>(GetOwningPlayerController(), OptionsWidgetClass.Get());
-		OptionsWidget->AddToViewport();
-		OptionsWidget->SetVisibility(ESlateVisibility::Collapsed);
-		OptionsWidget->OnOptionsClosedEvent.AddDynamic(this, &AGameHud::OnOptionsClosed);
-		Widgets.Add(OptionsWidget);
-	}
+	checkf(MenuWidgetClass, TEXT("Menu Widget Class is null, please fill out in GameHud Blueprint"));
+	MenuWidget = CreateWidget<UUserWidget>(GetOwningPlayerController(), MenuWidgetClass);
+	MenuWidget->AddToViewport();
+	MenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+	Widgets.Add(MenuWidget);
+
+	checkf(OptionsWidgetClass, TEXT("Options Widget Class is null, please fill out in GameHud Blueprint"));
+	OptionsWidget = CreateWidget<UOptionsWidget>(GetOwningPlayerController(), OptionsWidgetClass.Get());
+	OptionsWidget->AddToViewport();
+	OptionsWidget->SetVisibility(ESlateVisibility::Collapsed);
+	OptionsWidget->OnOptionsClosedEvent.AddDynamic(this, &AGameHud::OnOptionsClosed);
+	Widgets.Add(OptionsWidget);
 }
 
 void AGameHud::ShowGameOver()
@@ -66,20 +63,22 @@ void AGameHud::SwitchActiveWidget(const EGameWidget WidgetToActivate)
 	switch (WidgetToActivate)
 	{
 	case EGameWidget::GameHud:
-		// if (GameHudWidget)
-		// {
-		// 	GameHudWidget->SetVisibility(ESlateVisibility::Visible);
-		// 	if (ATopDownPlayerController* PlayerController = Cast<ATopDownPlayerController>(GetOwningPlayerController()))
-		// 	{
-		// 		PlayerController->SetInputGameOnly();
-		// 	}
-		// }
+		if (OverlayWidget)
+		{
+			OverlayWidget->SetVisibility(ESlateVisibility::Visible);
+			if (ATopDownPlayerController* PlayerController = Cast<
+				ATopDownPlayerController>(GetOwningPlayerController()))
+			{
+				PlayerController->SetInputGameOnly();
+			}
+		}
 		break;
 	case EGameWidget::PauseMenu:
 		if (MenuWidget)
 		{
 			MenuWidget->SetVisibility(ESlateVisibility::Visible);
-			if (ATopDownPlayerController* PlayerController = Cast<ATopDownPlayerController>(GetOwningPlayerController()))
+			if (ATopDownPlayerController* PlayerController = Cast<
+				ATopDownPlayerController>(GetOwningPlayerController()))
 			{
 				PlayerController->SetInputGameAndUI();
 			}
@@ -89,7 +88,8 @@ void AGameHud::SwitchActiveWidget(const EGameWidget WidgetToActivate)
 		if (OptionsWidget)
 		{
 			OptionsWidget->SetVisibility(ESlateVisibility::Visible);
-			if (ATopDownPlayerController* PlayerController = Cast<ATopDownPlayerController>(GetOwningPlayerController()))
+			if (ATopDownPlayerController* PlayerController = Cast<
+				ATopDownPlayerController>(GetOwningPlayerController()))
 			{
 				PlayerController->SetInputGameAndUI();
 			}
@@ -119,7 +119,8 @@ UOverlayWidgetController* AGameHud::GetOverlayWidgetController(const FWidgetCont
 {
 	if (OverlayWidgetController == nullptr)
 	{
-		checkf(OverlayWidgetControllerClass, TEXT("Overlay Widget Controller Class is null, please fill out in GameHud Blueprint"));
+		checkf(OverlayWidgetControllerClass,
+		       TEXT("Overlay Widget Controller Class is null, please fill out in GameHud Blueprint"));
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
 		OverlayWidgetController->SetWidgetControllerParams(WidgetControllerParams);
 		OverlayWidgetController->BindCallbackToDependencies();
@@ -133,7 +134,8 @@ UAmmoCounterWidgetController* AGameHud::GetAmmoCounterWidgetController(
 {
 	if (AmmoCounterWidgetController == nullptr)
 	{
-		checkf(AmmoCounterWidgetControllerClass, TEXT("Ammo Counter Widget Controller Class is null, please fill out in GameHud Blueprint"));
+		checkf(AmmoCounterWidgetControllerClass,
+		       TEXT("Ammo Counter Widget Controller Class is null, please fill out in GameHud Blueprint"));
 		AmmoCounterWidgetController = NewObject<UAmmoCounterWidgetController>(this, AmmoCounterWidgetControllerClass);
 		AmmoCounterWidgetController->SetWidgetControllerParams(WidgetControllerParams);
 		AmmoCounterWidgetController->BindCallbackToDependencies();
@@ -147,7 +149,8 @@ UInteractionWidgetController* AGameHud::GetInteractionWidgetController(
 {
 	if (InteractionWidgetController == nullptr)
 	{
-		checkf(InteractionWidgetControllerClass, TEXT("Interaction Widget Controller Class is null, please fill out in GameHud Blueprint"));
+		checkf(InteractionWidgetControllerClass,
+		       TEXT("Interaction Widget Controller Class is null, please fill out in GameHud Blueprint"));
 		InteractionWidgetController = NewObject<UInteractionWidgetController>(this, InteractionWidgetControllerClass);
 		InteractionWidgetController->SetWidgetControllerParams(WidgetControllerParams);
 		InteractionWidgetController->BindCallbackToDependencies();
@@ -160,7 +163,8 @@ UHealthWidgetController* AGameHud::GetHealthWidgetController(const FWidgetContro
 {
 	if (HealthWidgetController == nullptr)
 	{
-		checkf(HealthWidgetControllerClass, TEXT("Health Widget Controller Class is null, please fill out in GameHud Blueprint"));
+		checkf(HealthWidgetControllerClass,
+		       TEXT("Health Widget Controller Class is null, please fill out in GameHud Blueprint"));
 		HealthWidgetController = NewObject<UHealthWidgetController>(this, HealthWidgetControllerClass);
 		HealthWidgetController->SetWidgetControllerParams(WidgetControllerParams);
 		HealthWidgetController->BindCallbackToDependencies();
