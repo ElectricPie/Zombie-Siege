@@ -8,7 +8,7 @@
 
 class UInteractableComponent;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnInteractableChangedSignature, TWeakObjectPtr<UInteractableComponent> /*InteractableComponent*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnInteractableChangedSignature, UInteractableComponent* /*InteractableComponent*/)
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UInteractorComponent : public UActorComponent

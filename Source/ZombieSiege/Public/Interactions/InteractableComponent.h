@@ -8,7 +8,7 @@
 
 class UInteractorComponent;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInteractSignature, TWeakObjectPtr<AController> /*InteractionInstigator*/, TWeakObjectPtr<AActor> /*InteractionCauser*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInteractSignature, AController* /*InteractionInstigator*/, AActor* /*InteractionCauser*/);
 
 /**
  * 
@@ -21,7 +21,7 @@ class UInteractableComponent : public UBoxComponent
 public:
 	UInteractableComponent();
 
-	void Interact(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
+	void Interact(AController* InteractionInstigator, AActor* InteractionCauser);
 
 	FOnInteractSignature OnInteractEvent;
 

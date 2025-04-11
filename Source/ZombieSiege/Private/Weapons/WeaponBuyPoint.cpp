@@ -4,7 +4,7 @@
 #include "Weapons/WeaponBuyPoint.h"
 
 #include "Gun.h"
-#include "Components/InteractableComponent.h"
+#include "Interactions/InteractableComponent.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 
@@ -17,19 +17,24 @@ AWeaponBuyPoint::AWeaponBuyPoint()
 	InteractableComponent = CreateDefaultSubobject<UInteractableComponent>(TEXT("Interactable Component"));
 	RootComponent = InteractableComponent;
 	InteractableComponent->SetCanInteract(true);
-	InteractableComponent->SetInteractMessage(FText::FromString("buy weapon"));
-	InteractableComponent->OnInteractEvent.AddUObject(this, &AWeaponBuyPoint::BuyWeapon);
-	
+	InteractableComponent->SetInteractMessage(FText::FromString("Buy weapon"));
+	InteractableComponent->OnInteractEvent.AddLambda(
+		[this](const AController* InteractionInstigator, const AActor* InteractionCauser)
+		{
+			// TODO: Get money store and pass it to the buy weapon function
+			BuyWeapon(InteractionInstigator, InteractionCauser);
+		});
+
 	WeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh Component"));
 	WeaponMeshComponent->SetupAttachment(RootComponent);
 	WeaponMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	WeaponMeshComponent->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
 }
 
-void AWeaponBuyPoint::BuyWeapon(TWeakObjectPtr<AController> InteractionInstigator,
-                                TWeakObjectPtr<AActor> InteractionCauser)
+void AWeaponBuyPoint::BuyWeapon(const AController* InteractionInstigator,
+                                const AActor* InteractionCauser)
 {
-	if (!InteractionInstigator.IsValid())
+	if (InteractionInstigator == nullptr || InteractionCauser == nullptr)
 		return;
 
 	// TODO: Update to work with new interface
@@ -39,7 +44,8 @@ void AWeaponBuyPoint::BuyWeapon(TWeakObjectPtr<AController> InteractionInstigato
 		if (!MoneyStoreComponent->TakeMoney(Cost)) return;
 
 		// Adds the weapon to the players loadout
-		if (UWeaponLoadoutComponent* WeaponLoadoutComponent = InteractionCauser->FindComponentByClass<UWeaponLoadoutComponent>())
+		if (UWeaponLoadoutComponent* WeaponLoadoutComponent = InteractionCauser->FindComponentByClass<
+			UWeaponLoadoutComponent>())
 		{
 			AGun* NewWeapon = GetWorld()->SpawnActor<AGun>(WeaponClass, GetActorTransform());
 			WeaponLoadoutComponent->AddWeapon(NewWeapon, true);

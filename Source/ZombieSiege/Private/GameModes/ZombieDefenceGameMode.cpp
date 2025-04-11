@@ -205,24 +205,24 @@ void AZombieDefenceGameMode::ResetRoundStats()
 	UnitsKilledThisRound = 0;
 }
 
-void AZombieDefenceGameMode::OnSpawnPointActiveChanged(TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint, bool bNewActiveState)
+void AZombieDefenceGameMode::OnSpawnPointActiveChanged(AUnitSpawnPoint* SpawnPoint, bool bNewActiveState)
 {
-	if (SpawnPoint.IsValid())
+	if (SpawnPoint == nullptr)
+		return;
+	
+	const int32 FoundIndex = ActiveSpawnPoints.IndexOfByPredicate([SpawnPoint](const FWeightedSpawnPoint* SpawnPointWeight)
 	{
-		const int32 FoundIndex = ActiveSpawnPoints.IndexOfByPredicate([SpawnPoint](const FWeightedSpawnPoint* SpawnPointWeight)
-		{
-			return SpawnPointWeight->SpawnPoint == SpawnPoint;
-		});
+		return SpawnPointWeight->SpawnPoint == SpawnPoint;
+	});
 		
-		if (bNewActiveState && FoundIndex == INDEX_NONE)
-		{
-			FWeightedSpawnPoint* NewSpawnPointWeight = new FWeightedSpawnPoint(SpawnPoint, 0.f);
-			ActiveSpawnPoints.Add(NewSpawnPointWeight);
-		}
-		else if (!bNewActiveState && FoundIndex != INDEX_NONE)
-		{
-			ActiveSpawnPoints.RemoveAt(FoundIndex);
-		}
+	if (bNewActiveState && FoundIndex == INDEX_NONE)
+	{
+		FWeightedSpawnPoint* NewSpawnPointWeight = new FWeightedSpawnPoint(SpawnPoint, 0.f);
+		ActiveSpawnPoints.Add(NewSpawnPointWeight);
+	}
+	else if (!bNewActiveState && FoundIndex != INDEX_NONE)
+	{
+		ActiveSpawnPoints.RemoveAt(FoundIndex);
 	}
 }
 

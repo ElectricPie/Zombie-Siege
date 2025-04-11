@@ -48,5 +48,5 @@ private:
 	TArray<TWeakObjectPtr<ARoom>> ConnectedRooms;
 	
 	UFUNCTION()
-	void OnInteract(TWeakObjectPtr<AController> InteractionInstigator, TWeakObjectPtr<AActor> InteractionCauser);
+	void OnInteract(AController* InteractionInstigator, AActor* InteractionCauser);
 };

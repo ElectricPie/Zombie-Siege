@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Components/InteractorComponent.h"
-#include "Components/InteractableComponent.h"
+#include "Interactions/InteractorComponent.h"
+#include "Interactions/InteractableComponent.h"
 
 // Sets default values for this component's properties
 UInteractorComponent::UInteractorComponent()
@@ -17,25 +17,29 @@ UInteractorComponent::UInteractorComponent()
 
 void UInteractorComponent::Interact()
 {
-	if (CurrentInteractable == nullptr) return;
+	if (CurrentInteractable == nullptr)
+		return;
 
 	CurrentInteractable->Interact(GetOwner()->GetInstigatorController(), GetOwner());
 }
 
 void UInteractorComponent::AddInteractable(UInteractableComponent* InteractableComponent)
 {
-	if (InteractableComponent == nullptr) return;
+	if (InteractableComponent == nullptr)
+		return;
 	
 	CurrentInteractable = InteractableComponent;
-	OnEnterInteractableEvent.Broadcast(CurrentInteractable);
+	OnEnterInteractableEvent.Broadcast(CurrentInteractable.Get());
 }
 
 void UInteractorComponent::RemoveInteractable(const UInteractableComponent* InteractableComponent)
 {
-	if (InteractableComponent == nullptr) return;
-	// Don't want to remove the current one if its not the one we are leaving
-	if (CurrentInteractable != InteractableComponent) return;
+	if (InteractableComponent == nullptr)
+		return;
+	// Don't want to remove the current one if it's not the one we are leaving
+	if (CurrentInteractable != InteractableComponent)
+		return;
 
-	OnExitInteractableEvent.Broadcast(CurrentInteractable);
+	OnExitInteractableEvent.Broadcast(CurrentInteractable.Get());
 	CurrentInteractable = nullptr;
 }
