@@ -21,7 +21,8 @@ void UMoneyStoreComponent::SetMoney(const int32 AmountToSetTo)
 
 void UMoneyStoreComponent::AddMoney(const int32 AmountToAdd)
 {
-	Money += AmountToAdd;
+	Money = FMath::Max(0, Money + AmountToAdd);
+	
 	OnMoneyChangedEvent.Broadcast(Money, AmountToAdd);
 	if (MoneyGetSound)
 	{
@@ -31,7 +32,9 @@ void UMoneyStoreComponent::AddMoney(const int32 AmountToAdd)
 
 bool UMoneyStoreComponent::TakeMoney(const int32 AmountToTake)
 {
-	if (AmountToTake < 0) return false;
+	// Invalid amount
+	if (AmountToTake < 0)
+		return false;
 	
 	if (Money >= AmountToTake)
 	{
