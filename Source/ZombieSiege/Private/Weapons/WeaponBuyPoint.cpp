@@ -10,6 +10,8 @@
 #include "Money/MoneyStoreInterface.h"
 #include "Weapons/WeaponBuyPointDataAsset.h"
 
+#define DEFAULT_WEAPON_INTERACT_MESSAGE "Buy weapon"
+
 // Sets default values
 AWeaponBuyPoint::AWeaponBuyPoint()
 {
@@ -19,15 +21,7 @@ AWeaponBuyPoint::AWeaponBuyPoint()
 	InteractableComponent = CreateDefaultSubobject<UInteractableComponent>(TEXT("Interactable Component"));
 	RootComponent = InteractableComponent;
 	InteractableComponent->SetCanInteract(true);
-	InteractableComponent->SetInteractMessage(FText::FromString("Buy weapon"));
-	InteractableComponent->OnInteractEvent.AddLambda(
-		[this](const AController* InteractionInstigator, const AActor* InteractionCauser)
-		{
-			if (UMoneyStoreComponent* MoneyStoreComponent = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(InteractionInstigator))
-			{
-				BuyWeapon(MoneyStoreComponent, InteractionCauser);
-			}
-		});
+	InteractableComponent->SetInteractMessage(FText::FromString(DEFAULT_WEAPON_INTERACT_MESSAGE));
 
 	WeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh Component"));
 	WeaponMeshComponent->SetupAttachment(RootComponent);
@@ -40,6 +34,23 @@ void AWeaponBuyPoint::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 
 	RefreshWeaponMesh();
+}
+
+void AWeaponBuyPoint::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InteractableComponent->OnInteractEvent.AddLambda(
+	[this](const AController* InteractionInstigator, const AActor* InteractionCauser)
+	{
+		if (UMoneyStoreComponent* MoneyStoreComponent = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(InteractionInstigator))
+		{
+			BuyWeapon(MoneyStoreComponent, InteractionCauser);
+		}
+	});
+
+	const FText InteractMessage = FText::FromString(FString::Printf(TEXT("Buy weapon [Costs %d]"), WeaponBuyPointDataAsset->GetCost()));
+	InteractableComponent->SetInteractMessage(InteractMessage);
 }
 
 void AWeaponBuyPoint::RefreshWeaponMesh() const
