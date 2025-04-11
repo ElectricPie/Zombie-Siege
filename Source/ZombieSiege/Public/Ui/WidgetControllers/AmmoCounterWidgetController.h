@@ -9,6 +9,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUiAmmoChangedSignature, int32, CurrentAmmo, int32, MaxAmmo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUiReloadStateChangedSignature, bool, bIsReloading);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUiWeaponChangedSignature, AGun*, NewWeapon);
 
 /**
  * 
@@ -23,6 +24,8 @@ public:
 	FOnUiAmmoChangedSignature AmmoChangedEvent;
 	UPROPERTY(BlueprintAssignable)
 	FOnUiReloadStateChangedSignature ReloadStateChangedEvent;
+	UPROPERTY(BlueprintAssignable)
+	FOnUiWeaponChangedSignature WeaponChangedEvent;
 	
 public:
 	virtual void BindCallbackToDependencies() override;
