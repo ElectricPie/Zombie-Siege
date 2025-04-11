@@ -54,4 +54,6 @@ void UAmmoCounterWidgetController::OnWeaponChanged(AGun* NewWeapon)
 	}
 
 	CurrentWeapon = NewWeapon;
+
+	WeaponChangedEvent.Broadcast(CurrentWeapon);
 }
