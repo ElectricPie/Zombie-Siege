@@ -18,6 +18,13 @@ class AGun : public AActor
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnGunFiredSignature OnGunFiredEvent;
+	
+	FOnAmmoChangedSignature OnAmmoChangedEvent;
+	FOnReloadStateChanged OnReloadStateChangedEvent;
+
 public:	
 	// Sets default values for this actor's properties
 	AGun();
@@ -39,12 +46,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool GetIsReloading() const { return bIsReloading; }
 
-	UPROPERTY(BlueprintAssignable)
-	FOnGunFiredSignature OnGunFiredEvent;
-
-public:
-	FOnAmmoChangedSignature OnAmmoChangedEvent;
-	FOnReloadStateChanged OnReloadStateChangedEvent;
+	USkeletalMeshComponent* GetMesh() const { return GunMesh; }
 
 protected:
 	virtual void BeginPlay() override;
