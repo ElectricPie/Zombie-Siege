@@ -56,6 +56,8 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UInteractorComponent* GetInteractorComponent() const { return InteractorComponent; }
+	UFUNCTION(BlueprintPure)
+	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
 public:
 	UPROPERTY(BlueprintAssignable)

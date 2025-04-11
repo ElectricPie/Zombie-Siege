@@ -7,7 +7,7 @@
 #include "Windows/AllowWindowsPlatformTypes.h"
 #include "HealthComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTakeDamageSignature, UHealthComponent*, ChangedHealthComponent, float, DamageAmount);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthPercentageChangedSignature, const float /*NewHealthPercentage*/);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDeathSignature, AController*, KillInstigator, AActor*, KillCauser);
 
 class UFMODEvent;
@@ -42,8 +42,7 @@ public:
 	void SetMaxHealth(const float NewMaxHealth, const bool bKeepHealthPercentage = true);
 	
 public:
-	UPROPERTY(BlueprintAssignable)
-	FOnTakeDamageSignature OnTakeDamageEvent;
+	FOnHealthPercentageChangedSignature OnHealthPercentageChangedEvent;
 	UPROPERTY(BlueprintAssignable)
 	FOnDeathSignature OnDeathEvent;
 	
