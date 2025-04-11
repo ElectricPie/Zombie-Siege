@@ -49,7 +49,7 @@ private:
 	int32 Money = 0;
 
 	UPROPERTY(EditAnywhere, Category="Sound")
-	UFMODEvent* MoneyGetSound;
+	TObjectPtr<UFMODEvent> MoneyGetSound;
 	UPROPERTY(EditAnywhere, Category="Sound")
-	UFMODEvent* MoneySpendSound;
+	TObjectPtr<UFMODEvent> MoneySpendSound;
 };

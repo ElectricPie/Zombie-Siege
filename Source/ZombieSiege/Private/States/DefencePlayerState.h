@@ -36,6 +36,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UMoneyStoreComponent> MoneyStoreComponent;
 	
 	UPROPERTY(VisibleAnywhere, Category="Player", BlueprintGetter=GetTotalKills)
