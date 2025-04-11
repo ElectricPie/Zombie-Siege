@@ -62,11 +62,13 @@ private:
 	UPROPERTY(EditAnywhere, Category="Widgets")
 	TSubclassOf<UOptionsWidget> OptionsWidgetClass;
 	
-	//TObjectPtr<UGameHudWidget> GameHudWidget;
+	UPROPERTY()
 	TObjectPtr<UUserWidget> MenuWidget;
+	UPROPERTY()
 	TObjectPtr<UUserWidget> GameOverWidget;
+	UPROPERTY()
 	TObjectPtr<UOptionsWidget> OptionsWidget;
-
+	UPROPERTY()
 	TArray<TWeakObjectPtr<UUserWidget>> Widgets;
 
 	bool bMenuIsOpen = false;
@@ -77,15 +79,19 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="WidgetControllers")
 	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass;
+	UPROPERTY()
 	TObjectPtr<UOverlayWidgetController> OverlayWidgetController;
 	UPROPERTY(EditDefaultsOnly, Category="WidgetControllers")
 	TSubclassOf<UAmmoCounterWidgetController> AmmoCounterWidgetControllerClass;
+	UPROPERTY()
 	TObjectPtr<UAmmoCounterWidgetController> AmmoCounterWidgetController;
 	UPROPERTY(EditDefaultsOnly, Category="WidgetControllers")
 	TSubclassOf<UInteractionWidgetController> InteractionWidgetControllerClass;
+	UPROPERTY()
 	TObjectPtr<UInteractionWidgetController> InteractionWidgetController;
 	UPROPERTY(EditDefaultsOnly, Category="WidgetControllers")
 	TSubclassOf<UHealthWidgetController> HealthWidgetControllerClass;
+	UPROPERTY()
 	TObjectPtr<UHealthWidgetController> HealthWidgetController;
 
 private:	

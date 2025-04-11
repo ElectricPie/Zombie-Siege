@@ -11,8 +11,14 @@ struct FWidgetControllerParams
 {
 	GENERATED_BODY()
 
-	FWidgetControllerParams() {}
-	FWidgetControllerParams(APlayerController* InPlayerController, APlayerState* InPlayerState) : PlayerController(InPlayerController), PlayerState(InPlayerState) {}
+	FWidgetControllerParams()
+	{
+	}
+
+	FWidgetControllerParams(APlayerController* InPlayerController, APlayerState* InPlayerState) :
+		PlayerController(InPlayerController), PlayerState(InPlayerState)
+	{
+	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<APlayerController> PlayerController;
@@ -41,11 +47,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues();
-	
+
 protected:
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
 	TObjectPtr<APlayerController> PlayerController;
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
 	TObjectPtr<APlayerState> PlayerState;
-
 };
