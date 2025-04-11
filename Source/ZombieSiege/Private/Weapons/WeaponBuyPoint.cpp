@@ -8,6 +8,7 @@
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "Money/MoneyStoreInterface.h"
+#include "Weapons/WeaponBuyPointDataAsset.h"
 
 // Sets default values
 AWeaponBuyPoint::AWeaponBuyPoint()
@@ -34,6 +35,26 @@ AWeaponBuyPoint::AWeaponBuyPoint()
 	WeaponMeshComponent->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
 }
 
+void AWeaponBuyPoint::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	RefreshWeaponMesh();
+}
+
+void AWeaponBuyPoint::RefreshWeaponMesh() const
+{
+	if (WeaponBuyPointDataAsset && WeaponBuyPointDataAsset->GetWeaponClass())
+	{
+		const AGun* DefaultWeapon = WeaponBuyPointDataAsset->GetWeaponClass()->GetDefaultObject<AGun>();
+		WeaponMeshComponent->SetSkeletalMesh(DefaultWeapon->GetMesh()->GetSkeletalMeshAsset());
+	}
+	else
+	{
+		WeaponMeshComponent->SetSkeletalMesh(nullptr);
+	}
+}
+
 void AWeaponBuyPoint::BuyWeapon(UMoneyStoreComponent* MoneyStore,
                                 const AActor* ActorToGiveWeapon)
 {
@@ -41,13 +62,13 @@ void AWeaponBuyPoint::BuyWeapon(UMoneyStoreComponent* MoneyStore,
 		return;
 
 	// Not enough money
-	if (!MoneyStore->TakeMoney(Cost))
+	if (!MoneyStore->TakeMoney(WeaponBuyPointDataAsset->GetCost()))
 		return;
 
 	// Adds the weapon to the players loadout
 	if (UWeaponLoadoutComponent* WeaponLoadoutComponent = ActorToGiveWeapon->FindComponentByClass<UWeaponLoadoutComponent>())
 	{
-		AGun* NewWeapon = GetWorld()->SpawnActor<AGun>(WeaponClass, GetActorTransform());
+		AGun* NewWeapon = GetWorld()->SpawnActor<AGun>(WeaponBuyPointDataAsset->GetWeaponClass(), GetActorTransform());
 		WeaponLoadoutComponent->AddWeapon(NewWeapon, true);
 	}
 

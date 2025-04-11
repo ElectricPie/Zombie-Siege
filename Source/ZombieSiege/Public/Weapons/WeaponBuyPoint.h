@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/MoneyStoreComponent.h"
 #include "GameFramework/Actor.h"
 #include "WeaponBuyPoint.generated.h"
 
-class AGun;
+class UMoneyStoreComponent;
+class UWeaponBuyPointDataAsset;
 class UInteractableComponent;
 
 UCLASS()
@@ -18,19 +18,20 @@ class AWeaponBuyPoint : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AWeaponBuyPoint();
+	virtual void OnConstruction(const FTransform& Transform) override;
 	
 private:
+	UFUNCTION(CallInEditor, Category="Weapon", meta=(DisplayName="ForceMeshRefresh", ToolTip="Forces the weapon mesh to update to match the one in the data asset"))
+	void RefreshWeaponMesh() const;
+	
 	void BuyWeapon(UMoneyStoreComponent* MoneyStore, const AActor* ActorToGiveWeapon);
 	
 private:
-	UPROPERTY(VisibleInstanceOnly, Category="Components")
+	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UInteractableComponent> InteractableComponent;
-	UPROPERTY(VisibleInstanceOnly, Category="Components")
+	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<USkeletalMeshComponent> WeaponMeshComponent;
 
-	UPROPERTY(EditAnywhere, Category="Weapon Buy Point")
-	TSubclassOf<AGun> WeaponClass;
-	UPROPERTY(EditAnywhere, Category="Weapon Buy Point", meta=(ClampMin=0, UIMin=0))
-	int32 Cost = 100;
-
+	UPROPERTY(EditAnywhere, Category="Weapon")
+	TObjectPtr<UWeaponBuyPointDataAsset> WeaponBuyPointDataAsset;
 };
