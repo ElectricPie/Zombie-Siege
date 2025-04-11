@@ -2,8 +2,7 @@
 
 
 #include "Rooms/Room.h"
-
-#include "Barricade.h"
+#include "Rooms/Barricade.h"
 
 // Sets default values
 ARoom::ARoom()

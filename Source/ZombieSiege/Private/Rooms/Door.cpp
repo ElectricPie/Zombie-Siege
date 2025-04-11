@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Rooms/Door.h"
-
-#include "Room.h"
+#include "Rooms/Room.h"
 #include "Interactions/InteractableComponent.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Money/MoneyStoreInterface.h"

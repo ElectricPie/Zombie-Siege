@@ -54,20 +54,16 @@ public:
 	FOnActiveChangedSignature OnActiveChangedEvent;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-protected:
 	UPROPERTY()
-	USceneComponent* BaseComponent;
+	TObjectPtr<USceneComponent> BaseComponent;
 	UPROPERTY(VisibleAnywhere, Category="Components")
-	UStaticMeshComponent* Mesh;
+	TObjectPtr<UStaticMeshComponent> Mesh;
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Components")
 	TObjectPtr<UInteractableComponent> PlayerInteractionTrigger;
 	UPROPERTY(VisibleAnywhere, Category="Components")
-	UArrowComponent* InsideDirection;
+	TObjectPtr<UArrowComponent> InsideDirection;
 	UPROPERTY(VisibleAnywhere, Category="Components")
-	UMoneyRewardComponent* MoneyRewardComponent;
+	TObjectPtr<UMoneyRewardComponent> MoneyRewardComponent;
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UNavLinkComponent> NavLinkComponent;
 
@@ -77,12 +73,14 @@ protected:
 	int32 DestroyedPlanks = 0;
 
 private:
-	UFUNCTION()
-	void OnInteract(AController* InteractionInstigator, AActor* InteractionCauser);
-
-private:
 	UPROPERTY(EditAnywhere)
 	bool bIsActive = false;
 
+	UPROPERTY()
 	TArray<TWeakObjectPtr<AActor>> AgentsCrossing;
+	
+private:
+	UFUNCTION()
+	void OnInteract(AController* InteractionInstigator, AActor* InteractionCauser);
+
 };

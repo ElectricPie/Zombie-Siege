@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Barricade.h"
+#include "Rooms/Barricade.h"
 
 #include "NavLinkComponent.h"
 #include "Components/ArrowComponent.h"
@@ -10,6 +10,7 @@
 
 #define DEFAULT_BARRICADE_REWARD 40
 #define DEFAULT_BARRICADE_TIME_BETWEEN_REWARDS 5
+#define DEFAULT_BARRICADE_INTERACT_MESSAGE "Repair Barricade"
 
 // Sets default values
 ABarricade::ABarricade()
@@ -28,6 +29,7 @@ ABarricade::ABarricade()
 	PlayerInteractionTrigger = CreateDefaultSubobject<UInteractableComponent>(TEXT("Inside Interactable"));
 	PlayerInteractionTrigger->SetupAttachment(RootComponent);
 	PlayerInteractionTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
+	PlayerInteractionTrigger->SetInteractMessage(FText::FromString(DEFAULT_BARRICADE_INTERACT_MESSAGE));
 	
 	InsideDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("Inside Direction Arrow"));
 	InsideDirection->SetupAttachment(RootComponent);
@@ -47,7 +49,7 @@ ABarricade::ABarricade()
 	NavLinkComponent->Links.Add(Link);
 }
 
-float ABarricade::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+float ABarricade::TakeDamage(const float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
 	if (IsDestroyed()) return 0.f;
@@ -119,12 +121,6 @@ void ABarricade::StopCrossing(AActor* Agent)
 			Agent->OnDestroyed.RemoveDynamic(this, &ABarricade::StopCrossing);
 		}
 	}
-}
-
-// Called when the game starts or when spawned
-void ABarricade::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 void ABarricade::OnInteract(AController* InteractionInstigator, AActor* InteractionCauser)
