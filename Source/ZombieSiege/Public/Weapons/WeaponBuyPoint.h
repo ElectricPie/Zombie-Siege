@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/MoneyStoreComponent.h"
 #include "GameFramework/Actor.h"
 #include "WeaponBuyPoint.generated.h"
 
@@ -19,7 +20,7 @@ public:
 	AWeaponBuyPoint();
 	
 private:
-	void BuyWeapon(const AController* InteractionInstigator, const AActor* InteractionCauser);
+	void BuyWeapon(UMoneyStoreComponent* MoneyStore, const AActor* ActorToGiveWeapon);
 	
 private:
 	UPROPERTY(VisibleInstanceOnly, Category="Components")

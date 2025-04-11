@@ -7,6 +7,7 @@
 #include "Interactions/InteractableComponent.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
+#include "Money/MoneyStoreInterface.h"
 
 // Sets default values
 AWeaponBuyPoint::AWeaponBuyPoint()
@@ -21,8 +22,10 @@ AWeaponBuyPoint::AWeaponBuyPoint()
 	InteractableComponent->OnInteractEvent.AddLambda(
 		[this](const AController* InteractionInstigator, const AActor* InteractionCauser)
 		{
-			// TODO: Get money store and pass it to the buy weapon function
-			BuyWeapon(InteractionInstigator, InteractionCauser);
+			if (UMoneyStoreComponent* MoneyStoreComponent = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(InteractionInstigator))
+			{
+				BuyWeapon(MoneyStoreComponent, InteractionCauser);
+			}
 		});
 
 	WeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh Component"));
@@ -31,27 +34,23 @@ AWeaponBuyPoint::AWeaponBuyPoint()
 	WeaponMeshComponent->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
 }
 
-void AWeaponBuyPoint::BuyWeapon(const AController* InteractionInstigator,
-                                const AActor* InteractionCauser)
+void AWeaponBuyPoint::BuyWeapon(UMoneyStoreComponent* MoneyStore,
+                                const AActor* ActorToGiveWeapon)
 {
-	if (InteractionInstigator == nullptr || InteractionCauser == nullptr)
+	if (MoneyStore == nullptr || ActorToGiveWeapon == nullptr)
 		return;
 
-	// TODO: Update to work with new interface
-	if (UMoneyStoreComponent* MoneyStoreComponent = InteractionInstigator->GetComponentByClass<UMoneyStoreComponent>())
+	// Not enough money
+	if (!MoneyStore->TakeMoney(Cost))
+		return;
+
+	// Adds the weapon to the players loadout
+	if (UWeaponLoadoutComponent* WeaponLoadoutComponent = ActorToGiveWeapon->FindComponentByClass<UWeaponLoadoutComponent>())
 	{
-		// Not enough money
-		if (!MoneyStoreComponent->TakeMoney(Cost)) return;
-
-		// Adds the weapon to the players loadout
-		if (UWeaponLoadoutComponent* WeaponLoadoutComponent = InteractionCauser->FindComponentByClass<
-			UWeaponLoadoutComponent>())
-		{
-			AGun* NewWeapon = GetWorld()->SpawnActor<AGun>(WeaponClass, GetActorTransform());
-			WeaponLoadoutComponent->AddWeapon(NewWeapon, true);
-		}
-
-		// TODO: This is temporary until a it is decided how to handle the weapon ammo and multiplayer
-		Destroy();
+		AGun* NewWeapon = GetWorld()->SpawnActor<AGun>(WeaponClass, GetActorTransform());
+		WeaponLoadoutComponent->AddWeapon(NewWeapon, true);
 	}
+
+	// TODO: This is temporary until a it is decided how to handle the weapon ammo and multiplayer
+	Destroy();
 }

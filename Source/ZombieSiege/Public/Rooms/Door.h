@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Door.generated.h"
 
+class UMoneyStoreComponent;
 class ARoom;
 class UNavModifierComponent;
 class UNavLinkComponent;
@@ -28,7 +29,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TWeakObjectPtr<AActor> DoorPart;
+	TObjectPtr<AActor> DoorPart;
 
 protected:
 	virtual void BeginPlay() override;
@@ -48,5 +49,5 @@ private:
 	TArray<TWeakObjectPtr<ARoom>> ConnectedRooms;
 	
 	UFUNCTION()
-	void OnInteract(AController* InteractionInstigator, AActor* InteractionCauser);
+	void BuyDoor(UMoneyStoreComponent* MoneyStore);
 };
