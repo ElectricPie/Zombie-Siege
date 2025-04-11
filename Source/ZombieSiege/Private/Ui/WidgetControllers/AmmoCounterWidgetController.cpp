@@ -50,6 +50,7 @@ void UAmmoCounterWidgetController::OnWeaponChanged(AGun* NewWeapon)
 		{
 			AmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);
 		});
+		AmmoChangedEvent.Broadcast(NewWeapon->GetCurrentAmmo(), NewWeapon->GetWeaponStats()->GetMaxAmmo());
 	}
 
 	CurrentWeapon = NewWeapon;
