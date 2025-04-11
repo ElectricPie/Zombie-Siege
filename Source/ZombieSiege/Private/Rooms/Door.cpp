@@ -23,7 +23,7 @@ ADoor::ADoor()
 
 	InteractableTrigger = CreateDefaultSubobject<UInteractableComponent>(TEXT("Interactable Trigger"));
 	InteractableTrigger->SetupAttachment(RootComponent);
-	InteractableTrigger->SetInteractMessage(FText::FromString(TEXT(DEFAULT_DOOR_INTERACT_MESSAGE)));
+	InteractableTrigger->SetInteractMessage(FText::FromString(DEFAULT_DOOR_INTERACT_MESSAGE));
 	InteractableTrigger->SetCanInteract(true);
 }
 

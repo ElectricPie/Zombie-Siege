@@ -19,6 +19,9 @@ public:
 	// Sets default values for this actor's properties
 	AWeaponBuyPoint();
 	virtual void OnConstruction(const FTransform& Transform) override;
+
+protected:
+	virtual void BeginPlay() override;
 	
 private:
 	UFUNCTION(CallInEditor, Category="Weapon", meta=(DisplayName="ForceMeshRefresh", ToolTip="Forces the weapon mesh to update to match the one in the data asset"))
