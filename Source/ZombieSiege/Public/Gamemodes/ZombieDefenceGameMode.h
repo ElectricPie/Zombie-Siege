@@ -17,7 +17,7 @@ struct FWeightedSpawnPoint
 
 	FWeightedSpawnPoint(): SpawnPoint(nullptr), LastUsedTime(0.f) {}
 		
-	FWeightedSpawnPoint(TWeakObjectPtr<AUnitSpawnPoint> InSpawnPoint, float InLastUsedTime)
+	FWeightedSpawnPoint(AUnitSpawnPoint* InSpawnPoint, const float InLastUsedTime)
 		: SpawnPoint(InSpawnPoint)
 		, LastUsedTime(InLastUsedTime)
 	{
@@ -49,10 +49,10 @@ private:
 	void StartNewRound();
 	void ResetRoundStats();
 
-	void OnSpawnPointActiveChanged(AUnitSpawnPoint* SpawnPoint, bool bNewActiveState);
+	void OnSpawnPointActiveStateChanged(AUnitSpawnPoint* SpawnPoint, bool bNewActiveState);
 
 	void GameOver();
-	TWeakObjectPtr<AUnitSpawnPoint> GetWeightedRandomSpawnPoint() const;
+	AUnitSpawnPoint* GetWeightedRandomSpawnPoint() const;
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))
@@ -87,7 +87,7 @@ private:
 	
 	TArray<FWeightedSpawnPoint*> ActiveSpawnPoints;
 	
-	TSet<TWeakObjectPtr<AUnitCharacter>> ActiveUnits;
+	TSet<TObjectPtr<AUnitCharacter>> ActiveUnits;
 
 	UPROPERTY(EditAnywhere, Category="Weapon")
 	TArray<TSubclassOf<AGun>> StartingWeaponClasses;

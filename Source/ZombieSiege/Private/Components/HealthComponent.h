@@ -18,6 +18,11 @@ class UHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+public:
+	FOnHealthPercentageChangedSignature OnHealthPercentageChangedEvent;
+	UPROPERTY(BlueprintAssignable)
+	FOnDeathSignature OnDeathEvent;
+	
 public:	
 	// Sets default values for this component's properties
 	UHealthComponent();
@@ -41,17 +46,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Health")
 	void SetMaxHealth(const float NewMaxHealth, const bool bKeepHealthPercentage = true);
 	
-public:
-	FOnHealthPercentageChangedSignature OnHealthPercentageChangedEvent;
-	UPROPERTY(BlueprintAssignable)
-	FOnDeathSignature OnDeathEvent;
-	
 protected:
 	virtual void BeginPlay() override;
-
-private:
-	UFUNCTION()
-	void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 
 private:
 	UPROPERTY(EditAnywhere, Category="Health")
@@ -65,12 +61,18 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="Sound")
 	TObjectPtr<UFMODEvent> HitSound;
-	TWeakObjectPtr<UFMODAudioComponent> HitSoundComponent = nullptr;
 	UPROPERTY(EditAnywhere, Category="Sound")
 	TObjectPtr<UFMODEvent> DeathSound;
 	UPROPERTY(EditAnywhere, Category="Sound")
 	TObjectPtr<UFMODEvent> HealthSound;
 	UPROPERTY(EditAnywhere, Category="Sound")
 	FName HealthSoundParameterName = TEXT("Health");
+	UPROPERTY()
 	TObjectPtr<UFMODAudioComponent> HealthSoundComponent = nullptr;
+	
+	TWeakObjectPtr<UFMODAudioComponent> HitSoundComponent = nullptr;
+
+private:
+	UFUNCTION()
+	void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 };

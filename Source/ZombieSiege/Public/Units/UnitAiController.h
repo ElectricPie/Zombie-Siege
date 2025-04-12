@@ -15,10 +15,11 @@ class AUnitAiController : public AAIController
 	GENERATED_BODY()
 	
 public:
-	void StopBehaviorTree();
+	void StopBehaviorTree() const;
 	
 protected:
 	virtual void BeginPlay() override;
+	virtual void OnPossess(APawn* InPawn) override;
 
 private:
 	UPROPERTY(EditAnywhere, Category="AI")

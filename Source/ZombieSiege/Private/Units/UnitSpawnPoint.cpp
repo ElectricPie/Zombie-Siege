@@ -3,10 +3,10 @@
 
 #include "Units/UnitSpawnPoint.h"
 
-#include "UnitCharacter.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Rooms/Barricade.h"
+#include "Units/UnitCharacter.h"
 
 // Sets default values
 AUnitSpawnPoint::AUnitSpawnPoint()
@@ -38,17 +38,19 @@ AUnitSpawnPoint::AUnitSpawnPoint()
 #endif
 }
 
-TWeakObjectPtr<AUnitCharacter> AUnitSpawnPoint::SpawnUnit(const TSubclassOf<AUnitCharacter> UnitClass)
+AUnitCharacter* AUnitSpawnPoint::SpawnUnit(const TSubclassOf<AUnitCharacter>& UnitClass)
 {
-	if (bForceDeactivate) return nullptr;
-	if (UnitClass == nullptr) return nullptr;
-	if (!bIsActive || ActiveBarricades.Num() == 0) return nullptr;
-	if (GetWorld() == nullptr) return nullptr;
+	check(UnitClass)
+	if (bForceDeactivate || !bIsActive)
+		return nullptr;
+	if (ActiveBarricades.Num() == 0)
+		return nullptr;
 
 	// Select barricade for unit
 	const int32 BarricadeIndex = FMath::RandRange(0, ActiveBarricades.Num() - 1);
-	const TWeakObjectPtr<ABarricade> TargetBarricade = ActiveBarricades[BarricadeIndex];
-	if (!TargetBarricade.IsValid()) return nullptr;
+	ABarricade* TargetBarricade = ActiveBarricades[BarricadeIndex].Get();
+	if (!IsValid(TargetBarricade))
+		return nullptr;
 
 	const AActor* ActorToFit = UnitClass->GetDefaultObject<AActor>();
 	const FVector SpawnLocation = GetActorLocation();
@@ -58,9 +60,9 @@ TWeakObjectPtr<AUnitCharacter> AUnitSpawnPoint::SpawnUnit(const TSubclassOf<AUni
 
 	// Spawn the unit
 	FActorSpawnParameters SpawnParameters;
-	const TWeakObjectPtr<AUnitCharacter> SpawnedUnit = GetWorld()->SpawnActor<AUnitCharacter>(UnitClass, GetActorLocation(), GetActorRotation());
+	AUnitCharacter* SpawnedUnit = GetWorld()->SpawnActor<AUnitCharacter>(UnitClass, GetActorLocation(), GetActorRotation());
 	SpawnedUnit->SetTargetBarricade(TargetBarricade);
-	
+
 	return SpawnedUnit;
 }
 
@@ -73,7 +75,7 @@ void AUnitSpawnPoint::BeginPlay()
 	// Keep track of the active barricades
 	for (const auto& Barricade : ConnectedBarricades)
 	{
-		if (!Barricade.IsValid())
+		if (Barricade == nullptr)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%s has an invalid barricade in its connected barricades"), *GetActorNameOrLabel());
 			continue;
@@ -87,7 +89,9 @@ void AUnitSpawnPoint::BeginPlay()
 		}
 		else
 		{
-			BarricadeChangedHandles.Add(Barricade ,Barricade->OnActiveChangedEvent.AddUObject(this, &AUnitSpawnPoint::OnBarricadeActiveChanged));
+			BarricadeChangedHandles.Add(
+				Barricade,
+				Barricade->OnActiveChangedEvent.AddUObject(this, &AUnitSpawnPoint::OnBarricadeActiveChanged));
 		}
 	}
 

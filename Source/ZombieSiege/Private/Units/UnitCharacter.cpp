@@ -4,9 +4,9 @@
 #include "Units/UnitCharacter.h"
 
 #include "FMODBlueprintStatics.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/HealthComponent.h"
 #include "Components/MoneyRewardComponent.h"
-#include "Rooms/Barricade.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -23,9 +23,12 @@ AUnitCharacter::AUnitCharacter()
 
 void AUnitCharacter::Attack(AActor* Target)
 {
-	if (Target == nullptr) return;
+	if (Target == nullptr)
+		return;
 	// Delay time between attacks
-	if (GetGameTimeSinceCreation() - LastAttackTime < AttackDelay) return;
+	if (GetGameTimeSinceCreation() - LastAttackTime < AttackDelay)
+		return;
+	
 	UGameplayStatics::ApplyDamage(Target, AttackDamage, GetController(), this, UDamageType::StaticClass());
 	LastAttackTime = GetGameTimeSinceCreation();
 
@@ -40,7 +43,7 @@ void AUnitCharacter::Attack(AActor* Target)
 	}
 }
 
-void AUnitCharacter::SetTargetBarricade(TWeakObjectPtr<ABarricade> NewTargetBarricade)
+void AUnitCharacter::SetTargetBarricade(ABarricade* NewTargetBarricade)
 {
 	TargetBarricade = NewTargetBarricade;
 }
@@ -54,7 +57,14 @@ void AUnitCharacter::BeginPlay()
 
 void AUnitCharacter::Die(AController* KillInstigator, AActor* KillCauser)
 {
+	// Ragdoll the unit
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 	OnKilledEvent.Broadcast(this, KillInstigator, KillCauser);
-	Destroy();
+	SetLifeSpan(DeathLifeSpan);
 }
 
