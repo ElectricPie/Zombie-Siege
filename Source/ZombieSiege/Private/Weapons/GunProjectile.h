@@ -27,17 +27,12 @@ protected:
 private:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
-	UFUNCTION()
-	void DestroyProjectile();
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Components")
-	USphereComponent* CollisionComponent;
+	TObjectPtr<USphereComponent> CollisionComponent;
 	UPROPERTY(VisibleAnywhere, Category="Components")
-	UStaticMeshComponent* ProjectileMesh;
-	UPROPERTY(VisibleAnywhere, Category="Components")
-	UProjectileMovementComponent* ProjectileMovementComponent;
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
 	
 	float Damage;
 	TWeakObjectPtr<AController> ShooterController = nullptr;
