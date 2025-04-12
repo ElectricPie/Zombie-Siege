@@ -30,7 +30,7 @@ public:
 	 * @param UnitClass The class of unit to spawn
 	 * @return A pointer to the spawned unit or a nullptr if it fails to spawn
 	 */
-	TWeakObjectPtr<AUnitCharacter> SpawnUnit(TSubclassOf<AUnitCharacter> UnitClass);
+	AUnitCharacter* SpawnUnit(const TSubclassOf<AUnitCharacter>& UnitClass);
 	
 public:
 	FOnSpawnPointActiveChangedSignature OnActiveStateChangedEvent;
@@ -47,9 +47,9 @@ private:
 #endif
 	
 	UPROPERTY(EditAnywhere, Category="Barricades",meta=(ToolTip="The barricades that units spawned here will go to"))
-	TArray<TWeakObjectPtr<ABarricade>> ConnectedBarricades;
+	TArray<TObjectPtr<ABarricade>> ConnectedBarricades;
 	UPROPERTY(VisibleAnywhere, Category="Barricades")
-	TArray<TWeakObjectPtr<ABarricade>> ActiveBarricades;
+	TArray<TObjectPtr<ABarricade>> ActiveBarricades;
 
 	UPROPERTY(EditAnywhere)
 	bool bForceDeactivate = false;

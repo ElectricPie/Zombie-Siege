@@ -31,7 +31,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category="Target")
 	ABarricade* GetTargetBarricade() const { return TargetBarricade.Get(); }
-	void SetTargetBarricade(TWeakObjectPtr<ABarricade> NewTargetBarricade);
+	void SetTargetBarricade(ABarricade* NewTargetBarricade);
 
 	UFUNCTION(BlueprintPure, Category="Money")
 	UMoneyRewardComponent* GetMoneyRewardComponent() const { return MoneyRewardComponent; }
@@ -55,7 +55,7 @@ protected:
 	float LastAttackTime = 0.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Animation")
-	UAnimMontage* AttackMontage;
+	TObjectPtr<UAnimMontage> AttackMontage;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
 	float MaxHealth = 40.f;
@@ -72,13 +72,16 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UHealthComponent> HealthComponent;
 	UPROPERTY(VisibleAnywhere, Category="Target")
-	TWeakObjectPtr<ABarricade> TargetBarricade;
+	TObjectPtr<ABarricade> TargetBarricade;
 	
 	UPROPERTY(EditAnywhere, Category="Sound")
-	UFMODEvent* DeathSound;
+	TObjectPtr<UFMODEvent> DeathSound;
 	UPROPERTY(EditAnywhere, Category="Sound")
-	UFMODEvent* AttackSound;
+	TObjectPtr<UFMODEvent> AttackSound;
 	UPROPERTY(EditAnywhere, Category="Sound")
-	UFMODEvent* TakeDamageSound;
+	TObjectPtr<UFMODEvent> TakeDamageSound;
+
+	UPROPERTY(EditAnywhere)
+	float DeathLifeSpan = 5.f;
 
 };
