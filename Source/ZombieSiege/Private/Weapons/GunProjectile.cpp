@@ -24,9 +24,6 @@ AGunProjectile::AGunProjectile()
 
 	RootComponent = CollisionComponent;
 	
-	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	ProjectileMesh->SetupAttachment(RootComponent);
-	
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	ProjectileMovementComponent->InitialSpeed = 3000.f;
 	ProjectileMovementComponent->MaxSpeed = 3000.f;
@@ -48,7 +45,7 @@ void AGunProjectile::BeginPlay()
 	Super::BeginPlay();
 
 	FTimerHandle DestroyHandle;
-	GetWorld()->GetTimerManager().SetTimer(DestroyHandle, this, &AGunProjectile::DestroyProjectile, DestroyTime, false);
+	SetLifeSpan(DestroyTime);
 }
 
 
@@ -56,15 +53,9 @@ void AGunProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 	FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Hide the mesh so we can keep any effects until the projectile is destroyed
-	ProjectileMesh->SetVisibility(false);
 	CollisionComponent->SetCollisionProfileName("NoCollision");
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CollisionComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	
-	UGameplayStatics::ApplyDamage(OtherActor, Damage, ShooterController.Get(), ShooterActor.Get(), nullptr);
-
+	UGameplayStatics::ApplyDamage(OtherActor, Damage, ShooterController.Get(), this, nullptr);
 }
-
-void AGunProjectile::DestroyProjectile()
-{
-	Destroy();
-}
-
