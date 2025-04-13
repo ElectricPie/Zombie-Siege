@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{899b1fcb-7681-421a-af58-6b2f5089abfc}">
+		<property name="assetPath">
+			<value>Gunfire/Glock17/Glock17 - 5.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>96</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>2.0999895833333335</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{c0b760ca-e47e-4260-be54-b57ef777b209}</destination>
+		</relationship>
+	</object>
+</objects>

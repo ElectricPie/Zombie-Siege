@@ -1,3 +1,6 @@
+https://sonniss.com/gameaudiogdc/ > GDC
+
+
 Ambiance
 spooky-wind-57845 - https://pixabay.com/sound-effects/spooky-wind-57845/
 dark-wind-19785 - https://pixabay.com/sound-effects/dark-wind-19785/
@@ -6,6 +9,7 @@ medium-explosion-40472 - https://pixabay.com/sound-effects/medium-explosion-4047
 
 Gunshots
 single-pistol-gunshot-33-37187 - https://pixabay.com/sound-effects/single-pistol-gunshot-33-37187/
+Glock 17 - FIRING - Take 1 - 20m In Front - AB - MKH8020  -  GDC 2023 Pole Position
 
 Reloads
 mag-reload-81594 - https://pixabay.com/sound-effects/mag-reload-81594/
@@ -30,3 +34,6 @@ tubular-bell-of-death-89485 - https://pixabay.com/sound-effects/tubular-bell-of-
 Money
 cash-register-purchase-87313 - https://pixabay.com/sound-effects/cash-register-purchase-87313/
 coins-falling-013-36967 - https://pixabay.com/sound-effects/coins-falling-013-36967/
+
+Footsteps
+https://pixabay.com/sound-effects/concrete-footsteps-1-6265/
