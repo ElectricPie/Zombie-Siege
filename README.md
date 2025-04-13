@@ -12,14 +12,16 @@ Follow these steps to build and run the Zombie Siege project using Unreal Engine
         - **Desktop development with C++**
         - **Game development with C++**
         - Ensure you have the latest version of the **MSVC toolset** and **Windows SDK**.
+
 3. **FMOD**:
-   - Download and install FMOD for Unreal 2.03.07 from the [FMOD website](https://www.fmod.com/download).
-   - Place the FMODStudio and FMODStudioNiagara into ZombieSiege/Plugins.
+   - Download and install FMOD for Unreal 2.03.06 from the [FMOD website](https://www.fmod.com/download), you will need an FMOD account to download.
+   - Place the `FMODStudio` and `FMODStudioNiagara` into `ZombieSiege/Plugins`.
+     - You may need to create the `Plugins` folder if it does not exist.
 
 ### Generate Project Files:
-1. Right-click on the ZombieSiege.uproject file and select Generate Visual Studio project files.
+1. Right-click on the `ZombieSiege.uproject` file and select Generate Visual Studio project files.
 Alternatively, run the following command in the project directory:
-UnrealVersionSelector.exe /projectfiles ZombieSiege.uproject
+UnrealVersionSelector.exe `/projectfiles ZombieSiege.uproject`
 
 2. Open the generated .sln file in Visual Studio or open the ZombieSiege.uproject file in Unreal Engine 5.5.
 
@@ -28,3 +30,28 @@ UnrealVersionSelector.exe /projectfiles ZombieSiege.uproject
 - In Unreal Engine: Open the project and let it compile the code automatically.
 
 Launch the game by clicking the Play button in Unreal Engine.
+
+### Building FMOD Banks
+To ensure FMOD audio works correctly in the Zombie Siege project, you need to build the FMOD banks:
+
+1. **Install FMOD Studio**:
+   - Download and install FMOD Studio 2.03.06 from the [FMOD website](https://www.fmod.com/download), you will need an FMOD account to download.
+
+2. **Open the FMOD Project**:
+   - Open FMOD project file (`ZombieSiege_FMODProject.fspro`) in FMOD Studio found in the `ZombieSiege/ZombieSiege_FMODProject` directory.
+     
+3. **Set the built banks directory in FMOD Studio**
+   - Go to `Edit` > `Preferences` > `Build`.
+   - Set the `Build banks output directory` to `../Content/FMOD`.
+
+4. **Build the Banks**:
+   - Go to the `File` menu and select `Build...`.
+
+5. **Verify the Banks**:
+   - After building, ensure the `.bank` files are present in the `ZombieSiege/Content/FMOD/Desktop` directory.
+
+6. **Reload FMOD in Unreal Engine**:
+   - Open the Zombie Siege project in Unreal Engine.
+   - Navigate to the `FMOD` settings and click `Reload Banks` to ensure the latest banks are loaded.
+
+This process ensures that all FMOD audio assets are correctly built and integrated into the project.
