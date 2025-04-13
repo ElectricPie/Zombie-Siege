@@ -16,10 +16,10 @@ Follow these steps to build and run the Zombie Siege project using Unreal Engine
 3. **FMOD**:
    - Download and install FMOD for Unreal 2.03.06 from the [FMOD website](https://www.fmod.com/download), you will need an FMOD account to download.
    - Place the `FMODStudio` and `FMODStudioNiagara` into `ZombieSiege/Plugins`.
-     - You may need to create the `Plugins` folder if it does not exist.
+     - Overwrite the existing files.
 
 ### Running the Project
-You can either run the uproject file or run the project from the sln file in you IDE.
+You can either run the uproject file or run the project from the .sln file in you IDE which will require generating project files (See below).
 
 ### Generate Project Files:
 1. Right-click on the `ZombieSiege.uproject` file and select Generate Visual Studio project files.
