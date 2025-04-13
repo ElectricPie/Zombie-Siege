@@ -176,8 +176,9 @@ Plugins/**/Intermediate/*
 
 ## FMOD
 # FMOD plugins
-FMODStudio
-FMODStudioNiagara
+Plugins/FMODStudio/Binaries/
+Plugins/FMODStudio/Intermediate/
+Plugins/FMODStudio/DerivedDataCache/
 
 # FMOD Content
 */FMOD/Banks/
@@ -188,3 +189,13 @@ FMODStudioNiagara
 */FMOD/Reverbs/
 */FMOD/Snapshots/
 */FMOD/VCAs/
+
+# FMOD Studio Project
+ZombieSiege_FMODProject/Build
+ZombieSiege_FMODProject/.cache/
+ZombieSiege_FMODProject/.backup/
+ZombieSiege_FMODProject/.unsaved/
+!ZombieSiege_FMODProject/Build/.gitkeep
+!ZombieSiege_FMODProject/.cache/.gitkeep
+!ZombieSiege_FMODProject/.backup/.gitkeep
+!ZombieSiege_FMODProject/.unsaved/.gitkeep
