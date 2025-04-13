@@ -180,11 +180,11 @@ FMODStudio
 FMODStudioNiagara
 
 # FMOD Content
-FMOD/Banks/
-FMOD/Buses/
-FMOD/Events/
-FMOD/Ports/
-FMOD/PrivateIntegrationData/
-FMOD/Reverbs/
-FMOD/Snapshots/
-FMOD/VCAs/
+*/FMOD/Banks/
+*/FMOD/Buses/
+*/FMOD/Events/
+*/FMOD/Ports/
+*/FMOD/PrivateIntegrationData/
+*/FMOD/Reverbs/
+*/FMOD/Snapshots/
+*/FMOD/VCAs/
