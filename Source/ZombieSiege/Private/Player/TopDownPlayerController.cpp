@@ -105,11 +105,6 @@ void ATopDownPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	if (APlayerCharacter* PossessedPlayerCharacter = Cast<APlayerCharacter>(InPawn))
-	{
-		PlayerCharacter = PossessedPlayerCharacter;
-	}
-
 	if (AGameHud* Hud = Cast<AGameHud>(GetHUD()))
 	{
 		Hud->InitHud();
@@ -131,35 +126,41 @@ void ATopDownPlayerController::Move(const FInputActionValue& Value)
 	if (!CanDoAction())
 		return;
 
-	const FVector2D Direction = Value.Get<FVector2D>();
-	PlayerCharacter->Move(FVector(Direction.X, Direction.Y, 0.f).GetSafeNormal());
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		const FVector2D Direction = Value.Get<FVector2D>();
+		PlayerCharacter->Move(FVector(Direction.X, Direction.Y, 0.f).GetSafeNormal());
+	}
 }
 
 void ATopDownPlayerController::FaceMouse()
 {
 	if (!CanDoAction())
 		return;
-
-	FIntVector2 ViewportSize;
-	GetViewportSize(ViewportSize.X, ViewportSize.Y);
-
-	FVector2D MouseScreenLocation;
-	if (GetMousePosition(MouseScreenLocation.X, MouseScreenLocation.Y))
+	
+	if (GetPawn())
 	{
-		FVector WorldPosition;
-		FVector WorldDirection;
-		DeprojectScreenPositionToWorld(MouseScreenLocation.X, MouseScreenLocation.Y, WorldPosition, WorldDirection);
+		FIntVector2 ViewportSize;
+		GetViewportSize(ViewportSize.X, ViewportSize.Y);
 
-		FHitResult HitResult;
-		FCollisionQueryParams QueryParams;
-		QueryParams.AddIgnoredActor(this);
-
-		const FVector RayEnd = WorldPosition + WorldDirection * LookRaycastLimit;
-		if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldPosition, RayEnd, ECC_Visibility, QueryParams))
+		FVector2D MouseScreenLocation;
+		if (GetMousePosition(MouseScreenLocation.X, MouseScreenLocation.Y))
 		{
-			AimDirection = (HitResult.ImpactPoint - PlayerCharacter->GetActorLocation()).GetSafeNormal();
-			AimDirection.Z = PlayerCharacter->GetActorLocation().X;
-			ClientSetRotation(AimDirection.Rotation());
+			FVector WorldPosition;
+			FVector WorldDirection;
+			DeprojectScreenPositionToWorld(MouseScreenLocation.X, MouseScreenLocation.Y, WorldPosition, WorldDirection);
+
+			FHitResult HitResult;
+			FCollisionQueryParams QueryParams;
+			QueryParams.AddIgnoredActor(this);
+
+			const FVector RayEnd = WorldPosition + WorldDirection * LookRaycastLimit;
+			if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldPosition, RayEnd, ECC_Visibility, QueryParams))
+			{
+				AimDirection = (HitResult.ImpactPoint - GetPawn()->GetActorLocation()).GetSafeNormal();
+				AimDirection.Z = GetPawn()->GetActorLocation().X;
+				ClientSetRotation(AimDirection.Rotation());
+			}
 		}
 	}
 }
@@ -169,15 +170,21 @@ void ATopDownPlayerController::Interact()
 	if (!CanDoAction())
 		return;
 
-	PlayerCharacter->Interact();
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->Interact();
+	}
 }
 
 void ATopDownPlayerController::Fire()
 {
 	if (!CanDoAction())
 		return;
-
-	PlayerCharacter->Fire(this);
+	
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->Fire(this);
+	}
 }
 
 void ATopDownPlayerController::StopFiring()
@@ -185,7 +192,10 @@ void ATopDownPlayerController::StopFiring()
 	if (!CanDoAction())
 		return;
 
-	PlayerCharacter->StopFiring();
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->StopFiring();
+	}
 }
 
 void ATopDownPlayerController::SwapWeapon()
@@ -193,9 +203,12 @@ void ATopDownPlayerController::SwapWeapon()
 	if (!CanDoAction())
 		return;
 
-	if (UWeaponLoadoutComponent* WeaponLoadoutComponent = PlayerCharacter->GetWeaponLoadoutComponent())
+	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
 	{
-		WeaponLoadoutComponent->EquipNextWeapon();
+		if (UWeaponLoadoutComponent* WeaponLoadoutComponent = PlayerCharacter->GetWeaponLoadoutComponent())
+		{
+			WeaponLoadoutComponent->EquipNextWeapon();
+		}
 	}
 }
 
@@ -204,19 +217,24 @@ void ATopDownPlayerController::ReloadWeapon()
 	if (!CanDoAction())
 		return;
 
-	PlayerCharacter->ReloadWeapon();
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->ReloadWeapon();
+	}
 }
 
 bool ATopDownPlayerController::CanDoAction() const
 {
 	if (bIsGameOver)
 		return false;
-	if (PlayerCharacter == nullptr)
-		return false;
-	if (PlayerCharacter->GetIsDead())
-		return false;
 	if (bIsPaused)
 		return false;
+
+	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		if (PlayerCharacter->GetIsDead())
+			return false;
+	}
 
 	return true;
 }
