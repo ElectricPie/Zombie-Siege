@@ -3,6 +3,7 @@
 
 #include "Components/WeaponLoadoutComponent.h"
 
+#include "Net/UnrealNetwork.h"
 #include "Weapons/Gun.h"
 
 // Sets default values for this component's properties
@@ -11,15 +12,25 @@ UWeaponLoadoutComponent::UWeaponLoadoutComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
-	// ...
+	SetIsReplicatedByDefault(true);
 }
 
-void UWeaponLoadoutComponent::AddWeapon(AGun* NewWeapon, bool bEquip /*= false*/)
+void UWeaponLoadoutComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UWeaponLoadoutComponent, EquippedWeaponIndex);
+	DOREPLIFETIME(UWeaponLoadoutComponent, Weapons);
+}
+
+void UWeaponLoadoutComponent::AddWeapon_Server(AGun* NewWeapon, bool bEquip /*= false*/)
+{
+	check(GetOwner()->HasAuthority());
 	if (NewWeapon == nullptr || Weapons.Contains(NewWeapon))
 		return;
 
+	NewWeapon->SetOwner(GetOwner());
+	
 	// Force equip if there are no weapons
 	if (Weapons.IsEmpty())
 	{

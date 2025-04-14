@@ -20,8 +20,10 @@ public:
 	// Sets default values for this component's properties
 	UWeaponLoadoutComponent();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	UFUNCTION(BlueprintCallable)
-	void AddWeapon(AGun* NewWeapon, bool bEquip = false);
+	void AddWeapon_Server(AGun* NewWeapon, bool bEquip = false);
 	UFUNCTION(BlueprintCallable)
 	AGun* GetEquippedWeapon();
 	UFUNCTION()
@@ -43,8 +45,9 @@ protected:
 	virtual void BeginPlay() override;
 	
 private:
-	UPROPERTY(EditAnywhere, Category="Weapon Loadout", meta=(ClampMin=0, UIMin=0))
+	UPROPERTY(Replicated, EditAnywhere, Category="Weapon Loadout", meta=(ClampMin=0, UIMin=0))
 	int32 EquippedWeaponIndex;
-	UPROPERTY(VisibleAnywhere, Category="Weapon Loadout")
-	TArray<TWeakObjectPtr<AGun>> Weapons;
+	UPROPERTY(Replicated, VisibleAnywhere, Category="Weapon Loadout")
+	TArray<TObjectPtr<AGun>> Weapons;
+
 };

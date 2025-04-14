@@ -80,7 +80,7 @@ void AWeaponBuyPoint::BuyWeapon(UMoneyStoreComponent* MoneyStore,
 	if (UWeaponLoadoutComponent* WeaponLoadoutComponent = ActorToGiveWeapon->FindComponentByClass<UWeaponLoadoutComponent>())
 	{
 		AGun* NewWeapon = GetWorld()->SpawnActor<AGun>(WeaponBuyPointDataAsset->GetWeaponClass(), GetActorTransform());
-		WeaponLoadoutComponent->AddWeapon(NewWeapon, true);
+		WeaponLoadoutComponent->AddWeapon_Server(NewWeapon, true);
 	}
 
 	// TODO: This is temporary until a it is decided how to handle the weapon ammo and multiplayer

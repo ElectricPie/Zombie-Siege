@@ -27,6 +27,8 @@ AGun::AGun()
 
 	FiringArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Firing Direction"));
 	FiringArrow->SetupAttachment(RootComponent);
+
+	bReplicates = true;
 }
 
 void AGun::StartFiring(AController* ShooterController, AActor* ShooterActor)

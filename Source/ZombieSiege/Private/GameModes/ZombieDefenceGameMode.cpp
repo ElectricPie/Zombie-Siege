@@ -76,7 +76,7 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 					continue;
 
 				AGun* NewWeapon = GetWorld()->SpawnActor<AGun>(Weapon);
-				WeaponLoadout->AddWeapon(NewWeapon);
+				WeaponLoadout->AddWeapon_Server(NewWeapon);
 			}
 		}
 
