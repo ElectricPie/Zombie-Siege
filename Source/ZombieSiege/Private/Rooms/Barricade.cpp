@@ -8,6 +8,7 @@
 #include "Components/ArrowComponent.h"
 #include "Interactions/InteractableComponent.h"
 #include "Components/MoneyRewardComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 #define DEFAULT_BARRICADE_REWARD 40
 #define DEFAULT_BARRICADE_TIME_BETWEEN_REWARDS 5
@@ -61,6 +62,7 @@ float ABarricade::TakeDamage(const float DamageAmount, FDamageEvent const& Damag
 	{
 		Plank->SetVisibility(false);
 		DestroyedPlanks++;
+		UGameplayStatics::SpawnEmitterAtLocation(this, HitEffect, Plank->GetComponentLocation(), FRotator::ZeroRotator, true);
 		if (IsDestroyed())
 		{
 			UFMODBlueprintStatics::PlayEventAtLocation(this, DestructionSound, GetTransform(), true);

@@ -84,6 +84,9 @@ private:
 	TObjectPtr<UFMODEvent> HitSound;
 	UPROPERTY(EditAnywhere, Category="Audio")
 	TObjectPtr<UFMODEvent> DestructionSound;
+
+	UPROPERTY(EditAnywhere, Category="Effects")
+	TObjectPtr<UParticleSystem> HitEffect;
 	
 private:
 	UFUNCTION()
