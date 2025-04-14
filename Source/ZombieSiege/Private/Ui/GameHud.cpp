@@ -12,38 +12,6 @@
 #include "ZombieSiege/Public/Ui/WidgetControllers/OverlayWidgetController.h"
 #include "ZombieSiege/Public/Ui/Widgets/ZSiegeUserWidget.h"
 
-void AGameHud::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// Setup Overlay
-	checkf(OverlayWidgetClass, TEXT("Overlay Widget Class is null, please fill out in GameHud Blueprint"));
-	OverlayWidget = CreateWidget<UZSiegeUserWidget>(GetWorld(), OverlayWidgetClass);
-	Widgets.Add(OverlayWidget);
-
-	APlayerController* PlayerController = GetOwningPlayerController();
-	ADefencePlayerState* PlayerState = PlayerController->GetPlayerState<ADefencePlayerState>();
-	const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState);
-
-	OverlayWidgetController = GetOverlayWidgetController(WidgetControllerParams);
-	OverlayWidget->SetWidgetController(OverlayWidgetController);
-	OverlayWidget->AddToViewport();
-	OverlayWidgetController->BroadcastInitialValues();
-
-	checkf(MenuWidgetClass, TEXT("Menu Widget Class is null, please fill out in GameHud Blueprint"));
-	MenuWidget = CreateWidget<UUserWidget>(GetOwningPlayerController(), MenuWidgetClass);
-	MenuWidget->AddToViewport();
-	MenuWidget->SetVisibility(ESlateVisibility::Collapsed);
-	Widgets.Add(MenuWidget);
-
-	checkf(OptionsWidgetClass, TEXT("Options Widget Class is null, please fill out in GameHud Blueprint"));
-	OptionsWidget = CreateWidget<UOptionsWidget>(GetOwningPlayerController(), OptionsWidgetClass.Get());
-	OptionsWidget->AddToViewport();
-	OptionsWidget->SetVisibility(ESlateVisibility::Collapsed);
-	OptionsWidget->OnOptionsClosedEvent.AddDynamic(this, &AGameHud::OnOptionsClosed);
-	Widgets.Add(OptionsWidget);
-}
-
 void AGameHud::ShowGameOver()
 {
 	CollapseAllWidgets();
@@ -113,6 +81,36 @@ void AGameHud::ToggleMenu()
 	}
 
 	OnPauseMenuToggledEvent.Broadcast(bMenuIsOpen);
+}
+
+void AGameHud::InitHud()
+{
+	// Setup Overlay
+	checkf(OverlayWidgetClass, TEXT("Overlay Widget Class is null, please fill out in GameHud Blueprint"));
+	OverlayWidget = CreateWidget<UZSiegeUserWidget>(GetWorld(), OverlayWidgetClass);
+	Widgets.Add(OverlayWidget);
+
+	APlayerController* PlayerController = GetOwningPlayerController();
+	ADefencePlayerState* PlayerState = PlayerController->GetPlayerState<ADefencePlayerState>();
+	const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState);
+
+	OverlayWidgetController = GetOverlayWidgetController(WidgetControllerParams);
+	OverlayWidget->SetWidgetController(OverlayWidgetController);
+	OverlayWidget->AddToViewport();
+	OverlayWidgetController->BroadcastInitialValues();
+
+	checkf(MenuWidgetClass, TEXT("Menu Widget Class is null, please fill out in GameHud Blueprint"));
+	MenuWidget = CreateWidget<UUserWidget>(GetOwningPlayerController(), MenuWidgetClass);
+	MenuWidget->AddToViewport();
+	MenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+	Widgets.Add(MenuWidget);
+
+	checkf(OptionsWidgetClass, TEXT("Options Widget Class is null, please fill out in GameHud Blueprint"));
+	OptionsWidget = CreateWidget<UOptionsWidget>(GetOwningPlayerController(), OptionsWidgetClass.Get());
+	OptionsWidget->AddToViewport();
+	OptionsWidget->SetVisibility(ESlateVisibility::Collapsed);
+	OptionsWidget->OnOptionsClosedEvent.AddDynamic(this, &AGameHud::OnOptionsClosed);
+	Widgets.Add(OptionsWidget);
 }
 
 UOverlayWidgetController* AGameHud::GetOverlayWidgetController(const FWidgetControllerParams& WidgetControllerParams)

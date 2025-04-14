@@ -22,8 +22,6 @@ class ZOMBIESIEGE_API ATopDownPlayerController : public APlayerController, publi
 	GENERATED_BODY()
 
 public:
-	ATopDownPlayerController();
-	
 	FVector GetAimDirection() const { return AimDirection; }
 	void GameOver();
 	void SetInputGameOnly();
@@ -41,6 +39,7 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnRep_PlayerState() override;
 	
 private:
 	void Move(const FInputActionValue& Value);
