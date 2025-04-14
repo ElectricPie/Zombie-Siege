@@ -63,9 +63,6 @@ private:
 	void OnPauseMenuChanged(const bool bMenuIsOpen);
 	
 private:
-	// UPROPERTY(VisibleAnywhere, Category="Money")
-	// TObjectPtr<UMoneyStoreComponent> MoneyStoreComponent;
-	
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
@@ -83,8 +80,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Look")
 	float LookRaycastLimit = 3000.f;
-
-	TWeakObjectPtr<APlayerCharacter> PlayerCharacter;
 	
 	FVector AimDirection = FVector(0.f);
 
