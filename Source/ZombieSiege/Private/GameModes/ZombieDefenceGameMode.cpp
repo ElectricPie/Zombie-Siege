@@ -56,7 +56,7 @@ void AZombieDefenceGameMode::OnPostLogin(AController* NewPlayer)
 	{
 		if (UMoneyStoreComponent* MoneyStore = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(PlayerState))
 		{
-			MoneyStore->SetMoney(StartingMoney);
+			MoneyStore->SetMoney_Server(StartingMoney);
 		}
 	}
 }

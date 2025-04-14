@@ -4,6 +4,7 @@
 #include "Components/MoneyStoreComponent.h"
 
 #include "FMODBlueprintStatics.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values for this component's properties
 UMoneyStoreComponent::UMoneyStoreComponent()
@@ -11,10 +12,20 @@ UMoneyStoreComponent::UMoneyStoreComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
+	SetIsReplicatedByDefault(true);
 }
 
-void UMoneyStoreComponent::SetMoney(const int32 AmountToSetTo)
+void UMoneyStoreComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UMoneyStoreComponent, Money);
+}
+
+void UMoneyStoreComponent::SetMoney_Server(const int32 AmountToSetTo)
+{
+	check(GetOwner()->HasAuthority());
+	
 	Money = AmountToSetTo;
 	OnMoneyChangedEvent.Broadcast(Money, 0);
 }
@@ -51,3 +62,9 @@ bool UMoneyStoreComponent::TakeMoney(const int32 AmountToTake)
 
 	return false;
 }
+
+void UMoneyStoreComponent::OnRep_Money() const
+{
+	OnMoneyChangedEvent.Broadcast(Money, 0);
+}
+

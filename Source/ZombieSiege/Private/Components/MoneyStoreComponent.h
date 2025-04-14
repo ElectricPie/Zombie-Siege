@@ -14,19 +14,22 @@ UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class UMoneyStoreComponent : public UActorComponent
 {
 	GENERATED_BODY()
+
+public:
+	FOnMoneyChangedSignature OnMoneyChangedEvent;
 	
 public:	
 	// Sets default values for this component's properties
 	UMoneyStoreComponent();
 	
-	FOnMoneyChangedSignature OnMoneyChangedEvent;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	/**
 	 * @brief Sets the players money to the provided amount
 	 * @param AmountToSetTo The amount of money to set the player
 	 */
 	UFUNCTION(BlueprintCallable, Category="Money")
-	void SetMoney(const int32 AmountToSetTo);
+	void SetMoney_Server(const int32 AmountToSetTo);
 	/**
 	 * @brief Adds the given amount to the players current money
 	 * @param AmountToAdd The amount of money to add
@@ -45,11 +48,15 @@ public:
 	bool TakeMoney(int32 AmountToTake);
 	
 private:
-	UPROPERTY(VisibleAnywhere, Category="Money")
+	UPROPERTY(ReplicatedUsing=OnRep_Money, VisibleAnywhere, Category="Money")
 	int32 Money = 0;
 
 	UPROPERTY(EditAnywhere, Category="Sound")
 	TObjectPtr<UFMODEvent> MoneyGetSound;
 	UPROPERTY(EditAnywhere, Category="Sound")
 	TObjectPtr<UFMODEvent> MoneySpendSound;
+
+private:
+	UFUNCTION()
+	void OnRep_Money() const;
 };
