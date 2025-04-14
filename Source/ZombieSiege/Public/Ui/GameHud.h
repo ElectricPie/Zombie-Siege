@@ -36,8 +36,9 @@ class AGameHud : public AHUD
 	GENERATED_BODY()
 
 public:
-	virtual void BeginPlay() override;
-
+	FOnPauseMenuToggledSignature OnPauseMenuToggledEvent;
+	
+public:
 	void ShowGameOver();
 
 	UFUNCTION(BlueprintCallable)
@@ -46,13 +47,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ToggleMenu();
 
+	void InitHud();
+
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WidgetControllerParams);
 	UAmmoCounterWidgetController* GetAmmoCounterWidgetController(const FWidgetControllerParams& WidgetControllerParams);
 	UInteractionWidgetController* GetInteractionWidgetController(const FWidgetControllerParams& WidgetControllerParams);
 	UHealthWidgetController* GetHealthWidgetController(const FWidgetControllerParams& WidgetControllerParams);
-
-public:
-	FOnPauseMenuToggledSignature OnPauseMenuToggledEvent;
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Widgets")

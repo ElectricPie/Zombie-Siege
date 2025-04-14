@@ -6,17 +6,10 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "PlayerCharacter.h"
-#include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Ui/GameHud.h"
-
-ATopDownPlayerController::ATopDownPlayerController()
-{
-	// MoneyStoreComponent = CreateDefaultSubobject<UMoneyStoreComponent>(TEXT("Money Store"));
-	// MoneyStoreComponent->OnMoneyChangedEvent.AddUObject(this, &ATopDownPlayerController::OnMoneyChanged);
-}
 
 void ATopDownPlayerController::GameOver()
 {
@@ -115,6 +108,21 @@ void ATopDownPlayerController::OnPossess(APawn* InPawn)
 	if (APlayerCharacter* PossessedPlayerCharacter = Cast<APlayerCharacter>(InPawn))
 	{
 		PlayerCharacter = PossessedPlayerCharacter;
+	}
+
+	if (AGameHud* Hud = Cast<AGameHud>(GetHUD()))
+	{
+		Hud->InitHud();
+	}
+}
+
+void ATopDownPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	if (AGameHud* Hud = Cast<AGameHud>(GetHUD()))
+	{
+		Hud->InitHud();
 	}
 }
 
