@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="Bank" id="{547e5db5-4905-4aef-afc8-879452fe85d2}">
+		<property name="name">
+			<value>Barricade</value>
+		</property>
+		<relationship name="folder">
+			<destination>{2c52528f-535a-41ea-8440-7d107b2fb23d}</destination>
+		</relationship>
+	</object>
+</objects>

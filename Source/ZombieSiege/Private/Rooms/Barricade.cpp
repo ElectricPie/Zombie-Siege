@@ -3,6 +3,7 @@
 
 #include "Rooms/Barricade.h"
 
+#include "FMODBlueprintStatics.h"
 #include "NavLinkComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Interactions/InteractableComponent.h"
@@ -52,12 +53,22 @@ ABarricade::ABarricade()
 float ABarricade::TakeDamage(const float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	if (IsDestroyed()) return 0.f;
+	if (IsDestroyed())
+		return 0.f;
+	
 
 	if (UStaticMeshComponent* Plank = Planks[DestroyedPlanks])
 	{
 		Plank->SetVisibility(false);
 		DestroyedPlanks++;
+		if (IsDestroyed())
+		{
+			UFMODBlueprintStatics::PlayEventAtLocation(this, DestructionSound, GetTransform(), true);
+		}
+		else
+		{
+			UFMODBlueprintStatics::PlayEventAtLocation(this, HitSound, GetTransform(), true);
+		}
 	}
 
 	PlayerInteractionTrigger->SetCanInteract(true);

@@ -6,12 +6,13 @@
 #include "GameFramework/Actor.h"
 #include "Barricade.generated.h"
 
-struct FNavigationLink;
-class UNavLinkComponent;
 
+class UFMODEvent;
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnActiveChangedSignature, ABarricade* /*BarricadeChanging*/,
                                      bool /*bNewActiveState*/);
 
+struct FNavigationLink;
+class UNavLinkComponent;
 class UMoneyRewardComponent;
 class APlayerCharacter;
 class UInteractableComponent;
@@ -78,6 +79,11 @@ private:
 
 	UPROPERTY()
 	TArray<TWeakObjectPtr<AActor>> AgentsCrossing;
+
+	UPROPERTY(EditAnywhere, Category="Audio")
+	TObjectPtr<UFMODEvent> HitSound;
+	UPROPERTY(EditAnywhere, Category="Audio")
+	TObjectPtr<UFMODEvent> DestructionSound;
 	
 private:
 	UFUNCTION()
