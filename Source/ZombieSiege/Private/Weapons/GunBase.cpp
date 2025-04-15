@@ -104,7 +104,7 @@ void AGunBase::Fire_Server_Implementation()
 		return;
 	}
 
-	HandleFireMode(nullptr, nullptr);
+	HandleFireMode();
 }
 
 void AGunBase::StopFiring_Server_Implementation()
@@ -164,7 +164,7 @@ void AGunBase::CancelReload_Server_Implementation()
 	bIsReloading = false;
 }
 
-void AGunBase::SpawnProjectile(AController* ShooterController, AActor* ShooterActor)
+void AGunBase::SpawnProjectile()
 {
 	if (UFMODEvent* FireSound = WeaponStats->GetFireSound())
 	{
@@ -179,8 +179,9 @@ void AGunBase::SpawnProjectile(AController* ShooterController, AActor* ShooterAc
 
 	AGunProjectile* Projectile = GetWorld()->SpawnActor<AGunProjectile>(WeaponStats->GetProjectileClass(),
 	                                                                    SpawnLocation, SpawnRotation, SpawnParameters);
-	Projectile->Init(ShooterController, ShooterActor, WeaponStats->GetProjectileDamageType(),
-	                 WeaponStats->GetProjectileDamage());
+	const FGunProjectileInitData InitData(GetInstigatorController(), GetOwner(), WeaponStats->GetProjectileDamageType(),
+	                                      WeaponStats->GetProjectileDamage());
+	Projectile->InitProjectile(InitData);
 
 	OnGunFiredEvent.Broadcast();
 
@@ -188,40 +189,7 @@ void AGunBase::SpawnProjectile(AController* ShooterController, AActor* ShooterAc
 	OnAmmoChangedEvent.Broadcast(CurrentAmmo, WeaponStats->GetMaxAmmo());
 }
 
-void AGunBase::SingleShot(AController* ShooterController, AActor* ShooterActor)
-{
-	// Stop shooting if out of ammo
-	if (CurrentAmmo <= 0)
-	{
-		// MagEmpty();
-		GetWorld()->GetTimerManager().ClearTimer(ShotTimer);
-		return;
-	}
-
-	SpawnProjectile(ShooterController, ShooterActor);
-}
-
-void AGunBase::BurstShot(AController* ShooterController, AActor* ShooterActor)
-{
-	// Stop burst if out of ammo
-	if (CurrentAmmo <= 0)
-	{
-		MagEmpty();
-		GetWorld()->GetTimerManager().ClearTimer(BurstTimer);
-		return;
-	}
-
-	SpawnProjectile(ShooterController, ShooterActor);
-	BurstShotsFired++;
-
-	// Stop the burst if finished
-	if (BurstShotsFired >= WeaponStats->GetBurstShots())
-	{
-		GetWorld()->GetTimerManager().ClearTimer(BurstTimer);
-	}
-}
-
-void AGunBase::HandleFireMode(AController* ShooterController, AActor* ShooterActor)
+void AGunBase::HandleFireMode()
 {
 	bIsFiring = true;
 	LastFiredTime = GetGameTimeSinceCreation();
@@ -230,24 +198,53 @@ void AGunBase::HandleFireMode(AController* ShooterController, AActor* ShooterAct
 	switch (GetWeaponStats()->GetFireMode())
 	{
 	case EGunFireMode::Single:
-		SpawnProjectile(ShooterController, ShooterActor);
+		SpawnProjectile();
 		break;
 	case EGunFireMode::Burst:
 		{
-			SpawnProjectile(ShooterController, ShooterActor);
+			SpawnProjectile();
 			BurstShotsFired = 1;
 			FTimerDelegate BurstDelegate;
-			BurstDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGunBase, BurstShot), ShooterController,
-			                            ShooterActor);
+			BurstDelegate.BindLambda([this]()
+			{
+				// Stop burst if out of ammo
+				if (CurrentAmmo <= 0)
+				{
+					MagEmpty();
+					GetWorld()->GetTimerManager().ClearTimer(BurstTimer);
+					return;
+				}
+
+				SpawnProjectile();
+				BurstShotsFired++;
+
+				// Stop the burst if finished
+				if (BurstShotsFired >= WeaponStats->GetBurstShots())
+				{
+					GetWorld()->GetTimerManager().ClearTimer(BurstTimer);
+				}
+			});
+
 			GetWorld()->GetTimerManager().SetTimer(BurstTimer, BurstDelegate, WeaponStats->GetShotIntervals(), true);
 			break;
 		}
 	case EGunFireMode::FullAuto:
 		{
-			SpawnProjectile(ShooterController, ShooterActor);
+			SpawnProjectile();
 			FTimerDelegate ShotDelegate;
-			ShotDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(AGunBase, SingleShot), ShooterController,
-			                           ShooterActor);
+			
+			ShotDelegate.BindLambda([this]()
+			{
+				// Stop shooting if out of ammo
+				if (CurrentAmmo <= 0)
+				{
+					// MagEmpty();
+					GetWorld()->GetTimerManager().ClearTimer(ShotTimer);
+					return;
+				}
+
+				SpawnProjectile();
+			});
 			GetWorld()->GetTimerManager().SetTimer(ShotTimer, ShotDelegate, WeaponStats->GetShotIntervals(), true);
 			break;
 		}

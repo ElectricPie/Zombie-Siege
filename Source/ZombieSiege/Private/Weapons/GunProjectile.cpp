@@ -33,12 +33,12 @@ AGunProjectile::AGunProjectile()
 	bReplicates = true;
 }
 
-void AGunProjectile::Init(AController* Controller, AActor* Actor, TSubclassOf<UDamageType> NewDamageType, float NewDamage)
+void AGunProjectile::InitProjectile(const FGunProjectileInitData& InitData)
 {
-	ShooterController = Controller;
-	ShooterActor = Actor;
-	Damage = NewDamage;
-	DamageType = NewDamageType;
+	ShooterController = InitData.Controller;
+	ShooterActor = InitData.Actor;
+	Damage = InitData.Damage;
+	DamageType = InitData.DamageType;
 }
 
 // Called when the game starts or when spawned
@@ -46,7 +46,6 @@ void AGunProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FTimerHandle DestroyHandle;
 	SetLifeSpan(DestroyTime);
 }
 

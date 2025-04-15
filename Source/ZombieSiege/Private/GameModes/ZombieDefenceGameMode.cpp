@@ -66,7 +66,7 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 	Super::RestartPlayer(NewPlayer);
 
 	// Gives the player their starting weapons
-	if (const AActor* PlayerPawn = NewPlayer->GetPawn())
+	if (APawn* PlayerPawn = NewPlayer->GetPawn())
 	{
 		if (UWeaponLoadoutComponent* WeaponLoadout = PlayerPawn->FindComponentByClass<UWeaponLoadoutComponent>())
 		{
@@ -75,7 +75,10 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 				if (Weapon == nullptr)
 					continue;
 
-				AGunBase* NewWeapon = GetWorld()->SpawnActor<AGunBase>(Weapon);
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = PlayerPawn;
+				SpawnParams.Instigator = PlayerPawn;
+				AGunBase* NewWeapon = GetWorld()->SpawnActor<AGunBase>(Weapon, SpawnParams);
 				WeaponLoadout->AddWeapon_Server(NewWeapon);
 			}
 		}
