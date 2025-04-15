@@ -82,13 +82,7 @@ void APlayerCharacter::StopFiring()
 
 void APlayerCharacter::ReloadWeapon()
 {
-	if (WeaponLoadoutComponent->Reload())
-	{
-		if (UAnimMontage* ReloadAnimation = WeaponLoadoutComponent->GetEquippedWeapon()->GetWeaponStats()->GetReloadAnimMontage())
-		{
-			PlayAnimMontage(ReloadAnimation);
-		}
-	}
+	WeaponLoadoutComponent->Reload();
 }
 
 UMoneyStoreComponent* APlayerCharacter::GetMoneyStoreComponent_Implementation() const

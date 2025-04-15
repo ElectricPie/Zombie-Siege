@@ -7,8 +7,10 @@
 #include "FMODEvent.h"
 #include "GunProjectile.h"
 #include "Components/ArrowComponent.h"
+#include "GameFramework/Character.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
-#include "ZombieSiege/Public/Weapons/WeaponStatsDataAsset.h"
+#include "Weapons/WeaponStatsDataAsset.h"
 
 // Sets default values
 AGunBase::AGunBase()
@@ -36,7 +38,7 @@ void AGunBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AGunBase, CurrentAmmo, COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(AGunBase, bIsReloading, COND_OwnerOnly);
+	DOREPLIFETIME(AGunBase, bIsReloading);
 }
 
 void AGunBase::Fire()
@@ -57,21 +59,6 @@ void AGunBase::Reload()
 		return;
 
 	Reload_Server();
-
-	bIsReloading = true;
-
-	// Client reload prediction
-	if (!HasAuthority())
-	{
-		OnReloadStateChangedEvent.Broadcast(true);
-		const float ReloadTime = WeaponStats->GetReloadTime();
-		GetWorldTimerManager().SetTimer(ReloadingTimerHandle, FTimerDelegate::CreateLambda([this]()
-		{
-			OnReloadStateChangedEvent.Broadcast(false);
-			bIsReloading = false;
-			OnAmmoChangedEvent.Broadcast(WeaponStats->GetMaxAmmo(), WeaponStats->GetMaxAmmo());
-		}), ReloadTime, false);
-	}
 }
 
 void AGunBase::SetVisibility(const bool bIsVisible) const
@@ -135,6 +122,7 @@ void AGunBase::Reload_Server_Implementation()
 	if (!CanReload())
 		return;
 
+	UKismetSystemLibrary::PrintString(this, TEXT("Reloading Server"), true, true, FLinearColor::Blue, 5.f);
 	bIsReloading = true;
 	OnReloadStateChangedEvent.Broadcast(true);
 
@@ -144,9 +132,13 @@ void AGunBase::Reload_Server_Implementation()
 	}
 
 	float ReloadTime = WeaponStats->GetReloadTime();
-	if (const UAnimMontage* ReloadMontage = WeaponStats->GetReloadAnimMontage())
+	if (UAnimMontage* ReloadMontage = WeaponStats->GetReloadAnimMontage())
 	{
 		ReloadTime = ReloadMontage->GetPlayLength();
+		if (ACharacter* Character = Cast<ACharacter>(GetOwner()))
+		{
+			Character->PlayAnimMontage(ReloadMontage);
+		}
 	}
 
 	GetWorldTimerManager().SetTimer(ReloadingTimerHandle, FTimerDelegate::CreateLambda([this]()
@@ -272,11 +264,6 @@ void AGunBase::MagEmpty()
 	}
 }
 
-void AGunBase::OnRep_CurrentAmmo() const
-{
-	OnAmmoChangedEvent.Broadcast(CurrentAmmo, WeaponStats->GetMaxAmmo());
-}
-
 bool AGunBase::CanReload() const
 {
 	// Prevent reloading if at max ammo
@@ -284,4 +271,25 @@ bool AGunBase::CanReload() const
 		return false;
 
 	return true;
+}
+
+void AGunBase::OnRep_CurrentAmmo() const
+{
+	OnAmmoChangedEvent.Broadcast(CurrentAmmo, WeaponStats->GetMaxAmmo());
+}
+
+void AGunBase::OnRep_IsReloading() const
+{
+	OnReloadStateChangedEvent.Broadcast(bIsReloading);
+
+	if (bIsReloading)
+	{
+		if (UAnimMontage* ReloadMontage = WeaponStats->GetReloadAnimMontage())
+		{
+			if (ACharacter* Character = Cast<ACharacter>(GetOwner()))
+			{
+				Character->PlayAnimMontage(ReloadMontage);
+			}
+		}
+	}
 }

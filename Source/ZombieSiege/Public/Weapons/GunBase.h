@@ -67,7 +67,7 @@ private:
 	
 	UPROPERTY(ReplicatedUsing=OnRep_CurrentAmmo, VisibleInstanceOnly, Category="Gun|Ammo")
 	int32 CurrentAmmo = 0;
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing=OnRep_IsReloading)
 	bool bIsReloading = false;
 	FTimerHandle ReloadingTimerHandle;
 	
@@ -98,9 +98,10 @@ private:
 	void HandleFireMode(AController* ShooterController, AActor* ShooterActor);
 
 	void MagEmpty();
-
+	bool CanReload() const;
+	
 	UFUNCTION()
 	void OnRep_CurrentAmmo() const;
-
-	bool CanReload() const;
+	UFUNCTION()
+	void OnRep_IsReloading() const;
 };
