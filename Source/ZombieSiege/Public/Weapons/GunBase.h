@@ -88,14 +88,9 @@ private:
 	UFUNCTION(Server, Reliable)
 	void CancelReload_Server();
 	
-	UFUNCTION()
-	void SpawnProjectile(AController* ShooterController, AActor* ShooterActor);
-	UFUNCTION()
-	void SingleShot(AController* ShooterController, AActor* ShooterActor);
-	UFUNCTION()
-	void BurstShot(AController* ShooterController, AActor* ShooterActor);
+	void SpawnProjectile();
 	
-	void HandleFireMode(AController* ShooterController, AActor* ShooterActor);
+	void HandleFireMode();
 
 	void MagEmpty();
 	bool CanReload() const;
