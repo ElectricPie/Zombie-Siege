@@ -8,7 +8,7 @@
 #include "PlayerCharacter.generated.h"
 
 class UHealthComponent;
-class AGun;
+class AGunBase;
 class UAnimMontage;
 class UCameraComponent;
 class UInteractableComponent;
@@ -43,7 +43,7 @@ public:
 	UFUNCTION(BlueprintSetter)
 	UWeaponLoadoutComponent* GetWeaponLoadoutComponent() const { return WeaponLoadoutComponent; }
 
-	void Fire(AController* Shooter);
+	void Fire(AController* Shooter) const;
 	void StopFiring();
 	void ReloadWeapon();
 
@@ -98,7 +98,7 @@ private:
 	FName RifleWeaponSocket = TEXT("RifleSocket");
 
 private:
-	void OnWeaponAdded(AGun* Weapon);
+	void OnWeaponAdded(AGunBase* Weapon);
 	UFUNCTION()
 	void Die(AController* KillInstigator, AActor* KillCauser);
 };

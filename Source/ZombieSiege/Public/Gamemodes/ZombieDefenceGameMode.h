@@ -6,13 +6,13 @@
 #include "GameFramework/GameMode.h"
 #include "ZombieDefenceGameMode.generated.h"
 
-class AGun;
+class AGunBase;
 class AUnitSpawnPoint;
 class AUnitCharacter;
 
 struct FWeightedSpawnPoint
 {
-	TWeakObjectPtr<AUnitSpawnPoint> SpawnPoint;
+	TObjectPtr<AUnitSpawnPoint> SpawnPoint;
 	float LastUsedTime;
 
 	FWeightedSpawnPoint(): SpawnPoint(nullptr), LastUsedTime(0.f) {}
@@ -90,7 +90,7 @@ private:
 	TSet<TObjectPtr<AUnitCharacter>> ActiveUnits;
 
 	UPROPERTY(EditAnywhere, Category="Weapon")
-	TArray<TSubclassOf<AGun>> StartingWeaponClasses;
+	TArray<TSubclassOf<AGunBase>> StartingWeaponClasses;
 
 	FTimerHandle RoundSpawnTimerHandle;
 };

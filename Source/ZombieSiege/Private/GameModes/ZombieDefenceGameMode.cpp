@@ -15,7 +15,7 @@
 #include "States/DefencePlayerState.h"
 #include "Units/UnitSpawnPoint.h"
 #include "Units/UnitCharacter.h"
-#include "Weapons/Gun.h"
+#include "Weapons/GunBase.h"
 
 void AZombieDefenceGameMode::PlayerDeath(const AController* PlayerController)
 {
@@ -75,7 +75,7 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 				if (Weapon == nullptr)
 					continue;
 
-				AGun* NewWeapon = GetWorld()->SpawnActor<AGun>(Weapon);
+				AGunBase* NewWeapon = GetWorld()->SpawnActor<AGunBase>(Weapon);
 				WeaponLoadout->AddWeapon_Server(NewWeapon);
 			}
 		}
@@ -262,7 +262,7 @@ AUnitSpawnPoint* AZombieDefenceGameMode::GetWeightedRandomSpawnPoint() const
 	float TotalWeight = 0.f;
 	for (const auto& WeightedSpawnPoint : ActiveSpawnPoints)
 	{
-		if (!WeightedSpawnPoint->SpawnPoint.IsValid())
+		if (WeightedSpawnPoint->SpawnPoint == nullptr)
 		{
 			continue;
 		}
@@ -274,7 +274,7 @@ AUnitSpawnPoint* AZombieDefenceGameMode::GetWeightedRandomSpawnPoint() const
 	const float RandomWeight = UKismetMathLibrary::RandomFloatInRange(0.f, TotalWeight);
 	for (const auto& WeightedSpawnPoint : ActiveSpawnPoints)
 	{
-		if (!WeightedSpawnPoint->SpawnPoint.IsValid())
+		if (WeightedSpawnPoint->SpawnPoint == nullptr)
 		{
 			continue;
 		}

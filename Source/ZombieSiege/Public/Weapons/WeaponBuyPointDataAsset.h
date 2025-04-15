@@ -6,7 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "WeaponBuyPointDataAsset.generated.h"
 
-class AGun;
+class AGunBase;
 /**
  * 
  */
@@ -17,13 +17,13 @@ class ZOMBIESIEGE_API UWeaponBuyPointDataAsset : public UDataAsset
 
 public:
 	UFUNCTION(BlueprintPure)
-	TSubclassOf<AGun> GetWeaponClass() const { return WeaponClass; }
+	TSubclassOf<AGunBase> GetWeaponClass() const { return WeaponClass; }
 	UFUNCTION(BlueprintPure)
 	int32 GetCost() const { return Cost; }
 	
 private:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AGun> WeaponClass;
+	TSubclassOf<AGunBase> WeaponClass;
 	UPROPERTY(EditDefaultsOnly, meta=(ClampMin=0, UIMin=0))
 	int32 Cost = 100;
 };
