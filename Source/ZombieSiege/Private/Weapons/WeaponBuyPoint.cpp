@@ -3,7 +3,7 @@
 
 #include "Weapons/WeaponBuyPoint.h"
 
-#include "Gun.h"
+#include "Weapons/GunBase.h"
 #include "Interactions/InteractableComponent.h"
 #include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
@@ -57,8 +57,8 @@ void AWeaponBuyPoint::RefreshWeaponMesh() const
 {
 	if (WeaponBuyPointDataAsset && WeaponBuyPointDataAsset->GetWeaponClass())
 	{
-		const AGun* DefaultWeapon = WeaponBuyPointDataAsset->GetWeaponClass()->GetDefaultObject<AGun>();
-		WeaponMeshComponent->SetSkeletalMesh(DefaultWeapon->GetMesh()->GetSkeletalMeshAsset());
+		const AGunBase* DefaultWeapon = WeaponBuyPointDataAsset->GetWeaponClass()->GetDefaultObject<AGunBase>();
+		// WeaponMeshComponent->SetSkeletalMesh(DefaultWeapon->GetMesh()->GetSkeletalMeshAsset());
 	}
 	else
 	{
@@ -79,7 +79,7 @@ void AWeaponBuyPoint::BuyWeapon(UMoneyStoreComponent* MoneyStore,
 	// Adds the weapon to the players loadout
 	if (UWeaponLoadoutComponent* WeaponLoadoutComponent = ActorToGiveWeapon->FindComponentByClass<UWeaponLoadoutComponent>())
 	{
-		AGun* NewWeapon = GetWorld()->SpawnActor<AGun>(WeaponBuyPointDataAsset->GetWeaponClass(), GetActorTransform());
+		AGunBase* NewWeapon = GetWorld()->SpawnActor<AGunBase>(WeaponBuyPointDataAsset->GetWeaponClass(), GetActorTransform());
 		WeaponLoadoutComponent->AddWeapon_Server(NewWeapon, true);
 	}
 

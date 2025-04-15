@@ -10,7 +10,7 @@
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameModes/ZombieDefenceGameMode.h"
-#include "Weapons/Gun.h"
+#include "Weapons/GunBase.h"
 #include "ZombieSiege/Public/Weapons/WeaponStatsDataAsset.h"
 
 // Sets default values
@@ -67,28 +67,22 @@ void APlayerCharacter::Interact()
 	InteractorComponent->Interact();
 }
 
-void APlayerCharacter::Fire(AController* Shooter)
+void APlayerCharacter::Fire(AController* Shooter) const
 {
 	if (bIsReloading)
 		return;
 
-	if (AGun* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
-	{
-		EquippedWeapon->StartFiring(Shooter, this);
-	}
+	WeaponLoadoutComponent->Fire();
 }
 
 void APlayerCharacter::StopFiring()
 {
-	if (AGun* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
-	{
-		EquippedWeapon->StopFiring();
-	}
+	WeaponLoadoutComponent->StopFiring();
 }
 
 void APlayerCharacter::ReloadWeapon()
 {
-	if (WeaponLoadoutComponent->ReloadWeapon())
+	if (WeaponLoadoutComponent->Reload())
 	{
 		if (UAnimMontage* ReloadAnimation = WeaponLoadoutComponent->GetEquippedWeapon()->GetWeaponStats()->GetReloadAnimMontage())
 		{
@@ -102,7 +96,7 @@ UMoneyStoreComponent* APlayerCharacter::GetMoneyStoreComponent_Implementation() 
 	return IMoneyStoreInterface::Execute_GetMoneyStoreComponent(GetController());
 }
 
-void APlayerCharacter::OnWeaponAdded(AGun* Weapon)
+void APlayerCharacter::OnWeaponAdded(AGunBase* Weapon)
 {
 	if (Weapon == nullptr)
 		return;

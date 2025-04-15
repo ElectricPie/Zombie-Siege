@@ -29,6 +29,8 @@ AGunProjectile::AGunProjectile()
 	ProjectileMovementComponent->MaxSpeed = 3000.f;
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->bShouldBounce = false;
+
+	bReplicates = true;
 }
 
 void AGunProjectile::Init(AController* Controller, AActor* Actor, TSubclassOf<UDamageType> NewDamageType, float NewDamage)

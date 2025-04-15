@@ -6,10 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "WeaponLoadoutComponent.generated.h"
 
-class AGun;
+class AGunBase;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChangedSignature, AGun*, NewWeapon);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponAddedSignature, AGun*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChangedSignature, AGunBase*, NewWeapon);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponAddedSignature, AGunBase*);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UWeaponLoadoutComponent : public UActorComponent
@@ -22,19 +22,17 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	void Fire();
+	void StopFiring();
+	bool Reload();
+	
 	UFUNCTION(BlueprintCallable)
-	void AddWeapon_Server(AGun* NewWeapon, bool bEquip = false);
+	void AddWeapon_Server(AGunBase* NewWeapon, bool bEquip = false);
 	UFUNCTION(BlueprintCallable)
-	AGun* GetEquippedWeapon();
+	AGunBase* GetEquippedWeapon();
 	UFUNCTION()
 	void EquipNextWeapon();
 	int32 GetWeaponCount() const { return Weapons.Num(); }
-	
-	/**
-	 * @brief 
-	 * @return 
-	 */
-	bool ReloadWeapon();
 
 public:
 	UPROPERTY(BlueprintAssignable, Category="Weapon Loadout")
@@ -45,9 +43,14 @@ protected:
 	virtual void BeginPlay() override;
 	
 private:
-	UPROPERTY(Replicated, EditAnywhere, Category="Weapon Loadout", meta=(ClampMin=0, UIMin=0))
-	int32 EquippedWeaponIndex;
-	UPROPERTY(Replicated, VisibleAnywhere, Category="Weapon Loadout")
-	TArray<TObjectPtr<AGun>> Weapons;
+	UPROPERTY(ReplicatedUsing=OnRep_EquippedWeaponIndex, EditAnywhere, Category="Weapon Loadout", meta=(ClampMin=0, UIMin=0))
+	int32 EquippedWeaponIndex = -1;
+	UPROPERTY(ReplicatedUsing=OnRep_Weapons, VisibleAnywhere, Category="Weapon Loadout")
+	TArray<TObjectPtr<AGunBase>> Weapons;
 
+private:
+	UFUNCTION()
+	void OnRep_EquippedWeaponIndex();
+	UFUNCTION()
+	void OnRep_Weapons();
 };

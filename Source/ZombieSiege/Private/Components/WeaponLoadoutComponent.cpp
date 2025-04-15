@@ -4,7 +4,7 @@
 #include "Components/WeaponLoadoutComponent.h"
 
 #include "Net/UnrealNetwork.h"
-#include "Weapons/Gun.h"
+#include "Weapons/GunBase.h"
 
 // Sets default values for this component's properties
 UWeaponLoadoutComponent::UWeaponLoadoutComponent()
@@ -23,7 +23,37 @@ void UWeaponLoadoutComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	DOREPLIFETIME(UWeaponLoadoutComponent, Weapons);
 }
 
-void UWeaponLoadoutComponent::AddWeapon_Server(AGun* NewWeapon, bool bEquip /*= false*/)
+void UWeaponLoadoutComponent::Fire()
+{
+	if (AGunBase* Weapon = GetEquippedWeapon())
+	{
+		Weapon->Fire();
+	}
+}
+
+void UWeaponLoadoutComponent::StopFiring()
+{
+	if (AGunBase* Weapon = GetEquippedWeapon())
+	{
+		Weapon->StopFiring();
+	}
+}
+
+bool UWeaponLoadoutComponent::Reload()
+{
+	if (AGunBase* EquippedWeapon = GetEquippedWeapon())
+	{
+		if (EquippedWeapon->GetIsReloading())
+			return false;
+
+		EquippedWeapon->StopFiring();
+		EquippedWeapon->Reload();
+	}
+
+	return true;
+}
+
+void UWeaponLoadoutComponent::AddWeapon_Server(AGunBase* NewWeapon, bool bEquip /*= false*/)
 {
 	check(GetOwner()->HasAuthority());
 	if (NewWeapon == nullptr || Weapons.Contains(NewWeapon))
@@ -37,16 +67,19 @@ void UWeaponLoadoutComponent::AddWeapon_Server(AGun* NewWeapon, bool bEquip /*= 
 		bEquip = true;
 	}
 
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	if (AGunBase* EquippedWeapon = GetEquippedWeapon())
 	{
-		EquippedWeapon->CancelReload();
+		// EquippedWeapon->CancelReload();
 	}
 
 	const int32 NewWeaponIndex = Weapons.Add(NewWeapon);
 	if (bEquip)
 	{
-		// Hide the current weapon
-		Weapons[EquippedWeaponIndex]->SetVisibility(false);
+		// Hide the current weapon if one is equipped
+		if (Weapons.Num() > 0)
+		{
+			Weapons[NewWeaponIndex]->SetVisibility(false);
+		}
 
 		EquippedWeaponIndex = NewWeaponIndex;
 		OnWeaponChangedEvent.Broadcast(NewWeapon);
@@ -59,9 +92,9 @@ void UWeaponLoadoutComponent::AddWeapon_Server(AGun* NewWeapon, bool bEquip /*= 
 	OnWeaponAddedEvent.Broadcast(NewWeapon);
 }
 
-AGun* UWeaponLoadoutComponent::GetEquippedWeapon()
+AGunBase* UWeaponLoadoutComponent::GetEquippedWeapon()
 {
-	if (EquippedWeaponIndex >= Weapons.Num())
+	if (EquippedWeaponIndex >= Weapons.Num() || EquippedWeaponIndex < 0)
 		return nullptr;
 
 	return Weapons[EquippedWeaponIndex].Get();
@@ -73,8 +106,8 @@ void UWeaponLoadoutComponent::EquipNextWeapon()
 	if (Weapons.Num() <= 1)
 		return;
 
-	// Hide the current weapon
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	// Hide the current weapon if one is equipped
+	if (const AGunBase* EquippedWeapon = GetEquippedWeapon())
 	{
 		// Prevent changing weapons while reloading
 		if (EquippedWeapon->GetIsReloading())
@@ -93,33 +126,30 @@ void UWeaponLoadoutComponent::EquipNextWeapon()
 	}
 
 	// Show the new weapon
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	if (AGunBase* EquippedWeapon = GetEquippedWeapon())
 	{
 		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
 		EquippedWeapon->SetVisibility(true);
 	}
 }
 
-bool UWeaponLoadoutComponent::ReloadWeapon()
-{
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
-	{
-		if (EquippedWeapon->GetIsReloading())
-			return false;
-
-		EquippedWeapon->StopFiring();
-		EquippedWeapon->Reload();
-	}
-
-	return true;
-}
-
 void UWeaponLoadoutComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (AGun* EquippedWeapon = GetEquippedWeapon())
+	if (AGunBase* EquippedWeapon = GetEquippedWeapon())
 	{
 		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
 	}
+}
+
+void UWeaponLoadoutComponent::OnRep_EquippedWeaponIndex()
+{
+	OnWeaponChangedEvent.Broadcast(GetEquippedWeapon());
+}
+
+void UWeaponLoadoutComponent::OnRep_Weapons()
+{
+	// Need to be called if any weapons change order or are added/removed
+	OnWeaponChangedEvent.Broadcast(GetEquippedWeapon());
 }

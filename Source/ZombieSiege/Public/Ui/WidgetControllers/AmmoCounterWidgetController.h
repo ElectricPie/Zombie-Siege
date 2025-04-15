@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "WidgetController.h"
-#include "Weapons/Gun.h"
+#include "Weapons/GunBase.h"
 #include "AmmoCounterWidgetController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUiAmmoChangedSignature, int32, CurrentAmmo, int32, MaxAmmo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUiReloadStateChangedSignature, bool, bIsReloading);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUiWeaponChangedSignature, AGun*, NewWeapon);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUiWeaponChangedSignature, AGunBase*, NewWeapon);
 
 /**
  * 
@@ -33,11 +33,11 @@ public:
 
 private:
 	UPROPERTY()
-	TObjectPtr<AGun> CurrentWeapon;
+	TObjectPtr<AGunBase> CurrentWeapon;
 	FDelegateHandle WeaponReloadHandle;
 	FDelegateHandle AmmoChangeHandle;
 	
 private:
 	UFUNCTION()
-	void OnWeaponChanged(AGun* NewWeapon);
+	void OnWeaponChanged(AGunBase* NewWeapon);
 };
