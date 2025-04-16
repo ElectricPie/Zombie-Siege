@@ -2,7 +2,7 @@
 
 #include "Interactions/InteractableComponent.h"
 
-void UInteractableComponent::TryInteract(AController* InteractionInstigator, AActor* InteractionCauser)
+void UInteractableComponent::TryInteract(AController* InteractionInstigator, APawn* InteractionCauser)
 {
 	if (!bCanInteract)
 		return;

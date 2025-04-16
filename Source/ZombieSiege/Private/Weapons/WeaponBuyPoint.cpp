@@ -56,7 +56,7 @@ void AWeaponBuyPoint::BeginPlay()
 	if (HasAuthority())
 	{
 		InteractableComponent->OnInteractEvent.AddLambda(
-		   [this](const AController* InteractionInstigator, const AActor* InteractionCauser)
+		   [this](const AController* InteractionInstigator, APawn* InteractionCauser)
 		   {
 			   if (UMoneyStoreComponent* MoneyStoreComponent = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(InteractionInstigator))
 			   {
@@ -80,7 +80,7 @@ void AWeaponBuyPoint::RefreshWeaponMesh() const
 	}
 }
 
-bool AWeaponBuyPoint::TryBuyWeapon_Server(UMoneyStoreComponent* MoneyStore, const AActor* ActorToGiveWeapon)
+bool AWeaponBuyPoint::TryBuyWeapon_Server(UMoneyStoreComponent* MoneyStore, APawn* ActorToGiveWeapon)
 {
 	check(HasAuthority());
 
@@ -95,8 +95,10 @@ bool AWeaponBuyPoint::TryBuyWeapon_Server(UMoneyStoreComponent* MoneyStore, cons
 	if (UWeaponLoadoutComponent* WeaponLoadoutComponent = ActorToGiveWeapon->FindComponentByClass<
 		UWeaponLoadoutComponent>())
 	{
-		AGunBase* NewWeapon = GetWorld()->SpawnActor<AGunBase>(WeaponBuyPointDataAsset->GetWeaponClass(),
-		                                                       GetActorTransform());
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = ActorToGiveWeapon;
+		SpawnParams.Instigator = ActorToGiveWeapon;
+		AGunBase* NewWeapon = GetWorld()->SpawnActor<AGunBase>(WeaponBuyPointDataAsset->GetWeaponClass(), GetActorTransform(), SpawnParams);
 		WeaponLoadoutComponent->AddWeapon_Server(NewWeapon, true);
 
 		InteractableComponent->InteractionSuccessful();

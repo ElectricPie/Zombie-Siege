@@ -33,7 +33,7 @@ void UInteractorComponent::ServerInteract_Implementation(UInteractableComponent*
 		TimeoutHandle.Invalidate();
 	}), InteractionTimeout, false);
 	
-	CurrentInteractable->TryInteract(GetOwner()->GetInstigatorController(), GetOwner());
+	CurrentInteractable->TryInteract(GetOwner()->GetInstigatorController(), GetOwner<APawn>());
 }
 
 void UInteractorComponent::OnOverlapBegin(const AActor* OtherActor)

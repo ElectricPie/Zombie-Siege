@@ -30,7 +30,6 @@ ABarricade::ABarricade()
 	
 	PlayerInteractionTrigger = CreateDefaultSubobject<UInteractableComponent>(TEXT("Inside Interactable"));
 	PlayerInteractionTrigger->SetupAttachment(RootComponent);
-	PlayerInteractionTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
 	PlayerInteractionTrigger->SetInteractMessage(FText::FromString(DEFAULT_BARRICADE_INTERACT_MESSAGE));
 	
 	InsideDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("Inside Direction Arrow"));
@@ -136,7 +135,14 @@ void ABarricade::StopCrossing(AActor* Agent)
 	}
 }
 
-void ABarricade::OnInteract(AController* InteractionInstigator, AActor* InteractionCauser)
+void ABarricade::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	PlayerInteractionTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
+}
+
+void ABarricade::OnInteract(AController* InteractionInstigator, APawn* InteractionCauser)
 {
 	Repair();
 	MoneyRewardComponent->RewardMoney(InteractionInstigator);

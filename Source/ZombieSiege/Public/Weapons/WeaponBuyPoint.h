@@ -36,5 +36,5 @@ private:
 	UFUNCTION(CallInEditor, Category="Weapon", meta=(DisplayName="ForceMeshRefresh", ToolTip="Forces the weapon mesh to update to match the one in the data asset, this is only needed after changing the mesh in the data asset without restarting the editor"))
 	void RefreshWeaponMesh() const;
 	
-	bool TryBuyWeapon_Server(UMoneyStoreComponent* MoneyStore, const AActor* ActorToGiveWeapon) ;
+	bool TryBuyWeapon_Server(UMoneyStoreComponent* MoneyStore, APawn* ActorToGiveWeapon) ;
 };
