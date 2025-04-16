@@ -41,8 +41,10 @@ void UMoneyStoreComponent::AddMoney(const int32 AmountToAdd)
 	}
 }
 
-bool UMoneyStoreComponent::TakeMoney(const int32 AmountToTake)
+bool UMoneyStoreComponent::TakeMoney_Server(const int32 AmountToTake)
 {
+	check(GetOwner()->HasAuthority());
+	
 	// Invalid amount
 	if (AmountToTake < 0)
 		return false;

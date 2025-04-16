@@ -14,8 +14,7 @@ UInteractorComponent::UInteractorComponent()
 	// ...
 }
 
-
-void UInteractorComponent::Interact()
+void UInteractorComponent::ServerInteract_Implementation()
 {
 	if (CurrentInteractable == nullptr)
 		return;

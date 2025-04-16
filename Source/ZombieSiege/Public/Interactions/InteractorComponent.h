@@ -22,7 +22,8 @@ public:
 	FOnInteractableChangedSignature OnEnterInteractableEvent;
 	FOnInteractableChangedSignature OnExitInteractableEvent;
 
-	void Interact();
+	UFUNCTION(Server, Reliable)
+	void ServerInteract();
 	
 	void AddInteractable(UInteractableComponent* InteractableComponent);
 	void RemoveInteractable(const UInteractableComponent* InteractableComponent);

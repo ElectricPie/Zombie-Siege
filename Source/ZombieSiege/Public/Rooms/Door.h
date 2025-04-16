@@ -48,6 +48,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="Room")
 	TArray<TWeakObjectPtr<ARoom>> ConnectedRooms;
 	
-	UFUNCTION()
-	void BuyDoor(UMoneyStoreComponent* MoneyStore);
+	void TryBuyDoor_Server(UMoneyStoreComponent* MoneyStore);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastDoorOpened();
 };
