@@ -58,5 +58,5 @@ private:
 
 private:
 	UFUNCTION()
-	void OnRep_Money() const;
+	void OnRep_Money(const int32 OldMoney) const;
 };

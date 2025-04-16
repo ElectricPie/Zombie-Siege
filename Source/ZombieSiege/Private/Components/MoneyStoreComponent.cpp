@@ -63,8 +63,8 @@ bool UMoneyStoreComponent::TakeMoney(const int32 AmountToTake)
 	return false;
 }
 
-void UMoneyStoreComponent::OnRep_Money() const
+void UMoneyStoreComponent::OnRep_Money(const int32 OldMoney) const
 {
-	OnMoneyChangedEvent.Broadcast(Money, 0);
+	OnMoneyChangedEvent.Broadcast(Money, Money - OldMoney);
 }
 
