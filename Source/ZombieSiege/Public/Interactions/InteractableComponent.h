@@ -24,6 +24,10 @@ public:
 	FOnInteractableConsumedSignature OnInteractableConsumedEvent;
 	
 public:
+	UInteractableComponent();
+	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	void TryInteract(AController* InteractionInstigator, APawn* InteractionCauser);
 	
 	void SetInteractMessage(const FText& NewInteractMessage) { InteractMessage = NewInteractMessage; }
@@ -39,7 +43,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	FText InteractMessage = FText::FromString("Interact");
 
-	UPROPERTY(EditAnywhere, Category="Interaction")
+	UPROPERTY(Replicated, EditAnywhere, Category="Interaction")
 	bool bCanInteract;
 	UPROPERTY(EditAnywhere, Category="Interaction", meta=(ToolTip="Indicates if the interactable can be consumed after interaction"))
 	bool bCanBeConsumed = false;
