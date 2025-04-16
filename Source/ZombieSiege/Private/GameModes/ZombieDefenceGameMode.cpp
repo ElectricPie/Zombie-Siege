@@ -3,18 +3,18 @@
 
 #include "GameModes/ZombieDefenceGameMode.h"
 
-#include "Units/UnitAiController.h"
 #include "Components/HealthComponent.h"
-#include "Components/MoneyRewardComponent.h"
-#include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Money/MoneyRewardComponent.h"
+#include "Money/MoneyStoreComponent.h"
 #include "Player/TopDownPlayerController.h"
 #include "States/DefenceGameState.h"
 #include "States/DefencePlayerState.h"
-#include "Units/UnitSpawnPoint.h"
+#include "Units/UnitAiController.h"
 #include "Units/UnitCharacter.h"
+#include "Units/UnitSpawnPoint.h"
 #include "Weapons/GunBase.h"
 
 void AZombieDefenceGameMode::PlayerDeath(const AController* PlayerController)

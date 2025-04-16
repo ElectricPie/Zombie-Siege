@@ -35,7 +35,7 @@ public:
 	 * @param AmountToAdd The amount of money to add
 	 */
 	UFUNCTION(BlueprintCallable, Category="Money")
-	void AddMoney(const int32 AmountToAdd);
+	void AddMoney_Server(const int32 AmountToAdd);
 	UFUNCTION(BlueprintPure, Category="Money")
 	int32 GetMoney() const { return Money; }
 	/**
@@ -48,7 +48,7 @@ public:
 	bool TakeMoney_Server(int32 AmountToTake);
 	
 private:
-	UPROPERTY(ReplicatedUsing=OnRep_Money, VisibleAnywhere, Category="Money")
+	UPROPERTY(Replicated, VisibleAnywhere, Category="Money")
 	int32 Money = 0;
 
 	UPROPERTY(EditAnywhere, Category="Sound")
@@ -57,6 +57,6 @@ private:
 	TObjectPtr<UFMODEvent> MoneySpendSound;
 
 private:
-	UFUNCTION()
-	void OnRep_Money(const int32 OldMoney) const;
+	UFUNCTION(Client, Reliable)
+	void ClientMoneyChanged(int32 NewMoney, const int32 AmountChanged);
 };

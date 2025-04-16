@@ -6,8 +6,8 @@
 #include "FMODBlueprintStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/HealthComponent.h"
-#include "Components/MoneyRewardComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Money/MoneyRewardComponent.h"
 
 // Sets default values
 AUnitCharacter::AUnitCharacter()
