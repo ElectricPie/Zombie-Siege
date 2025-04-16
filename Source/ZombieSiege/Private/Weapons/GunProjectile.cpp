@@ -57,6 +57,9 @@ void AGunProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 	CollisionComponent->SetCollisionProfileName("NoCollision");
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	
-	UGameplayStatics::ApplyDamage(OtherActor, Damage, ShooterController.Get(), this, nullptr);
+
+	if (HasAuthority())
+	{
+		UGameplayStatics::ApplyDamage(OtherActor, Damage, ShooterController.Get(), this, nullptr);
+	}
 }
