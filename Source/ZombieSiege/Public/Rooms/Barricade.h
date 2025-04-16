@@ -73,6 +73,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	int32 DestroyedPlanks = 0;
 
+protected:
+	virtual void BeginPlay() override;
+
 private:
 	UPROPERTY(EditAnywhere)
 	bool bIsActive = false;
@@ -90,6 +93,6 @@ private:
 	
 private:
 	UFUNCTION()
-	void OnInteract(AController* InteractionInstigator, AActor* InteractionCauser);
+	void OnInteract(AController* InteractionInstigator, APawn* InteractionCauser);
 
 };

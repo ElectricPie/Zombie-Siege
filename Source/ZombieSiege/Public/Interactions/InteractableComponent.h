@@ -6,7 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "InteractableComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInteractSignature, AController* /*InteractionInstigator*/, AActor* /*InteractionCauser*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInteractSignature, AController* /*InteractionInstigator*/, APawn* /*InteractionCauser*/);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInteractionSuccessfulSignature, const bool /*bWasSuccessful*/, UInteractableComponent* /*SuccessfulInteractableComponent*/);
 DECLARE_MULTICAST_DELEGATE(FOnInteractableConsumedSignature);
 
@@ -24,7 +24,7 @@ public:
 	FOnInteractableConsumedSignature OnInteractableConsumedEvent;
 	
 public:
-	void TryInteract(AController* InteractionInstigator, AActor* InteractionCauser);
+	void TryInteract(AController* InteractionInstigator, APawn* InteractionCauser);
 	
 	void SetInteractMessage(const FText& NewInteractMessage) { InteractMessage = NewInteractMessage; }
 	FText GetInteractMessage() const { return InteractMessage; }

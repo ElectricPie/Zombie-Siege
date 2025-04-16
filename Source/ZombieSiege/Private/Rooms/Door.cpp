@@ -33,7 +33,7 @@ void ADoor::BeginPlay()
 	Super::BeginPlay();
 
 	InteractableTrigger->OnInteractEvent.AddLambda(
-		[this](const AController* InteractionInstigator, const AActor* InteractionCauser)
+		[this](const AController* InteractionInstigator, const APawn* InteractionCauser)
 		{
 			if (UMoneyStoreComponent* MoneyStoreComponent = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(InteractionInstigator))
 			{

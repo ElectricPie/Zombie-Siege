@@ -164,11 +164,6 @@ void AGunBase::CancelReload_Server_Implementation()
 
 void AGunBase::SpawnProjectile()
 {
-	if (UFMODEvent* FireSound = WeaponStats->GetFireSound())
-	{
-		UFMODBlueprintStatics::PlayEventAtLocation(this, FireSound, GetActorTransform(), true);
-	}
-
 	const FActorSpawnParameters SpawnParameters;
 	const FVector SpawnLocation = ProjectileSpawn->GetComponentLocation();
 
@@ -181,10 +176,20 @@ void AGunBase::SpawnProjectile()
 	                                      WeaponStats->GetProjectileDamage());
 	Projectile->InitProjectile(InitData);
 
-	OnGunFiredEvent.Broadcast();
-
 	CurrentAmmo--;
 	OnAmmoChangedEvent.Broadcast(CurrentAmmo, WeaponStats->GetMaxAmmo());
+	
+	SpawnProjectile_Multicast();
+}
+
+void AGunBase::SpawnProjectile_Multicast_Implementation()
+{
+	if (UFMODEvent* FireSound = WeaponStats->GetFireSound())
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(this, FireSound, GetActorTransform(), true);
+	}
+	
+	OnGunFiredEvent.Broadcast();
 }
 
 void AGunBase::HandleFireMode()
@@ -273,7 +278,7 @@ void AGunBase::OnRep_CurrentAmmo() const
 	OnAmmoChangedEvent.Broadcast(CurrentAmmo, WeaponStats->GetMaxAmmo());
 }
 
-void AGunBase::OnRep_IsReloading() const
+void AGunBase::OnRep_IsReloading()
 {
 	OnReloadStateChangedEvent.Broadcast(bIsReloading);
 
@@ -285,6 +290,11 @@ void AGunBase::OnRep_IsReloading() const
 			{
 				Character->PlayAnimMontage(ReloadMontage);
 			}
+		}
+
+		if (UFMODEvent* ReloadSound = WeaponStats->GetReloadSound())
+		{
+			UFMODBlueprintStatics::PlayEventAtLocation(this, ReloadSound, GetActorTransform(), true);
 		}
 	}
 }

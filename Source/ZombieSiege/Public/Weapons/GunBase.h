@@ -89,6 +89,8 @@ private:
 	void CancelReload_Server();
 	
 	void SpawnProjectile();
+	UFUNCTION(NetMulticast, Reliable)
+	void SpawnProjectile_Multicast();
 	
 	void HandleFireMode();
 
@@ -98,5 +100,5 @@ private:
 	UFUNCTION()
 	void OnRep_CurrentAmmo() const;
 	UFUNCTION()
-	void OnRep_IsReloading() const;
+	void OnRep_IsReloading();
 };
