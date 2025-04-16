@@ -77,6 +77,9 @@ protected:
 
 	float SpeedModifier = 0.8f;
 
+protected:
+	virtual void BeginPlay() override;
+	
 private:
 	UPROPERTY(EditAnywhere, Category="Weapon",
 		meta=(ToolTip="The time a reload takes if the equiped gun has no reload animation"))
@@ -100,5 +103,5 @@ private:
 private:
 	void OnWeaponAdded(AGunBase* Weapon);
 	UFUNCTION()
-	void Die(AController* KillInstigator, AActor* KillCauser);
+	void Die_Server(AController* KillInstigator, AActor* KillCauser);
 };

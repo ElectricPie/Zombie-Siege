@@ -36,7 +36,6 @@ APlayerCharacter::APlayerCharacter()
 	WeaponLoadoutComponent->OnWeaponAddedEvent.AddUObject(this, &APlayerCharacter::OnWeaponAdded);
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-	HealthComponent->OnDeathEvent.AddDynamic(this, &APlayerCharacter::Die);
 
 	GetMesh()->SetReceivesDecals(false);
 }
@@ -90,6 +89,16 @@ UMoneyStoreComponent* APlayerCharacter::GetMoneyStoreComponent_Implementation() 
 	return IMoneyStoreInterface::Execute_GetMoneyStoreComponent(GetController());
 }
 
+void APlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (HasAuthority())
+	{
+		HealthComponent->OnDeathEvent.AddUObject(this, &APlayerCharacter::Die_Server);
+	}
+}
+
 void APlayerCharacter::OnWeaponAdded(AGunBase* Weapon)
 {
 	if (Weapon == nullptr)
@@ -112,8 +121,9 @@ void APlayerCharacter::OnWeaponAdded(AGunBase* Weapon)
 	Weapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
 }
 
-void APlayerCharacter::Die(AController* KillInstigator, AActor* KillCauser)
+void APlayerCharacter::Die_Server(AController* KillInstigator, AActor* KillCauser)
 {
+	// TODO: Sub to OnPlayerDeathEvent in gamemode
 	if (AZombieDefenceGameMode* GameMode = Cast<AZombieDefenceGameMode>(GetWorld()->GetAuthGameMode()))
 	{
 		GameMode->PlayerDeath(GetController());
