@@ -181,9 +181,9 @@ void ATopDownPlayerController::Fire()
 	if (!CanDoAction())
 		return;
 	
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
 	{
-		PlayerCharacter->Fire(this);
+		PlayerCharacter->Fire();
 	}
 }
 
@@ -207,7 +207,7 @@ void ATopDownPlayerController::SwapWeapon()
 	{
 		if (UWeaponLoadoutComponent* WeaponLoadoutComponent = PlayerCharacter->GetWeaponLoadoutComponent())
 		{
-			WeaponLoadoutComponent->EquipNextWeapon();
+			WeaponLoadoutComponent->ServerEquipNextWeapon();
 		}
 	}
 }

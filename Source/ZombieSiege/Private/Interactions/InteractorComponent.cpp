@@ -14,31 +14,65 @@ UInteractorComponent::UInteractorComponent()
 	// ...
 }
 
-void UInteractorComponent::ServerInteract_Implementation()
+void UInteractorComponent::ServerInteract_Implementation(UInteractableComponent* InteractableComponent)
 {
-	if (CurrentInteractable == nullptr)
+	if (CurrentInteractable == nullptr || InteractionSuccessfulHandle.IsValid())
 		return;
 
-	CurrentInteractable->Interact(GetOwner()->GetInstigatorController(), GetOwner());
-}
-
-void UInteractorComponent::AddInteractable(UInteractableComponent* InteractableComponent)
-{
-	if (InteractableComponent == nullptr)
-		return;
+	InteractionSuccessfulHandle = CurrentInteractable->OnInteractionSuccessfulEvent.AddLambda(
+	[this](const bool bWasSuccessful, UInteractableComponent* SuccessfulInteractableComponent)
+	{
+		ClientInteractionSuccessful(bWasSuccessful, SuccessfulInteractableComponent);
+		InteractionSuccessfulHandle.Reset();
+		TimeoutHandle.Invalidate();
+	});
 	
-	CurrentInteractable = InteractableComponent;
-	OnEnterInteractableEvent.Broadcast(CurrentInteractable.Get());
+	GetWorld()->GetTimerManager().SetTimer(TimeoutHandle, FTimerDelegate::CreateLambda([this]()
+	{
+		InteractionSuccessfulHandle.Reset();
+		TimeoutHandle.Invalidate();
+	}), InteractionTimeout, false);
+	
+	CurrentInteractable->TryInteract(GetOwner()->GetInstigatorController(), GetOwner());
 }
 
-void UInteractorComponent::RemoveInteractable(const UInteractableComponent* InteractableComponent)
+void UInteractorComponent::OnOverlapBegin(const AActor* OtherActor)
 {
-	if (InteractableComponent == nullptr)
-		return;
-	// Don't want to remove the current one if it's not the one we are leaving
-	if (CurrentInteractable != InteractableComponent)
-		return;
-
-	OnExitInteractableEvent.Broadcast(CurrentInteractable.Get());
-	CurrentInteractable = nullptr;
+	if (UInteractableComponent* InteractableComponent = OtherActor->GetComponentByClass<UInteractableComponent>())
+	{
+		if (InteractableComponent->GetCanInteract())
+		{
+			CurrentInteractable = InteractableComponent;
+			OnEnterInteractableEvent.Broadcast(InteractableComponent);
+		}
+	}
 }
+
+void UInteractorComponent::OnOverlapEnd(const AActor* OtherActor)
+{
+	if (const UInteractableComponent* InteractableComponent = OtherActor->GetComponentByClass<UInteractableComponent>())
+	{
+		if (CurrentInteractable == InteractableComponent)
+		{
+			CurrentInteractable = nullptr;
+			OnExitInteractableEvent.Broadcast(InteractableComponent);
+		}
+	} 
+}
+
+void UInteractorComponent::Interact()
+{
+	ServerInteract(CurrentInteractable.Get());
+}
+
+void UInteractorComponent::ClientInteractionSuccessful_Implementation(const bool bSuccess, UInteractableComponent* InteractableComponent)
+{
+	if (bSuccess)
+	{
+		InteractableComponent->ConsumeInteractable();
+	}
+
+	CurrentInteractable = nullptr;
+	OnExitInteractableEvent.Broadcast(InteractableComponent);
+}
+

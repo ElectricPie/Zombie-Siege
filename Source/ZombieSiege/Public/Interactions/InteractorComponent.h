@@ -8,27 +8,38 @@
 
 class UInteractableComponent;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnInteractableChangedSignature, UInteractableComponent* /*InteractableComponent*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnInteractableChangedSignature, const UInteractableComponent* /*InteractableComponent*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnInteratorSuccessfulSignature, bool /*bSuccess*/);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class UInteractorComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+public:
+	FOnInteractableChangedSignature OnEnterInteractableEvent;
+	FOnInteractableChangedSignature OnExitInteractableEvent;
+	
 public:	
 	// Sets default values for this component's properties
 	UInteractorComponent();
 
-	FOnInteractableChangedSignature OnEnterInteractableEvent;
-	FOnInteractableChangedSignature OnExitInteractableEvent;
+	void OnOverlapBegin(const AActor* OtherActor);
+	void OnOverlapEnd(const AActor* OtherActor);
 
-	UFUNCTION(Server, Reliable)
-	void ServerInteract();
+	void Interact();
 	
-	void AddInteractable(UInteractableComponent* InteractableComponent);
-	void RemoveInteractable(const UInteractableComponent* InteractableComponent);
-
 private:
+	UPROPERTY(EditAnywhere, meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The amout of time to wait before the interaction is considered failed"))
+	float InteractionTimeout = 0.5f;
+	
 	TWeakObjectPtr<UInteractableComponent> CurrentInteractable;
-
+	FDelegateHandle InteractionSuccessfulHandle;
+	FTimerHandle TimeoutHandle;
+	
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerInteract(UInteractableComponent* InteractableComponent);
+	UFUNCTION(Client, Reliable)
+	void ClientInteractionSuccessful(const bool bSuccess, UInteractableComponent* InteractableComponent);
 };

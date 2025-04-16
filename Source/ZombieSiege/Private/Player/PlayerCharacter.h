@@ -38,14 +38,14 @@ public:
 	bool IsMovingForward() const;
 
 	void Move(const FVector Direction);
-	void Interact();
+	void Interact() const;
 
 	UFUNCTION(BlueprintSetter)
 	UWeaponLoadoutComponent* GetWeaponLoadoutComponent() const { return WeaponLoadoutComponent; }
 
-	void Fire(AController* Shooter) const;
-	void StopFiring();
-	void ReloadWeapon();
+	void Fire() const;
+	void StopFiring() const;
+	void ReloadWeapon() const;
 
 	UFUNCTION(BlueprintPure)
 	bool GetIsDead() const { return bIsDead; }
@@ -104,4 +104,10 @@ private:
 	void OnWeaponAdded(AGunBase* Weapon);
 	UFUNCTION()
 	void Die_Server(AController* KillInstigator, AActor* KillCauser);
+	
+	UFUNCTION()
+	void OnOverlap(AActor* OverlappedActor, AActor* OtherActor);
+	UFUNCTION()
+	void OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
+
 };

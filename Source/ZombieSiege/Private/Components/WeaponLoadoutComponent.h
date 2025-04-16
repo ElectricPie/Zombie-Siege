@@ -30,8 +30,8 @@ public:
 	void AddWeapon_Server(AGunBase* NewWeapon, bool bEquip = false);
 	UFUNCTION(BlueprintCallable)
 	AGunBase* GetEquippedWeapon();
-	UFUNCTION()
-	void EquipNextWeapon();
+	UFUNCTION(Server, Reliable)
+	void ServerEquipNextWeapon();
 	int32 GetWeaponCount() const { return Weapons.Num(); }
 
 public:
@@ -50,7 +50,7 @@ private:
 
 private:
 	UFUNCTION()
-	void OnRep_EquippedWeaponIndex();
+	void OnRep_EquippedWeaponIndex(const int32 OldEquippedWeaponIndex);
 	UFUNCTION()
 	void OnRep_Weapons();
 };
