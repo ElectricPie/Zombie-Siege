@@ -100,7 +100,7 @@ void APlayerCharacter::BeginPlay()
 		HealthComponent->OnDeathEvent.AddUObject(this, &APlayerCharacter::Die_Server);
 	}
 
-	if (IsLocallyControlled())
+	if (!HasAuthority())
 	{
 		OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlap);
 		OnActorEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
