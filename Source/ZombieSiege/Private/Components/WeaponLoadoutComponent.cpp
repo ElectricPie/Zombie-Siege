@@ -100,7 +100,7 @@ AGunBase* UWeaponLoadoutComponent::GetEquippedWeapon()
 	return Weapons[EquippedWeaponIndex].Get();
 }
 
-void UWeaponLoadoutComponent::EquipNextWeapon()
+void UWeaponLoadoutComponent::ServerEquipNextWeapon_Implementation()
 {
 	// No need to change weapons if there is only one
 	if (Weapons.Num() <= 1)
@@ -131,6 +131,10 @@ void UWeaponLoadoutComponent::EquipNextWeapon()
 		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
 		EquippedWeapon->SetVisibility(true);
 	}
+	else
+	{
+		OnWeaponChangedEvent.Broadcast(nullptr);
+	}
 }
 
 void UWeaponLoadoutComponent::BeginPlay()
@@ -143,9 +147,24 @@ void UWeaponLoadoutComponent::BeginPlay()
 	}
 }
 
-void UWeaponLoadoutComponent::OnRep_EquippedWeaponIndex()
+void UWeaponLoadoutComponent::OnRep_EquippedWeaponIndex(const int32 OldEquippedWeaponIndex)
 {
+	if (const AGunBase* OldEquippedWeapon = Weapons.IsValidIndex(OldEquippedWeaponIndex) ? Weapons[OldEquippedWeaponIndex] : nullptr)
+	{
+		OldEquippedWeapon->SetVisibility(false);
+	}
+	
 	OnWeaponChangedEvent.Broadcast(GetEquippedWeapon());
+
+	if (AGunBase* EquippedWeapon = GetEquippedWeapon())
+	{
+		OnWeaponChangedEvent.Broadcast(EquippedWeapon);
+		EquippedWeapon->SetVisibility(true);
+	}
+	else
+	{
+		OnWeaponChangedEvent.Broadcast(nullptr);
+	}
 }
 
 void UWeaponLoadoutComponent::OnRep_Weapons()

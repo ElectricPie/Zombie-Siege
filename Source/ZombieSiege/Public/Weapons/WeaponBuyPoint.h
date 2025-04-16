@@ -24,12 +24,6 @@ protected:
 	virtual void BeginPlay() override;
 	
 private:
-	UFUNCTION(CallInEditor, Category="Weapon", meta=(DisplayName="ForceMeshRefresh", ToolTip="Forces the weapon mesh to update to match the one in the data asset"))
-	void RefreshWeaponMesh() const;
-	
-	void BuyWeapon(UMoneyStoreComponent* MoneyStore, const AActor* ActorToGiveWeapon);
-	
-private:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UInteractableComponent> InteractableComponent;
 	UPROPERTY(VisibleAnywhere, Category="Components")
@@ -37,4 +31,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Weapon")
 	TObjectPtr<UWeaponBuyPointDataAsset> WeaponBuyPointDataAsset;
+
+private:
+	UFUNCTION(CallInEditor, Category="Weapon", meta=(DisplayName="ForceMeshRefresh", ToolTip="Forces the weapon mesh to update to match the one in the data asset, this is only needed after changing the mesh in the data asset without restarting the editor"))
+	void RefreshWeaponMesh() const;
+	
+	bool TryBuyWeapon_Server(UMoneyStoreComponent* MoneyStore, const AActor* ActorToGiveWeapon) ;
 };

@@ -61,12 +61,12 @@ void APlayerCharacter::Move(const FVector Direction)
 	AddMovementInput(FVector::RightVector, Direction.Y * SpeedModifier);
 }
 
-void APlayerCharacter::Interact()
+void APlayerCharacter::Interact() const
 {
-	InteractorComponent->ServerInteract();
+	InteractorComponent->Interact();
 }
 
-void APlayerCharacter::Fire(AController* Shooter) const
+void APlayerCharacter::Fire() const
 {
 	if (bIsReloading)
 		return;
@@ -74,12 +74,12 @@ void APlayerCharacter::Fire(AController* Shooter) const
 	WeaponLoadoutComponent->Fire();
 }
 
-void APlayerCharacter::StopFiring()
+void APlayerCharacter::StopFiring() const
 {
 	WeaponLoadoutComponent->StopFiring();
 }
 
-void APlayerCharacter::ReloadWeapon()
+void APlayerCharacter::ReloadWeapon() const
 {
 	WeaponLoadoutComponent->Reload();
 }
@@ -95,7 +95,15 @@ void APlayerCharacter::BeginPlay()
 
 	if (HasAuthority())
 	{
+		OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlap);
+		OnActorEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
 		HealthComponent->OnDeathEvent.AddUObject(this, &APlayerCharacter::Die_Server);
+	}
+
+	if (IsLocallyControlled())
+	{
+		OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlap);
+		OnActorEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
 	}
 }
 
@@ -136,4 +144,14 @@ void APlayerCharacter::Die_Server(AController* KillInstigator, AActor* KillCause
 	}
 
 	OnPlayerDeathEvent.Broadcast(this);
+}
+
+void APlayerCharacter::OnOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	InteractorComponent->OnOverlapBegin(OtherActor);
+}
+
+void APlayerCharacter::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
+{
+	InteractorComponent->OnOverlapEnd(OtherActor);
 }

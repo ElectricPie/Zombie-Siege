@@ -47,7 +47,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool GetIsReloading() const { return bIsReloading; }
 
-// 	USkeletalMeshComponent* GetMesh() const { return GunMesh; }
+ 	USkeletalMeshComponent* GetMesh() const { return GunMesh; }
 
 protected:
 	virtual void BeginPlay() override;

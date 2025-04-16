@@ -6,9 +6,9 @@
 #include "Components/BoxComponent.h"
 #include "InteractableComponent.generated.h"
 
-class UInteractorComponent;
-
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInteractSignature, AController* /*InteractionInstigator*/, AActor* /*InteractionCauser*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInteractionSuccessfulSignature, const bool /*bWasSuccessful*/, UInteractableComponent* /*SuccessfulInteractableComponent*/);
+DECLARE_MULTICAST_DELEGATE(FOnInteractableConsumedSignature);
 
 /**
  * 
@@ -19,26 +19,28 @@ class UInteractableComponent : public UBoxComponent
 	GENERATED_BODY()
 
 public:
-	UInteractableComponent();
-
-	void Interact(AController* InteractionInstigator, AActor* InteractionCauser);
-
 	FOnInteractSignature OnInteractEvent;
-
-	void SetInteractMessage(const FText NewInteractMessage) { InteractMessage = NewInteractMessage; }
-	FText GetInteractMessage() { return InteractMessage; }
+	FOnInteractionSuccessfulSignature OnInteractionSuccessfulEvent;
+	FOnInteractableConsumedSignature OnInteractableConsumedEvent;
+	
+public:
+	void TryInteract(AController* InteractionInstigator, AActor* InteractionCauser);
+	
+	void SetInteractMessage(const FText& NewInteractMessage) { InteractMessage = NewInteractMessage; }
+	FText GetInteractMessage() const { return InteractMessage; }
 	void SetCanInteract(bool bNewCanInteract);
+	bool GetCanInteract() const { return bCanInteract; }
+
+	void InteractionSuccessful();
+
+	void ConsumeInteractable() const;
 	
 private:
 	UPROPERTY(EditAnywhere)
 	FText InteractMessage = FText::FromString("Interact");
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-	UFUNCTION()
-	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	TArray<TWeakObjectPtr<UInteractorComponent>> InteractorsInRange;
 
 	UPROPERTY(EditAnywhere, Category="Interaction")
 	bool bCanInteract;
+	UPROPERTY(EditAnywhere, Category="Interaction", meta=(ToolTip="Indicates if the interactable can be consumed after interaction"))
+	bool bCanBeConsumed = false;
 };
