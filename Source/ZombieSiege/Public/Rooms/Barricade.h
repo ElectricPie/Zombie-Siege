@@ -33,8 +33,6 @@ public:
 	bool IsDestroyed() const { return DestroyedPlanks >= Planks.Num(); }
 
 	UFUNCTION(BlueprintCallable, Category="Barricade")
-	void Repair();
-	UFUNCTION(BlueprintCallable, Category="Barricade")
 	void SetIsActive(const bool bNewIsActive);
 	UFUNCTION(BlueprintPure, Category="Barricade")
 	bool GetIsActive() const { return bIsActive; }
@@ -78,7 +76,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	bool bIsActive = false;
 
-	UPROPERTY()
 	TArray<TWeakObjectPtr<AActor>> AgentsCrossing;
 
 	UPROPERTY(EditAnywhere, Category="Audio")
@@ -94,5 +91,10 @@ private:
 	void OnInteract(AController* InteractionInstigator, APawn* InteractionCauser);
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastDestroyPlank(UStaticMeshComponent* Plank);
+	
+	UFUNCTION(BlueprintCallable, Category="Barricade")
+	void Repair_Server();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRepair();
 
 };
