@@ -8,8 +8,7 @@
 
 
 class UFMODEvent;
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnActiveChangedSignature, ABarricade* /*BarricadeChanging*/,
-                                     bool /*bNewActiveState*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnActiveChangedSignature, ABarricade* /*BarricadeChanging*/, bool /*bNewActiveState*/);
 
 struct FNavigationLink;
 class UNavLinkComponent;
@@ -28,8 +27,7 @@ public:
 	// Sets default values for this actor's properties
 	ABarricade();
 
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	                         AActor* DamageCauser) override;
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Barricade")
 	bool IsDestroyed() const { return DestroyedPlanks >= Planks.Num(); }
@@ -94,5 +92,7 @@ private:
 private:
 	UFUNCTION()
 	void OnInteract(AController* InteractionInstigator, APawn* InteractionCauser);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastDestroyPlank(UStaticMeshComponent* Plank);
 
 };
