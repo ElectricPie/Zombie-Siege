@@ -8,7 +8,6 @@
 #include "GunProjectile.h"
 #include "Components/ArrowComponent.h"
 #include "GameFramework/Character.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Weapons/WeaponStatsDataAsset.h"
 
@@ -122,7 +121,6 @@ void AGunBase::Reload_Server_Implementation()
 	if (!CanReload())
 		return;
 
-	UKismetSystemLibrary::PrintString(this, TEXT("Reloading Server"), true, true, FLinearColor::Blue, 5.f);
 	bIsReloading = true;
 	OnReloadStateChangedEvent.Broadcast(true);
 
