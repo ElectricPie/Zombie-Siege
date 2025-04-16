@@ -7,8 +7,8 @@
 #include "NavLinkComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Interactions/InteractableComponent.h"
-#include "Components/MoneyRewardComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Money/MoneyRewardComponent.h"
 
 #define DEFAULT_BARRICADE_REWARD 40
 #define DEFAULT_BARRICADE_TIME_BETWEEN_REWARDS 5

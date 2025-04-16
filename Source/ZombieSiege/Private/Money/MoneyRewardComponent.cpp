@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Components/MoneyRewardComponent.h"
+#include "Money/MoneyRewardComponent.h"
 
-#include "MoneyStoreComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Money/MoneyStoreComponent.h"
 #include "ZombieSiege/Public/Money/MoneyStoreInterface.h"
 
 // Sets default values for this component's properties
@@ -18,8 +18,10 @@ UMoneyRewardComponent::UMoneyRewardComponent()
 
 int32 UMoneyRewardComponent::RewardMoney(const AActor* ActorToReward)
 {
-	if (ActorToReward == nullptr) return 0;
-	if (GetWorld() == nullptr) return 0;
+	if (ActorToReward == nullptr)
+		return 0;
+	if (GetWorld() == nullptr)
+		return 0;
 
 	const double CurrentTime = UGameplayStatics::GetTimeSeconds(GetWorld());
 	if (TimeBetweenRewards != 0.f)
@@ -32,7 +34,7 @@ int32 UMoneyRewardComponent::RewardMoney(const AActor* ActorToReward)
 
 	if (UMoneyStoreComponent* MoneyStore = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(ActorToReward))
 	{
-		MoneyStore->AddMoney(AmountToGive);	
+		MoneyStore->AddMoney_Server(AmountToGive);
 		LastRewardAt = CurrentTime;
 		
 		return AmountToGive;

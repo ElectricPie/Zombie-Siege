@@ -3,11 +3,11 @@
 
 #include "Weapons/WeaponBuyPoint.h"
 
-#include "Weapons/GunBase.h"
-#include "Interactions/InteractableComponent.h"
-#include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
+#include "Interactions/InteractableComponent.h"
+#include "Money/MoneyStoreComponent.h"
 #include "Money/MoneyStoreInterface.h"
+#include "Weapons/GunBase.h"
 #include "Weapons/WeaponBuyPointDataAsset.h"
 #include "Weapons/WeaponStatsDataAsset.h"
 
