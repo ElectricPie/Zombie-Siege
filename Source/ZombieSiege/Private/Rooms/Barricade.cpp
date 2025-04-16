@@ -68,19 +68,6 @@ float ABarricade::TakeDamage(const float DamageAmount, FDamageEvent const& Damag
 	return DamageAmount;
 }
 
-void ABarricade::Repair()
-{
-	if (AgentsCrossing.Num() > 0) return;
-	
-	for (const auto & Plank : Planks)
-	{
-		Plank->SetVisibility(true);
-	}
-	DestroyedPlanks = 0;
-
-	PlayerInteractionTrigger->SetCanInteract(false);
-}
-
 void ABarricade::SetIsActive(const bool bNewIsActive)
 {
 	bIsActive = bNewIsActive;
@@ -135,7 +122,7 @@ void ABarricade::BeginPlay()
 
 void ABarricade::OnInteract(AController* InteractionInstigator, APawn* InteractionCauser)
 {
-	Repair();
+	Repair_Server();
 	MoneyRewardComponent->RewardMoney(InteractionInstigator);
 }
 
@@ -150,5 +137,26 @@ void ABarricade::MulticastDestroyPlank_Implementation(UStaticMeshComponent* Plan
 	else
 	{
 		UFMODBlueprintStatics::PlayEventAtLocation(this, HitSound, GetTransform(), true);
+	}
+}
+
+void ABarricade::Repair_Server()
+{
+	check(HasAuthority());
+	
+	if (AgentsCrossing.Num() > 0)
+		return;
+	
+	MulticastRepair();
+	DestroyedPlanks = 0;
+
+	PlayerInteractionTrigger->SetCanInteract(false);
+}
+
+void ABarricade::MulticastRepair_Implementation()
+{
+	for (const auto & Plank : Planks)
+	{
+		Plank->SetVisibility(true);
 	}
 }
