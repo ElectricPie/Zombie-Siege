@@ -7,8 +7,8 @@
 #include "Windows/AllowWindowsPlatformTypes.h"
 #include "HealthComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthPercentageChangedSignature, const float /*NewHealthPercentage*/);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDeathSignature, AController*, KillInstigator, AActor*, KillCauser);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthValueChangedSignature, const float /*NewHealthPercentage*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnDeathSignature, AController* /*KillInstigator*/, AActor* /*KillCauser*/);
 
 class UFMODEvent;
 class UFMODAudioComponent;
@@ -19,13 +19,15 @@ class UHealthComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	FOnHealthPercentageChangedSignature OnHealthPercentageChangedEvent;
-	UPROPERTY(BlueprintAssignable)
+	FOnHealthValueChangedSignature OnHealthPercentageChangedEvent;
+	FOnHealthValueChangedSignature OnCurrentHealthChangedEvent;
 	FOnDeathSignature OnDeathEvent;
 	
 public:	
 	// Sets default values for this component's properties
 	UHealthComponent();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -50,9 +52,9 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditAnywhere, Category="Health")
+	UPROPERTY(Replicated, EditAnywhere, Category="Health")
 	float MaxHealth = 30.f;
-	UPROPERTY(VisibleAnywhere, Category="Health")
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentHealth, VisibleAnywhere, Category="Health")
 	float CurrentHealth = 30.f;
 	UPROPERTY(EditAnywhere, Category="Health", meta=(ClampMin=0, UIMin=0, ToolTip="The rate at which health regenerates per second"))
 	float HealthRegenRate = 0.f;
@@ -75,4 +77,7 @@ private:
 private:
 	UFUNCTION()
 	void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+
+	UFUNCTION()
+	void OnRep_CurrentHealth();
 };

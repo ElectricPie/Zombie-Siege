@@ -18,7 +18,6 @@ AUnitCharacter::AUnitCharacter()
 	MoneyRewardComponent = CreateDefaultSubobject<UMoneyRewardComponent>(TEXT("Money Reward"));
 	
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
-	HealthComponent->OnDeathEvent.AddDynamic(this, &AUnitCharacter::Die);
 }
 
 void AUnitCharacter::Attack(AActor* Target)
@@ -52,19 +51,38 @@ void AUnitCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CurrentHealth = MaxHealth;
+	if (HasAuthority())
+	{
+		HealthComponent->OnDeathEvent.AddUObject(this, &AUnitCharacter::Die_Server);
+	}
+	else
+	{
+		HealthComponent->OnCurrentHealthChangedEvent.AddUObject(this, &AUnitCharacter::HealthChange_Client);
+	}
 }
 
-void AUnitCharacter::Die(AController* KillInstigator, AActor* KillCauser)
+void AUnitCharacter::Die_Server(AController* KillInstigator, AActor* KillCauser)
 {
-	// Ragdoll the unit
+	Ragdoll();
+	
+	OnKilledEvent.Broadcast(this, KillInstigator, KillCauser);
+	SetLifeSpan(DeathLifeSpan);
+}
+
+void AUnitCharacter::HealthChange_Client(const float NewCurrentHealth)
+{
+	if (NewCurrentHealth <= 0.f)
+	{
+		Ragdoll();
+	}
+}
+
+void AUnitCharacter::Ragdoll()
+{
 	GetMesh()->SetEnableGravity(true);
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
-	OnKilledEvent.Broadcast(this, KillInstigator, KillCauser);
-	SetLifeSpan(DeathLifeSpan);
 }
 

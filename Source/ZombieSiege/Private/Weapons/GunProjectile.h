@@ -34,7 +34,6 @@ public:
 	AGunProjectile();
 
 	void InitProjectile(const FGunProjectileInitData& InitData);
-	// void Init(AController* Controller, AActor* Actor, TSubclassOf<UDamageType> NewDamageType, float NewDamage);
 
 protected:
 	// Called when the game starts or when spawned
