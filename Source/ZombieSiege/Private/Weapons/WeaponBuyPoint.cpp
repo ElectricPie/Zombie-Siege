@@ -9,6 +9,7 @@
 #include "Components/WeaponLoadoutComponent.h"
 #include "Money/MoneyStoreInterface.h"
 #include "Weapons/WeaponBuyPointDataAsset.h"
+#include "Weapons/WeaponStatsDataAsset.h"
 
 #define DEFAULT_WEAPON_INTERACT_MESSAGE "Buy weapon"
 
@@ -42,6 +43,10 @@ void AWeaponBuyPoint::BeginPlay()
 {
 	Super::BeginPlay();
 
+	const FText DisplayName = WeaponBuyPointDataAsset->GetWeaponClass()->GetDefaultObject<AGunBase>()->GetWeaponStats()->GetDisplayName();
+	const FText InteractMessage = FText::FromString(FString::Printf(TEXT("Buy %s [Costs %d]"), *DisplayName.ToString(), WeaponBuyPointDataAsset->GetCost()));
+	InteractableComponent->SetInteractMessage(InteractMessage);
+	
 	InteractableComponent->OnInteractableConsumedEvent.AddLambda([this]()
 		{
 			SetActorHiddenInGame(true);
@@ -60,13 +65,6 @@ void AWeaponBuyPoint::BeginPlay()
 		   });
 		return;
 	}
-
-	// Client only
-	const FText InteractMessage = FText::FromString(
-		FString::Printf(TEXT("Buy weapon [Costs %d]"), WeaponBuyPointDataAsset->GetCost()));
-	InteractableComponent->SetInteractMessage(InteractMessage);
-
-	
 }
 
 void AWeaponBuyPoint::RefreshWeaponMesh() const
