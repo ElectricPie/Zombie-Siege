@@ -17,14 +17,20 @@ class ADefenceGameState : public AGameState
 	GENERATED_BODY()
 
 public:
+	FOnGameModeRoundChangedSignature OnRoundChangedEvent;
+
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	UFUNCTION(BlueprintPure, Category="Round")
 	int32 GetCurrentRound() const { return CurrentRound; }
 	void StartNextRound();
-
-public:
-	FOnGameModeRoundChangedSignature OnRoundChangedEvent;
 	
 private:
-	UPROPERTY(VisibleAnywhere, Category="Round")
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentRound, VisibleAnywhere, Category="Round")
 	int32 CurrentRound = 0;
+
+private:
+	UFUNCTION()
+	void OnRep_CurrentRound() const;
 };
