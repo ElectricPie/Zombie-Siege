@@ -2,6 +2,20 @@
 
 #include "Interactions/InteractableComponent.h"
 
+#include "Net/UnrealNetwork.h"
+
+UInteractableComponent::UInteractableComponent()
+{
+	SetIsReplicatedByDefault(true);
+}
+
+void UInteractableComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UInteractableComponent, bCanInteract);
+}
+
 void UInteractableComponent::TryInteract(AController* InteractionInstigator, APawn* InteractionCauser)
 {
 	if (!bCanInteract)
