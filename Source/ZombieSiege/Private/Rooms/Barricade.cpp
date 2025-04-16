@@ -48,28 +48,19 @@ ABarricade::ABarricade()
 	Link.Right = FVector(120.f, 0.f, 0.f);
 	Link.Direction = ENavLinkDirection::LeftToRight;
 	NavLinkComponent->Links.Add(Link);
+
+	bReplicates = true;
 }
 
-float ABarricade::TakeDamage(const float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
+float ABarricade::TakeDamage(const float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (IsDestroyed())
 		return 0.f;
-	
 
 	if (UStaticMeshComponent* Plank = Planks[DestroyedPlanks])
 	{
-		Plank->SetVisibility(false);
 		DestroyedPlanks++;
-		UGameplayStatics::SpawnEmitterAtLocation(this, HitEffect, Plank->GetComponentLocation(), FRotator::ZeroRotator, true);
-		if (IsDestroyed())
-		{
-			UFMODBlueprintStatics::PlayEventAtLocation(this, DestructionSound, GetTransform(), true);
-		}
-		else
-		{
-			UFMODBlueprintStatics::PlayEventAtLocation(this, HitSound, GetTransform(), true);
-		}
+		MulticastDestroyPlank(Plank);
 	}
 
 	PlayerInteractionTrigger->SetCanInteract(true);
@@ -146,4 +137,18 @@ void ABarricade::OnInteract(AController* InteractionInstigator, APawn* Interacti
 {
 	Repair();
 	MoneyRewardComponent->RewardMoney(InteractionInstigator);
+}
+
+void ABarricade::MulticastDestroyPlank_Implementation(UStaticMeshComponent* Plank)
+{
+	Plank->SetVisibility(false);
+	UGameplayStatics::SpawnEmitterAtLocation(this, HitEffect, Plank->GetComponentLocation(), FRotator::ZeroRotator, true);
+	if (IsDestroyed())
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(this, DestructionSound, GetTransform(), true);
+	}
+	else
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(this, HitSound, GetTransform(), true);
+	}
 }
