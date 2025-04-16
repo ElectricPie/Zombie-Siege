@@ -45,7 +45,7 @@ public:
 	 * @return Returns true if the money can be taken, false otherwise
 	 */
 	UFUNCTION(BlueprintCallable, Category="Money")
-	bool TakeMoney(int32 AmountToTake);
+	bool TakeMoney_Server(int32 AmountToTake);
 	
 private:
 	UPROPERTY(ReplicatedUsing=OnRep_Money, VisibleAnywhere, Category="Money")

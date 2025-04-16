@@ -63,7 +63,7 @@ void APlayerCharacter::Move(const FVector Direction)
 
 void APlayerCharacter::Interact()
 {
-	InteractorComponent->Interact();
+	InteractorComponent->ServerInteract();
 }
 
 void APlayerCharacter::Fire(AController* Shooter) const

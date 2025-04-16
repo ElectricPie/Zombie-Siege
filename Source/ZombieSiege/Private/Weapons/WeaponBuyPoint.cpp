@@ -73,7 +73,7 @@ void AWeaponBuyPoint::BuyWeapon(UMoneyStoreComponent* MoneyStore,
 		return;
 
 	// Not enough money
-	if (!MoneyStore->TakeMoney(WeaponBuyPointDataAsset->GetCost()))
+	if (!MoneyStore->TakeMoney_Server(WeaponBuyPointDataAsset->GetCost()))
 		return;
 
 	// Adds the weapon to the players loadout
