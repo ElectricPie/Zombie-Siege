@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Components/HealthComponent.h"
+#include "Health/HealthComponent.h"
 
 #include "FMODBlueprintStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -36,13 +36,6 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		CurrentHealth = NewHealth;
 		OnHealthPercentageChangedEvent.Broadcast(GetHealthPercentage());
 	}
-
-	// Health Sound
-	if (HealthSoundComponent)
-	{
-		const float HealthPercentage = GetHealthPercentage();
-		HealthSoundComponent->SetParameter(HealthSoundParameterName, HealthPercentage * 100.f);
-	}
 }
 
 void UHealthComponent::SetMaxHealth(const float NewMaxHealth, const bool bKeepHealthPercentage /*=true*/)
@@ -68,59 +61,51 @@ void UHealthComponent::BeginPlay()
 	{
 		Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OnTakeAnyDamage);
 	}
-
-	if (HealthSound)
-	{
-		HealthSoundComponent = UFMODBlueprintStatics::PlayEventAttached(HealthSound,
-			GetOwner()->GetRootComponent(),
-			NAME_None,
-			FVector::ZeroVector,
-			EAttachLocation::KeepRelativeOffset,
-			true,
-			true,
-			true);
-	}
 }
 
 void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                        AController* InstigatedBy, AActor* DamageCauser)
 {
+	if (!GetOwner()->HasAuthority())
+		return;
+	
+	if (bIsDead)
+		return;
+	
 	CurrentHealth -= Damage;
-
 	OnHealthPercentageChangedEvent.Broadcast(GetHealthPercentage());
 
 	if (CurrentHealth <= 0.f)
 	{
-		// Death
-		if (DeathSound && GetOwner())
-		{
-			UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), DeathSound, GetOwner()->GetActorTransform(), true);
-		}
-		
-		OnDeathEvent.Broadcast(InstigatedBy, DamageCauser);
+		MulticastDie(InstigatedBy, DamageCauser);
 	}
 	else
 	{
-		if (HitSound && GetOwner())
-		{
-			// Only play the sound if one isn't playing already
-			if (!HitSoundComponent.IsValid())
-			{
-				HitSoundComponent = UFMODBlueprintStatics::PlayEventAttached(HitSound,
-					GetOwner()->GetRootComponent(),
-					NAME_None,
-					FVector::ZeroVector,
-					EAttachLocation::KeepRelativeOffset,
-					true,
-					true ,
-					true);
-			}
-		}
+		MulticastHit();
 	}
 }
 
 void UHealthComponent::OnRep_CurrentHealth()
 {
 	OnCurrentHealthChangedEvent.Broadcast(GetHealthPercentage());
+}
+
+void UHealthComponent::MulticastHit_Implementation()
+{
+	if (HitSound)
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), HitSound, GetOwner()->GetActorTransform(), true);
+	}
+}
+
+void UHealthComponent::MulticastDie_Implementation(AController* KillerController, AActor* KillerActor)
+{
+	
+	if (DeathSound)
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), DeathSound, GetOwner()->GetActorTransform(), true);
+	}
+	
+	OnDeathEvent.Broadcast(KillerController, KillerActor);
 }
 

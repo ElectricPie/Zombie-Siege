@@ -3,8 +3,8 @@
 
 #include "GameModes/ZombieDefenceGameMode.h"
 
-#include "Components/HealthComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
+#include "Health/HealthComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Money/MoneyRewardComponent.h"
