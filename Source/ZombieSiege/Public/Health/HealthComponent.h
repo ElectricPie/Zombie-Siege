@@ -53,6 +53,11 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+	UFUNCTION()
+	virtual void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+	
+	UFUNCTION()
+	virtual void OnRep_CurrentHealth();
 
 private:
 	UPROPERTY(Replicated, EditAnywhere, Category="Health")
@@ -73,11 +78,6 @@ private:
 	bool bIsDead = false;
 
 private:
-	UFUNCTION()
-	void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
-
-	UFUNCTION()
-	void OnRep_CurrentHealth();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastDie(AController* KillerController, AActor* KillerActor);

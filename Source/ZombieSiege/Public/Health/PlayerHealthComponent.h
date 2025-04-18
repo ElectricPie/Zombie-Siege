@@ -13,19 +13,21 @@ class ZOMBIESIEGE_API UPlayerHealthComponent : public UHealthComponent
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UFMODAudioComponent> HealthSoundComponent;
-	
-public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void OnRep_CurrentHealth() override;
 	
 private:
-	UPROPERTY(EditAnywhere, Category="Sound")
+	UPROPERTY()
 	TObjectPtr<UFMODEvent> HealthSound;
 	UPROPERTY(EditAnywhere, Category="Sound")
 	FName HealthSoundParameterName = TEXT("Health");
+	UPROPERTY()
+	TObjectPtr<UFMODAudioComponent> HealthSoundComponent;
+
+private:
+	void UpdateHealthSoundParameter() const;
 	
 };
