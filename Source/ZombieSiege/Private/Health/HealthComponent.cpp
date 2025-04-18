@@ -30,7 +30,8 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (bEnableHealthRegen)
+	
+	if (GetOwner()->HasAuthority() && bEnableHealthRegen)
 	{
 		const float NewHealth = FMath::Clamp(CurrentHealth + HealthRegenRate * DeltaTime, 0.f, MaxHealth);
 		CurrentHealth = NewHealth;
@@ -55,12 +56,10 @@ void UHealthComponent::SetMaxHealth(const float NewMaxHealth, const bool bKeepHe
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	CurrentHealth = MaxHealth;
-
-	if (AActor* Owner = GetOwner())
-	{
-		Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OnTakeAnyDamage);
-	}
+	
+	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OnTakeAnyDamage);
 }
 
 void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,

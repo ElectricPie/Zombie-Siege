@@ -6,15 +6,15 @@
 #include "FMODAudioComponent.h"
 #include "FMODBlueprintStatics.h"
 
-void UPlayerHealthComponent::TickComponent(const float DeltaTime, const ELevelTick TickType,
-                                           FActorComponentTickFunction* ThisTickFunction)
+void UPlayerHealthComponent::TickComponent(float DeltaTime, enum ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	if (HealthSoundComponent)
+
+	// For listen server and standalone
+	if (GetOwner()->HasAuthority() && GetOwner<APawn>()->IsLocallyControlled())
 	{
-		const float HealthPercentage = GetHealthPercentage();
-		HealthSoundComponent->SetParameter(HealthSoundParameterName, HealthPercentage * 100.f);
+		UpdateHealthSoundParameter();
 	}
 }
 
@@ -22,10 +22,6 @@ void UPlayerHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Only play sound if the player is local
-	if (!GetOwner<APawn>()->IsLocallyControlled())
-		return;
-	
 	if (HealthSound)
 	{
 		HealthSoundComponent = UFMODBlueprintStatics::PlayEventAttached(
@@ -37,5 +33,22 @@ void UPlayerHealthComponent::BeginPlay()
 			true,
 			true,
 			true);
+	}
+}
+
+void UPlayerHealthComponent::OnRep_CurrentHealth()
+{
+	Super::OnRep_CurrentHealth();
+
+	// For clients
+	UpdateHealthSoundParameter();
+}
+
+void UPlayerHealthComponent::UpdateHealthSoundParameter() const
+{
+	if (GetOwner<APawn>()->IsLocallyControlled() && HealthSoundComponent)
+	{
+		const float HealthPercentage = GetHealthPercentage();
+		HealthSoundComponent->SetParameter(HealthSoundParameterName, HealthPercentage * 100.f);
 	}
 }
