@@ -30,7 +30,7 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	
+
 	if (GetOwner()->HasAuthority() && bEnableHealthRegen)
 	{
 		const float NewHealth = FMath::Clamp(CurrentHealth + HealthRegenRate * DeltaTime, 0.f, MaxHealth);
@@ -56,9 +56,9 @@ void UHealthComponent::SetMaxHealth(const float NewMaxHealth, const bool bKeepHe
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	CurrentHealth = MaxHealth;
-	
+
 	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OnTakeAnyDamage);
 }
 
@@ -67,10 +67,10 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
 {
 	if (!GetOwner()->HasAuthority())
 		return;
-	
+
 	if (bIsDead)
 		return;
-	
+
 	CurrentHealth -= Damage;
 	OnHealthPercentageChangedEvent.Broadcast(GetHealthPercentage());
 
@@ -86,6 +86,7 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
 
 void UHealthComponent::OnRep_CurrentHealth()
 {
+	OnHealthPercentageChangedEvent.Broadcast(GetHealthPercentage());
 	OnCurrentHealthChangedEvent.Broadcast(GetHealthPercentage());
 }
 
@@ -99,12 +100,10 @@ void UHealthComponent::MulticastHit_Implementation()
 
 void UHealthComponent::MulticastDie_Implementation(AController* KillerController, AActor* KillerActor)
 {
-	
 	if (DeathSound)
 	{
 		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), DeathSound, GetOwner()->GetActorTransform(), true);
 	}
-	
+
 	OnDeathEvent.Broadcast(KillerController, KillerActor);
 }
-
