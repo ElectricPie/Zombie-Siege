@@ -18,6 +18,19 @@ void ADefenceGameState::StartNextRound()
 	OnRoundChangedEvent.Broadcast(CurrentRound);
 }
 
+void ADefenceGameState::AddAlivePlayer(AController* Player)
+{
+	check(Player);
+
+	AlivePlayers.AddUnique(Player);
+}
+
+void ADefenceGameState::RemoveAlivePlayer(AController* Player)
+{
+	check(Player);
+	AlivePlayers.Remove(Player);
+}
+
 void ADefenceGameState::OnRep_CurrentRound() const
 {
 	OnRoundChangedEvent.Broadcast(CurrentRound);

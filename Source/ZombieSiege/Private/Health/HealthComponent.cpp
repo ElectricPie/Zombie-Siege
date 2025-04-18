@@ -105,5 +105,5 @@ void UHealthComponent::MulticastDie_Implementation(AController* KillerController
 		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), DeathSound, GetOwner()->GetActorTransform(), true);
 	}
 
-	OnDeathEvent.Broadcast(KillerController, KillerActor);
+	OnDeathEvent.Broadcast(GetOwner(), KillerController, KillerActor);
 }

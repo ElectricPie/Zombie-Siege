@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TopDownPlayerController.h"
+#include "Player/TopDownPlayerController.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "PlayerCharacter.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "Health/HealthComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PlayerCharacter.h"
 #include "Ui/GameHud.h"
 
 void ATopDownPlayerController::GameOver()
@@ -52,12 +52,16 @@ void ATopDownPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (!IsLocalController())
+		return;
+	
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
 		GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(InputMappingContext, 0);
 	}
 
+	// TODO: Setup widget controller for pausing
 	if (AGameHud* GameHud = Cast<AGameHud>(GetHUD()))
 	{
 		GameHud->OnPauseMenuToggledEvent.AddUObject(this, &ATopDownPlayerController::OnPauseMenuChanged);

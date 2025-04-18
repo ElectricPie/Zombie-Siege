@@ -90,11 +90,10 @@ private:
 private:
 	void OnWeaponAdded(AGunBase* Weapon);
 	UFUNCTION()
-	void Die_Server(AController* KillInstigator, AActor* KillCauser);
+	void Die_Server(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
 	
 	UFUNCTION()
 	void OnOverlap(AActor* OverlappedActor, AActor* OtherActor);
 	UFUNCTION()
 	void OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
-	
 };

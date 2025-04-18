@@ -3,15 +3,13 @@
 
 #include "Player/PlayerCharacter.h"
 
-#include "TopDownPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "GameModes/ZombieDefenceGameMode.h"
 #include "Health/PlayerHealthComponent.h"
 #include "Interactions/InteractorComponent.h"
 #include "Weapons/GunBase.h"
-#include "ZombieSiege/Public/Weapons/WeaponStatsDataAsset.h"
+#include "Weapons/WeaponStatsDataAsset.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -128,14 +126,8 @@ void APlayerCharacter::OnWeaponAdded(AGunBase* Weapon)
 	Weapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
 }
 
-void APlayerCharacter::Die_Server(AController* KillInstigator, AActor* KillCauser)
+void APlayerCharacter::Die_Server(AActor* VictimActor, AController* KillerController, AActor* KillerActor)
 {
-	// TODO: Sub to OnPlayerDeathEvent in game mode
-	if (AZombieDefenceGameMode* GameMode = Cast<AZombieDefenceGameMode>(GetWorld()->GetAuthGameMode()))
-	{
-		GameMode->PlayerDeath(GetController());
-	}
-
 	HealthComponent->SetEnableHealthRegen(false);
 }
 

@@ -80,7 +80,7 @@ private:
 	
 private:
 	UFUNCTION()
-	void Die_Server(AController* KillInstigator, AActor* KillCauser);
+	void Die_Server(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
 	void HealthChange_Client(const float NewCurrentHealth);
 
 	void Ragdoll();

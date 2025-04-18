@@ -9,6 +9,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Money/MoneyRewardComponent.h"
 #include "Money/MoneyStoreComponent.h"
+#include "Player/PlayerCharacter.h"
 #include "Player/TopDownPlayerController.h"
 #include "States/DefenceGameState.h"
 #include "States/DefencePlayerState.h"
@@ -16,20 +17,6 @@
 #include "Units/UnitCharacter.h"
 #include "Units/UnitSpawnPoint.h"
 #include "Weapons/GunBase.h"
-
-void AZombieDefenceGameMode::PlayerDeath(const AController* PlayerController)
-{
-	AlivePlayers--;
-	if (ADefencePlayerState* DefencePlayerState = PlayerController->GetPlayerState<ADefencePlayerState>())
-	{
-		DefencePlayerState->AddDeath();
-	}
-
-	if (AlivePlayers <= 0)
-	{
-		GameOver();
-	}
-}
 
 void AZombieDefenceGameMode::BeginPlay()
 {
@@ -47,7 +34,7 @@ void AZombieDefenceGameMode::BeginPlay()
 		                                       RoundStartDelay, true, CurrentSpawnDelay);
 	}
 }
- 
+
 void AZombieDefenceGameMode::OnPostLogin(AController* NewPlayer)
 {
 	Super::OnPostLogin(NewPlayer);
@@ -65,10 +52,13 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 {
 	Super::RestartPlayer(NewPlayer);
 
-	// Gives the player their starting weapons
-	if (APawn* PlayerPawn = NewPlayer->GetPawn())
+	ADefenceGameState* DefenceGameState = GetGameState<ADefenceGameState>();
+	check(DefenceGameState);
+
+	if (APlayerCharacter* PlayerCharacter = NewPlayer->GetPawn<APlayerCharacter>())
 	{
-		if (UWeaponLoadoutComponent* WeaponLoadout = PlayerPawn->FindComponentByClass<UWeaponLoadoutComponent>())
+		// Gives the player their starting weapons
+		if (UWeaponLoadoutComponent* WeaponLoadout = PlayerCharacter->FindComponentByClass<UWeaponLoadoutComponent>())
 		{
 			for (auto& Weapon : StartingWeaponClasses)
 			{
@@ -76,39 +66,17 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 					continue;
 
 				FActorSpawnParameters SpawnParams;
-				SpawnParams.Owner = PlayerPawn;
-				SpawnParams.Instigator = PlayerPawn;
+				SpawnParams.Owner = PlayerCharacter;
+				SpawnParams.Instigator = PlayerCharacter;
 				AGunBase* NewWeapon = GetWorld()->SpawnActor<AGunBase>(Weapon, SpawnParams);
 				WeaponLoadout->AddWeapon_Server(NewWeapon);
 			}
 		}
+		
+		PlayerCharacter->GetHealthComponent_Implementation()->OnDeathEvent.AddDynamic(this, &AZombieDefenceGameMode::PlayerDied);
 
-		AlivePlayers++;
-	}
-}
 
-void AZombieDefenceGameMode::OnUnitKilled(AUnitCharacter* UnitKilled, AController* KillInstigator, AActor* KillCauser)
-{
-	if (!ActiveUnits.Contains(UnitKilled))
-		return;
-
-	UnitsKilledThisRound++;
-	ActiveUnits.Remove(UnitKilled);
-
-	if (UnitsKilledThisRound >= UnitsToBeSpawnedThisRound)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("All units killed, starting new round"));
-		StartNewRound();
-	}
-
-	if (UMoneyRewardComponent* MoneyRewardComponent = UnitKilled->GetMoneyRewardComponent())
-	{
-		MoneyRewardComponent->RewardMoney(KillInstigator);
-	}
-
-	if (ADefencePlayerState* DefencePlayerState = KillInstigator->GetPlayerState<ADefencePlayerState>())
-	{
-		DefencePlayerState->AddKill();
+		DefenceGameState->AddAlivePlayer(NewPlayer);
 	}
 }
 
@@ -116,7 +84,7 @@ void AZombieDefenceGameMode::GetActiveUnitSpawnPoints()
 {
 	if (!GetWorld())
 		return;
-	
+
 	ActiveSpawnPoints.Empty();
 
 	TArray<AActor*> UnitSpawnPoints;
@@ -144,7 +112,7 @@ void AZombieDefenceGameMode::SpawnUnit()
 {
 	if (ActiveSpawnPoints.IsEmpty())
 		return;
-	
+
 	if (ActiveUnits.Num() >= MaxCurrentSpawnedUnits)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Reached max spawned units"));
@@ -167,9 +135,9 @@ void AZombieDefenceGameMode::SpawnUnit()
 		if (UHealthComponent* HealthComponent = NewUnit->GetHealthComponent_Implementation())
 		{
 			HealthComponent->SetMaxHealth(HealthIncreasePerRound * GetGameState<ADefenceGameState>()->GetCurrentRound());
+			HealthComponent->OnDeathEvent.AddDynamic(this, &AZombieDefenceGameMode::UnitKilled);
 		}
 
-		NewUnit->OnKilledEvent.AddUObject(this, &AZombieDefenceGameMode::OnUnitKilled);
 		UnitsSpawnedThisRound++;
 		if (UnitsSpawnedThisRound >= UnitsToBeSpawnedThisRound)
 		{
@@ -291,4 +259,53 @@ AUnitSpawnPoint* AZombieDefenceGameMode::GetWeightedRandomSpawnPoint() const
 
 	ActiveSpawnPoints[0]->LastUsedTime = GetWorld()->GetTimeSeconds();
 	return ActiveSpawnPoints[0]->SpawnPoint.Get();
+}
+
+void AZombieDefenceGameMode::PlayerDied(AActor* VictimActor, AController* KillerController, AActor* KillerActor)
+{
+	const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(VictimActor);
+	check(PlayerCharacter);
+	APlayerController* PlayerController = Cast<APlayerController>(PlayerCharacter->GetController());
+	check(PlayerController);
+	ADefenceGameState* DefenceGameState = GetGameState<ADefenceGameState>();
+	check(DefenceGameState);
+	ADefencePlayerState* DefencePlayerState = PlayerController->GetPlayerState<ADefencePlayerState>();
+	if (!ensure(DefencePlayerState))
+		return;
+
+	DefencePlayerState->AddDeath();
+	DefenceGameState->RemoveAlivePlayer(PlayerController);
+
+	if (DefenceGameState->GetAlivePlayersCount() <= 0)
+	{
+		GameOver();
+	}
+}
+
+void AZombieDefenceGameMode::UnitKilled(AActor* VictimActor, AController* KillerController, AActor* KillerActor)
+{
+	AUnitCharacter* UnitKilled = Cast<AUnitCharacter>(VictimActor);
+	check(UnitKilled);
+	
+	if (!ActiveUnits.Contains(UnitKilled))
+		return;
+
+	UnitsKilledThisRound++;
+	ActiveUnits.Remove(UnitKilled);
+
+	if (UnitsKilledThisRound >= UnitsToBeSpawnedThisRound)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("All units killed, starting new round"));
+		StartNewRound();
+	}
+
+	if (UMoneyRewardComponent* MoneyRewardComponent = UnitKilled->GetMoneyRewardComponent())
+	{
+		MoneyRewardComponent->RewardMoney(KillerController);
+	}
+
+	if (ADefencePlayerState* DefencePlayerState = KillerController->GetPlayerState<ADefencePlayerState>())
+	{
+		DefencePlayerState->AddKill();
+	}
 }
