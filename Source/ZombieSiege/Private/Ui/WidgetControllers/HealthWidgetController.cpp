@@ -8,9 +8,9 @@
 
 void UHealthWidgetController::BindCallbackToDependencies()
 {
-	if (const APlayerCharacter* PlayerCharacter = PlayerController->GetPawn<APlayerCharacter>())
+	if (const IHealthComponentInterface* HealthInterface = PlayerController->GetPawn<APlayerCharacter>())
 	{
-		UHealthComponent* HealthComponent = PlayerCharacter->GetPlayerHealthComponent();
+		UHealthComponent* HealthComponent = HealthInterface->GetHealthComponent_Implementation();;
 		HealthComponent->OnHealthPercentageChangedEvent.AddLambda([this](const float NewHealthPercentage)
 		{
 			OnHealthPercentageChangedEvent.Broadcast(NewHealthPercentage);
@@ -20,9 +20,9 @@ void UHealthWidgetController::BindCallbackToDependencies()
 
 void UHealthWidgetController::BroadcastInitialValues()
 {
-	if (const APlayerCharacter* PlayerCharacter = PlayerController->GetPawn<APlayerCharacter>())
+	if (const IHealthComponentInterface* HealthInterface = PlayerController->GetPawn<APlayerCharacter>())
 	{
-		const UHealthComponent* HealthComponent = PlayerCharacter->GetPlayerHealthComponent();
+		const UHealthComponent* HealthComponent = HealthInterface->GetHealthComponent_Implementation();
 		OnHealthPercentageChangedEvent.Broadcast(HealthComponent->GetHealthPercentage());
 	}
 }

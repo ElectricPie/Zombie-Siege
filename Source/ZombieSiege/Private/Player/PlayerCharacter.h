@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Health/HealthComponentInterface.h"
 #include "ZombieSiege/Public/Money/MoneyStoreInterface.h"
 #include "PlayerCharacter.generated.h"
 
@@ -17,7 +18,7 @@ class USpringArmComponent;
 class UWeaponLoadoutComponent;
 
 UCLASS()
-class APlayerCharacter : public ACharacter, public IMoneyStoreInterface
+class APlayerCharacter : public ACharacter, public IMoneyStoreInterface, public IHealthComponentInterface
 {
 	GENERATED_BODY()
 
@@ -45,11 +46,12 @@ public:
 	/* MoneyStoreInterface */
 	virtual UMoneyStoreComponent* GetMoneyStoreComponent_Implementation() const override;
 	/* End MoneyStoreInterface */
+	/* HealthComponentInterface */
+	virtual UHealthComponent* GetHealthComponent_Implementation() const override;
+	/* End HealthComponentInterface */
 
 	UFUNCTION(BlueprintPure)
 	UInteractorComponent* GetInteractorComponent() const { return InteractorComponent; }
-	UFUNCTION(BlueprintPure)
-	UPlayerHealthComponent* GetPlayerHealthComponent() const { return HealthComponent; }
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")

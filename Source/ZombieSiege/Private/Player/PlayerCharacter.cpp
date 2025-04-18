@@ -83,6 +83,11 @@ UMoneyStoreComponent* APlayerCharacter::GetMoneyStoreComponent_Implementation() 
 	return IMoneyStoreInterface::Execute_GetMoneyStoreComponent(GetController());
 }
 
+UHealthComponent* APlayerCharacter::GetHealthComponent_Implementation() const
+{
+	return HealthComponent;
+}
+
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
