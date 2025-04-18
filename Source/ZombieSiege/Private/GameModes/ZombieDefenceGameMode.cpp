@@ -164,7 +164,7 @@ void AZombieDefenceGameMode::SpawnUnit()
 	{
 		ActiveUnits.Add(NewUnit);
 
-		if (UHealthComponent* HealthComponent = NewUnit->GetHealthComponent())
+		if (UHealthComponent* HealthComponent = NewUnit->GetHealthComponent_Implementation())
 		{
 			HealthComponent->SetMaxHealth(HealthIncreasePerRound * GetGameState<ADefenceGameState>()->GetCurrentRound());
 		}

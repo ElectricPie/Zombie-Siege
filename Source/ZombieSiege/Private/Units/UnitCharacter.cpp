@@ -47,6 +47,11 @@ void AUnitCharacter::SetTargetBarricade(ABarricade* NewTargetBarricade)
 	TargetBarricade = NewTargetBarricade;
 }
 
+UHealthComponent* AUnitCharacter::GetHealthComponent_Implementation() const
+{
+	return HealthComponent;
+}
+
 void AUnitCharacter::BeginPlay()
 {
 	Super::BeginPlay();

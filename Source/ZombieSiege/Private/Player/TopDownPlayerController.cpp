@@ -8,7 +8,7 @@
 #include "PlayerCharacter.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/PlayerState.h"
-#include "Health/PlayerHealthComponent.h"
+#include "Health/HealthComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Ui/GameHud.h"
 
@@ -231,9 +231,9 @@ bool ATopDownPlayerController::CanDoAction() const
 	if (bIsPaused)
 		return false;
 
-	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	if (const IHealthComponentInterface* HealthComponentInterface = Cast<APlayerCharacter>(GetPawn()))
 	{
-		if (PlayerCharacter->GetPlayerHealthComponent()->GetIsDead())
+		if (HealthComponentInterface->GetHealthComponent_Implementation()->GetIsDead())
 			return false;
 	}
 

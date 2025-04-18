@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Health/HealthComponentInterface.h"
 #include "UnitCharacter.generated.h"
 
 class UHealthComponent;
@@ -15,7 +16,7 @@ class UMoneyRewardComponent;
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnUnitKilledSingature, AUnitCharacter* /*UnitKilled*/, AController* /*KillInstigator*/, AActor* /*KillCauser*/)
 
 UCLASS()
-class AUnitCharacter : public ACharacter
+class AUnitCharacter : public ACharacter, public IHealthComponentInterface
 {
 	GENERATED_BODY()
 
@@ -35,8 +36,10 @@ public:
 
 	UFUNCTION(BlueprintPure, Category="Money")
 	UMoneyRewardComponent* GetMoneyRewardComponent() const { return MoneyRewardComponent; }
-	UFUNCTION(BlueprintPure, Category="Health")
-	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
+
+	/* HealthComponentInterface */
+	virtual UHealthComponent* GetHealthComponent_Implementation() const override;
+	/* End HealthComponentInterface */
 	
 public:
 	FOnUnitKilledSingature OnKilledEvent;
