@@ -66,11 +66,11 @@ void AUnitCharacter::BeginPlay()
 	}
 }
 
-void AUnitCharacter::Die_Server(AController* KillInstigator, AActor* KillCauser)
+void AUnitCharacter::Die_Server(AActor* VictimActor, AController* KillerController, AActor* KillerActor)
 {
 	Ragdoll();
 	
-	OnKilledEvent.Broadcast(this, KillInstigator, KillCauser);
+	OnKilledEvent.Broadcast(this, KillerController, KillerActor);
 	SetLifeSpan(DeathLifeSpan);
 }
 

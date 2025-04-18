@@ -8,7 +8,7 @@
 #include "HealthComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthValueChangedSignature, const float /*NewHealthPercentage*/);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDeathSignature, AController*, KillerController, AActor*, KillerActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnDeathSignature, AActor*, VictimActor, AController*, KillerController, AActor*, KillerActor);
 
 class UFMODEvent;
 class UFMODAudioComponent;

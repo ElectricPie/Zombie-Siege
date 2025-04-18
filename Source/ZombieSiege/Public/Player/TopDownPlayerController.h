@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "ZombieSiege/Public/Money/MoneyStoreInterface.h"
+#include "Money/MoneyStoreInterface.h"
 #include "TopDownPlayerController.generated.h"
 
 class UMoneyStoreComponent;
@@ -40,28 +40,7 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnRep_PlayerState() override;
-	
-private:
-	void Move(const FInputActionValue& Value);
-	void FaceMouse();
-	
-	void Interact();
-	
-	void Fire();
-	void StopFiring();
-	void SwapWeapon();
-	void ReloadWeapon();
 
-	/**
-	 * @brief Check if the player can do any action, this includes checking if the game is over or if the player
-	 * character is valid and dead
-	 * @return True if the player can do any action, false otherwise
-	 */
-	bool CanDoAction() const;
-
-	void ToggleMenu();
-	void OnPauseMenuChanged(const bool bMenuIsOpen);
-	
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
@@ -84,4 +63,25 @@ private:
 	FVector AimDirection = FVector(0.f);
 
 	bool bIsGameOver = false;
+	
+private:
+	void Move(const FInputActionValue& Value);
+	void FaceMouse();
+	
+	void Interact();
+	
+	void Fire();
+	void StopFiring();
+	void SwapWeapon();
+	void ReloadWeapon();
+
+	/**
+	 * @brief Check if the player can do any action, this includes checking if the game is over or if the player
+	 * character is valid and dead
+	 * @return True if the player can do any action, false otherwise
+	 */
+	bool CanDoAction() const;
+
+	void ToggleMenu();
+	void OnPauseMenuChanged(const bool bMenuIsOpen);
 };

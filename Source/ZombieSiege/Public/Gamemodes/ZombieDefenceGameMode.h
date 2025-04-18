@@ -31,35 +31,16 @@ UCLASS()
 class AZombieDefenceGameMode : public AGameMode
 {
 	GENERATED_BODY()
-
-public:
-	void PlayerDeath(const AController* PlayerController);
 	
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	virtual void RestartPlayer(AController* NewPlayer) override;
-
-private:
-	void OnUnitKilled(AUnitCharacter* UnitKilled, AController* KillInstigator, AActor* KillCauser);
-
-	void GetActiveUnitSpawnPoints();
-	void SpawnUnit();
-
-	void StartNewRound();
-	void ResetRoundStats();
-
-	void OnSpawnPointActiveStateChanged(AUnitSpawnPoint* SpawnPoint, bool bNewActiveState);
-
-	void GameOver();
-	AUnitSpawnPoint* GetWeightedRandomSpawnPoint() const;
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))
 	int32 StartingMoney = 500;
-	UPROPERTY(VisibleAnywhere, Category="Player")
-	int32 AlivePlayers = 0;
-
+	
 	UPROPERTY(EditAnywhere, Category="Spawning")
 	TSubclassOf<AUnitCharacter> UnitClass;
 	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=1, UIMin=1, ToolTip="The maximum amount of units that can be spawned in at one time"))
@@ -93,4 +74,21 @@ private:
 	TArray<TSubclassOf<AGunBase>> StartingWeaponClasses;
 
 	FTimerHandle RoundSpawnTimerHandle;
+
+private:
+	void GetActiveUnitSpawnPoints();
+	void SpawnUnit();
+
+	void StartNewRound();
+	void ResetRoundStats();
+
+	void OnSpawnPointActiveStateChanged(AUnitSpawnPoint* SpawnPoint, bool bNewActiveState);
+
+	void GameOver();
+	AUnitSpawnPoint* GetWeightedRandomSpawnPoint() const;
+	
+	UFUNCTION()
+	void PlayerDied(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
+	UFUNCTION()
+	void UnitKilled(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
 };

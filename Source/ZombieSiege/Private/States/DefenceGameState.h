@@ -25,11 +25,19 @@ public:
 	UFUNCTION(BlueprintPure, Category="Round")
 	int32 GetCurrentRound() const { return CurrentRound; }
 	void StartNextRound();
+
+	void AddAlivePlayer(AController* Player);
+	void RemoveAlivePlayer(AController* Player);
+	int32 GetAlivePlayersCount() const { return AlivePlayers.Num(); }
+	UFUNCTION(BlueprintCallable)
+	TArray<AController*> GetAlivePlayers() const { return AlivePlayers; }
 	
 private:
 	UPROPERTY(ReplicatedUsing=OnRep_CurrentRound, VisibleAnywhere, Category="Round")
 	int32 CurrentRound = 0;
-
+	UPROPERTY()
+	TArray<TObjectPtr<AController>> AlivePlayers;
+	
 private:
 	UFUNCTION()
 	void OnRep_CurrentRound() const;
