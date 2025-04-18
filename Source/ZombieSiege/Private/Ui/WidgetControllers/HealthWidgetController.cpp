@@ -3,14 +3,14 @@
 
 #include "Ui/WidgetControllers/HealthWidgetController.h"
 
-#include "Components/HealthComponent.h"
+#include "Health/PlayerHealthComponent.h"
 #include "Player/PlayerCharacter.h"
 
 void UHealthWidgetController::BindCallbackToDependencies()
 {
 	if (const APlayerCharacter* PlayerCharacter = PlayerController->GetPawn<APlayerCharacter>())
 	{
-		UHealthComponent* HealthComponent = PlayerCharacter->GetHealthComponent();
+		UHealthComponent* HealthComponent = PlayerCharacter->GetPlayerHealthComponent();
 		HealthComponent->OnHealthPercentageChangedEvent.AddLambda([this](const float NewHealthPercentage)
 		{
 			OnHealthPercentageChangedEvent.Broadcast(NewHealthPercentage);
@@ -22,7 +22,7 @@ void UHealthWidgetController::BroadcastInitialValues()
 {
 	if (const APlayerCharacter* PlayerCharacter = PlayerController->GetPawn<APlayerCharacter>())
 	{
-		const UHealthComponent* HealthComponent = PlayerCharacter->GetHealthComponent();
+		const UHealthComponent* HealthComponent = PlayerCharacter->GetPlayerHealthComponent();
 		OnHealthPercentageChangedEvent.Broadcast(HealthComponent->GetHealthPercentage());
 	}
 }

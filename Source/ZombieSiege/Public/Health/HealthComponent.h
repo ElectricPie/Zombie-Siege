@@ -8,12 +8,12 @@
 #include "HealthComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthValueChangedSignature, const float /*NewHealthPercentage*/);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnDeathSignature, AController* /*KillInstigator*/, AActor* /*KillCauser*/);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDeathSignature, AController*, KillerController, AActor*, KillerActor);
 
 class UFMODEvent;
 class UFMODAudioComponent;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class UHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -21,6 +21,7 @@ class UHealthComponent : public UActorComponent
 public:
 	FOnHealthValueChangedSignature OnHealthPercentageChangedEvent;
 	FOnHealthValueChangedSignature OnCurrentHealthChangedEvent;
+	UPROPERTY(BlueprintAssignable)
 	FOnDeathSignature OnDeathEvent;
 	
 public:	
@@ -40,6 +41,8 @@ public:
 	float GetCurrentHealth() const { return CurrentHealth; }
 	UFUNCTION(BlueprintPure, Category="Health")
 	float GetHealthPercentage() const { return CurrentHealth / MaxHealth; }
+	UFUNCTION(BlueprintPure, Category="Health")
+	bool GetIsDead() const { return bIsDead; }
 	/**
 	 * @brief Sets the max health
 	 * @param NewMaxHealth The new maximum health value
@@ -65,14 +68,9 @@ private:
 	TObjectPtr<UFMODEvent> HitSound;
 	UPROPERTY(EditAnywhere, Category="Sound")
 	TObjectPtr<UFMODEvent> DeathSound;
-	UPROPERTY(EditAnywhere, Category="Sound")
-	TObjectPtr<UFMODEvent> HealthSound;
-	UPROPERTY(EditAnywhere, Category="Sound")
-	FName HealthSoundParameterName = TEXT("Health");
-	UPROPERTY()
-	TObjectPtr<UFMODAudioComponent> HealthSoundComponent = nullptr;
-	
-	TWeakObjectPtr<UFMODAudioComponent> HitSoundComponent = nullptr;
+
+	UPROPERTY(Replicated)
+	bool bIsDead = false;
 
 private:
 	UFUNCTION()
@@ -80,4 +78,9 @@ private:
 
 	UFUNCTION()
 	void OnRep_CurrentHealth();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastDie(AController* KillerController, AActor* KillerActor);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastHit();
 };

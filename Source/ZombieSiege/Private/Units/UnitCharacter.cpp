@@ -5,7 +5,7 @@
 
 #include "FMODBlueprintStatics.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/HealthComponent.h"
+#include "Health/HealthComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Money/MoneyRewardComponent.h"
 
@@ -53,7 +53,7 @@ void AUnitCharacter::BeginPlay()
 
 	if (HasAuthority())
 	{
-		HealthComponent->OnDeathEvent.AddUObject(this, &AUnitCharacter::Die_Server);
+		HealthComponent->OnDeathEvent.AddDynamic(this, &AUnitCharacter::Die_Server);
 	}
 	else
 	{

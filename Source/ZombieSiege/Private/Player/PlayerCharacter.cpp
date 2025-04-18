@@ -5,11 +5,11 @@
 
 #include "TopDownPlayerController.h"
 #include "Camera/CameraComponent.h"
-#include "Components/HealthComponent.h"
-#include "Interactions/InteractorComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameModes/ZombieDefenceGameMode.h"
+#include "Health/PlayerHealthComponent.h"
+#include "Interactions/InteractorComponent.h"
 #include "Weapons/GunBase.h"
 #include "ZombieSiege/Public/Weapons/WeaponStatsDataAsset.h"
 
@@ -30,20 +30,14 @@ APlayerCharacter::APlayerCharacter()
 	Camera->SetupAttachment(CameraArm);
 	Camera->bUsePawnControlRotation = false;
 
-	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
-
 	WeaponLoadoutComponent = CreateDefaultSubobject<UWeaponLoadoutComponent>(TEXT("WeaponLoadout"));
 	WeaponLoadoutComponent->OnWeaponAddedEvent.AddUObject(this, &APlayerCharacter::OnWeaponAdded);
 
-	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("InteractorComponent"));
+
+	HealthComponent = CreateDefaultSubobject<UPlayerHealthComponent>(TEXT("PlayerHealthComponent"));
 
 	GetMesh()->SetReceivesDecals(false);
-}
-
-// Called to bind functionality to input
-void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
 bool APlayerCharacter::IsMovingForward() const
@@ -97,7 +91,7 @@ void APlayerCharacter::BeginPlay()
 	{
 		OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlap);
 		OnActorEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
-		HealthComponent->OnDeathEvent.AddUObject(this, &APlayerCharacter::Die_Server);
+		HealthComponent->OnDeathEvent.AddDynamic(this, &APlayerCharacter::Die_Server);
 	}
 
 	if (!HasAuthority())
@@ -131,19 +125,13 @@ void APlayerCharacter::OnWeaponAdded(AGunBase* Weapon)
 
 void APlayerCharacter::Die_Server(AController* KillInstigator, AActor* KillCauser)
 {
-	// TODO: Sub to OnPlayerDeathEvent in gamemode
+	// TODO: Sub to OnPlayerDeathEvent in game mode
 	if (AZombieDefenceGameMode* GameMode = Cast<AZombieDefenceGameMode>(GetWorld()->GetAuthGameMode()))
 	{
 		GameMode->PlayerDeath(GetController());
 	}
 
-	bIsDead = true;
-	if (HealthComponent)
-	{
-		HealthComponent->SetEnableHealthRegen(false);
-	}
-
-	OnPlayerDeathEvent.Broadcast(this);
+	HealthComponent->SetEnableHealthRegen(false);
 }
 
 void APlayerCharacter::OnOverlap(AActor* OverlappedActor, AActor* OtherActor)

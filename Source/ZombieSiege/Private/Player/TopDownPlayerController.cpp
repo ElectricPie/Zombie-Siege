@@ -8,6 +8,7 @@
 #include "PlayerCharacter.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/PlayerState.h"
+#include "Health/PlayerHealthComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Ui/GameHud.h"
 
@@ -232,7 +233,7 @@ bool ATopDownPlayerController::CanDoAction() const
 
 	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
 	{
-		if (PlayerCharacter->GetIsDead())
+		if (PlayerCharacter->GetPlayerHealthComponent()->GetIsDead())
 			return false;
 	}
 

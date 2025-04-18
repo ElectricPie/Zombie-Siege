@@ -7,7 +7,7 @@
 #include "ZombieSiege/Public/Money/MoneyStoreInterface.h"
 #include "PlayerCharacter.generated.h"
 
-class UHealthComponent;
+class UPlayerHealthComponent;
 class AGunBase;
 class UAnimMontage;
 class UCameraComponent;
@@ -15,8 +15,6 @@ class UInteractableComponent;
 class UInteractorComponent;
 class USpringArmComponent;
 class UWeaponLoadoutComponent;
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDeath, APlayerCharacter*, PlayerCharacter);
 
 UCLASS()
 class APlayerCharacter : public ACharacter, public IMoneyStoreInterface
@@ -26,9 +24,6 @@ class APlayerCharacter : public ACharacter, public IMoneyStoreInterface
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	/**
 	 * @brief Gets the velocity relative to the direction they are facing
@@ -47,9 +42,6 @@ public:
 	void StopFiring() const;
 	void ReloadWeapon() const;
 
-	UFUNCTION(BlueprintPure)
-	bool GetIsDead() const { return bIsDead; }
-
 	/* MoneyStoreInterface */
 	virtual UMoneyStoreComponent* GetMoneyStoreComponent_Implementation() const override;
 	/* End MoneyStoreInterface */
@@ -57,11 +49,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	UInteractorComponent* GetInteractorComponent() const { return InteractorComponent; }
 	UFUNCTION(BlueprintPure)
-	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
-
-public:
-	UPROPERTY(BlueprintAssignable)
-	FOnPlayerDeath OnPlayerDeathEvent;
+	UPlayerHealthComponent* GetPlayerHealthComponent() const { return HealthComponent; }
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
@@ -73,7 +61,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	TObjectPtr<UWeaponLoadoutComponent> WeaponLoadoutComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
-	TObjectPtr<UHealthComponent> HealthComponent;
+	TObjectPtr<UPlayerHealthComponent> HealthComponent;
 
 	float SpeedModifier = 0.8f;
 
@@ -86,9 +74,6 @@ private:
 	float DefaultReloadTime = 2.f;
 	bool bIsReloading = false;
 	FTimerHandle ReloadingTimerHandle;
-
-	UPROPERTY(VisibleAnywhere, Category="Health")
-	bool bIsDead = false;
 
 	UPROPERTY(EditAnywhere, Category="Movement",
 		meta=(ToolTip="How far from forward the character can move before they are considered to be moving backwards",
@@ -109,5 +94,5 @@ private:
 	void OnOverlap(AActor* OverlappedActor, AActor* OtherActor);
 	UFUNCTION()
 	void OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
-
+	
 };
