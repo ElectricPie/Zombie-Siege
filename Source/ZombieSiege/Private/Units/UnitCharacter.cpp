@@ -20,15 +20,15 @@ AUnitCharacter::AUnitCharacter()
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 }
 
-void AUnitCharacter::Attack(AActor* Target)
+void AUnitCharacter::Attack(AActor* AttackTarget)
 {
-	if (Target == nullptr)
+	if (AttackTarget == nullptr)
 		return;
 	// Delay time between attacks
 	if (GetGameTimeSinceCreation() - LastAttackTime < AttackDelay)
 		return;
 	
-	UGameplayStatics::ApplyDamage(Target, AttackDamage, GetController(), this, UDamageType::StaticClass());
+	UGameplayStatics::ApplyDamage(AttackTarget, AttackDamage, GetController(), this, UDamageType::StaticClass());
 	LastAttackTime = GetGameTimeSinceCreation();
 
 	if (AttackSound)

@@ -25,7 +25,7 @@ public:
 	AUnitCharacter();
 
 	UFUNCTION(BlueprintCallable)
-	void Attack(AActor* Target);
+	void Attack(AActor* AttackTarget);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category=Attack)
 	float GetAttackRange() const { return AttackRange; };
