@@ -36,7 +36,8 @@ public:
 	virtual UMoneyStoreComponent* GetMoneyStoreComponent_Implementation() const override;
 	/* End MoneyStoreInterface */
 	
-	void PlayerRespawned();
+	UFUNCTION(Client, Reliable)
+	void ClientRespawnPlayer();
 	
 protected:
 	virtual void BeginPlay() override;

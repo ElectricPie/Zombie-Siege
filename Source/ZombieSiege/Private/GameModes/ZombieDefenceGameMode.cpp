@@ -333,6 +333,6 @@ void AZombieDefenceGameMode::RespawnDeadPlayers()
 		PlayerController->UnPossess();
 		RestartPlayer(PlayerController);
 		DefenceGameState->RespawnPlayer(PlayerController);
-		PlayerController->PlayerRespawned();
+		PlayerController->ClientRespawnPlayer();
 	}
 }

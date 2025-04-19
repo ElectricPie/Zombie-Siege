@@ -48,7 +48,7 @@ UMoneyStoreComponent* ATopDownPlayerController::GetMoneyStoreComponent_Implement
 	return IMoneyStoreInterface::Execute_GetMoneyStoreComponent(GetPlayerState<APlayerState>());
 }
 
-void ATopDownPlayerController::PlayerRespawned()
+void ATopDownPlayerController::ClientRespawnPlayer_Implementation()
 {
 	EnableInput(this);
 	SetInputGameOnly();
