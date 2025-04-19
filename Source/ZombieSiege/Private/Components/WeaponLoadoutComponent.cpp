@@ -23,6 +23,19 @@ void UWeaponLoadoutComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	DOREPLIFETIME(UWeaponLoadoutComponent, Weapons);
 }
 
+void UWeaponLoadoutComponent::OnComponentDestroyed(bool bDestroyingHierarchy)
+{
+	Super::OnComponentDestroyed(bDestroyingHierarchy);
+
+	for (AGunBase* Weapon : Weapons)
+	{
+		if (Weapon)
+		{
+			Weapon->Destroy();
+		}
+	}
+}
+
 void UWeaponLoadoutComponent::Fire()
 {
 	if (AGunBase* Weapon = GetEquippedWeapon())

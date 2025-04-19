@@ -51,11 +51,14 @@ void AZombieDefenceGameMode::OnPostLogin(AController* NewPlayer)
 void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 {
 	Super::RestartPlayer(NewPlayer);
-
+	
+	ATopDownPlayerController* NewPlayerController = Cast<ATopDownPlayerController>(NewPlayer);
+	check(NewPlayerController);
+	
 	ADefenceGameState* DefenceGameState = GetGameState<ADefenceGameState>();
 	check(DefenceGameState);
 
-	if (APlayerCharacter* PlayerCharacter = NewPlayer->GetPawn<APlayerCharacter>())
+	if (APlayerCharacter* PlayerCharacter = NewPlayerController->GetPawn<APlayerCharacter>())
 	{
 		// Gives the player their starting weapons
 		if (UWeaponLoadoutComponent* WeaponLoadout = PlayerCharacter->FindComponentByClass<UWeaponLoadoutComponent>())
@@ -74,9 +77,8 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 		}
 		
 		PlayerCharacter->GetHealthComponent_Implementation()->OnDeathEvent.AddDynamic(this, &AZombieDefenceGameMode::PlayerDied);
-
-
-		DefenceGameState->AddAlivePlayer(NewPlayer);
+		
+		DefenceGameState->AddAlivePlayer(NewPlayerController);
 	}
 }
 
@@ -163,6 +165,8 @@ void AZombieDefenceGameMode::StartNewRound()
 
 	GetWorld()->GetTimerManager().SetTimer(RoundSpawnTimerHandle, this, &AZombieDefenceGameMode::SpawnUnit,
 	                                       RoundStartDelay, true, CurrentSpawnDelay);
+
+	RespawnDeadPlayers();
 }
 
 void AZombieDefenceGameMode::ResetRoundStats()
@@ -263,7 +267,7 @@ AUnitSpawnPoint* AZombieDefenceGameMode::GetWeightedRandomSpawnPoint() const
 
 void AZombieDefenceGameMode::PlayerDied(AActor* VictimActor, AController* KillerController, AActor* KillerActor)
 {
-	const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(VictimActor);
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(VictimActor);
 	check(PlayerCharacter);
 	ATopDownPlayerController* PlayerController = PlayerCharacter->GetController<ATopDownPlayerController>();
 	check(PlayerController);
@@ -275,7 +279,10 @@ void AZombieDefenceGameMode::PlayerDied(AActor* VictimActor, AController* Killer
 
 	DefencePlayerState->AddDeath();
 	DefenceGameState->RemoveAlivePlayer(PlayerController);
-
+	
+	PlayerCharacter->SetLifeSpan(PlayerLifespanAfterDeath);
+	PlayerController->UnPossess();
+	
 	if (DefenceGameState->GetAlivePlayersCount() <= 0)
 	{
 		GameOver();
@@ -307,5 +314,25 @@ void AZombieDefenceGameMode::UnitKilled(AActor* VictimActor, AController* Killer
 	if (ADefencePlayerState* DefencePlayerState = KillerController->GetPlayerState<ADefencePlayerState>())
 	{
 		DefencePlayerState->AddKill();
+	}
+}
+
+void AZombieDefenceGameMode::RespawnDeadPlayers()
+{
+	ADefenceGameState* DefenceGameState = GetGameState<ADefenceGameState>();
+	check(DefenceGameState);
+	
+	TArray<ATopDownPlayerController*> PlayersToRespawn;
+	for (auto& APlayerController : DefenceGameState->GetDeadPlayers())
+	{
+		PlayersToRespawn.Add(APlayerController);
+	}
+
+	for (const auto& PlayerController : PlayersToRespawn)
+	{
+		PlayerController->UnPossess();
+		RestartPlayer(PlayerController);
+		DefenceGameState->RespawnPlayer(PlayerController);
+		PlayerController->PlayerRespawned();
 	}
 }
