@@ -74,6 +74,9 @@ private:
 	TArray<TSubclassOf<AGunBase>> StartingWeaponClasses;
 
 	FTimerHandle RoundSpawnTimerHandle;
+	
+	UPROPERTY(EditAnywhere)
+	float PlayerLifespanAfterDeath = 5.f;
 
 private:
 	void GetActiveUnitSpawnPoints();
@@ -91,4 +94,6 @@ private:
 	void PlayerDied(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
 	UFUNCTION()
 	void UnitKilled(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
+
+	void RespawnDeadPlayers();
 };

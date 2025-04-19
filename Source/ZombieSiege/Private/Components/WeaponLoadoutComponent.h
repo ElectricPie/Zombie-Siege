@@ -22,6 +22,8 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+
 	void Fire();
 	void StopFiring();
 	bool Reload();

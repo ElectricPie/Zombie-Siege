@@ -36,7 +36,7 @@ void ATopDownPlayerController::SetInputGameOnly()
 void ATopDownPlayerController::SetInputGameAndUI()
 {
 	FInputModeGameAndUI InputMode;
-	// This is need as without it in GameOnly mode it locks the mouse when left clicking
+	// This is need as without it in GameOnly mode it locks the mouse when left-clicking
 	InputMode.SetHideCursorDuringCapture(false);
 	SetInputMode(InputMode);
 	bShowMouseCursor = true;
@@ -46,6 +46,12 @@ void ATopDownPlayerController::SetInputGameAndUI()
 UMoneyStoreComponent* ATopDownPlayerController::GetMoneyStoreComponent_Implementation() const
 {
 	return IMoneyStoreInterface::Execute_GetMoneyStoreComponent(GetPlayerState<APlayerState>());
+}
+
+void ATopDownPlayerController::PlayerRespawned()
+{
+	EnableInput(this);
+	SetInputGameOnly();
 }
 
 void ATopDownPlayerController::BeginPlay()
@@ -274,6 +280,5 @@ void ATopDownPlayerController::OnPauseMenuChanged(const bool bMenuIsOpen)
 void ATopDownPlayerController::PlayerDied(AActor* VictimActor, AController* KillerController, AActor* KillerActor)
 {
 	DisableInput(this);
-
 	SetInputMode(FInputModeUIOnly());
 }
