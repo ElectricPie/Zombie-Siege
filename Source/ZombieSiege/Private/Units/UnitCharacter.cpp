@@ -20,10 +20,13 @@ AUnitCharacter::AUnitCharacter()
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 }
 
-void AUnitCharacter::Attack(AActor* AttackTarget)
+void AUnitCharacter::Attack_Server(AActor* AttackTarget)
 {
+	check(HasAuthority());
+	
 	if (AttackTarget == nullptr)
 		return;
+	
 	// Delay time between attacks
 	if (GetGameTimeSinceCreation() - LastAttackTime < AttackDelay)
 		return;
@@ -31,15 +34,7 @@ void AUnitCharacter::Attack(AActor* AttackTarget)
 	UGameplayStatics::ApplyDamage(AttackTarget, AttackDamage, GetController(), this, UDamageType::StaticClass());
 	LastAttackTime = GetGameTimeSinceCreation();
 
-	if (AttackSound)
-	{
-		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), AttackSound, GetActorTransform(), true);
-	}
-	
-	if (AttackMontage)
-	{
-		PlayAnimMontage(AttackMontage);
-	}
+	MulticastAttack();
 }
 
 void AUnitCharacter::SetTargetBarricade(ABarricade* NewTargetBarricade)
@@ -89,5 +84,18 @@ void AUnitCharacter::Ragdoll()
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AUnitCharacter::MulticastAttack_Implementation()
+{
+	if (AttackSound)
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), AttackSound, GetActorTransform(), true);
+	}
+	
+	if (AttackMontage)
+	{
+		PlayAnimMontage(AttackMontage);
+	}
 }
 

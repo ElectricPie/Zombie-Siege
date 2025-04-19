@@ -25,8 +25,7 @@ public:
 	AUnitCharacter();
 
 	UFUNCTION(BlueprintCallable)
-	void Attack(AActor* AttackTarget);
-
+	void Attack_Server(AActor* AttackTarget);
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category=Attack)
 	float GetAttackRange() const { return AttackRange; };
 
@@ -84,4 +83,7 @@ private:
 	void HealthChange_Client(const float NewCurrentHealth);
 
 	void Ragdoll();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAttack();
 };
