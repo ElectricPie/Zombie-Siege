@@ -12,7 +12,7 @@
 #include "Player/PlayerCharacter.h"
 #include "Ui/GameHud.h"
 
-void ATopDownPlayerController::GameOver()
+void ATopDownPlayerController::MulticastGameOver_Implementation()
 {
 	bIsGameOver = true;
 	if (AGameHud* GameHud = Cast<AGameHud>(GetHUD()))

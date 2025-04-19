@@ -201,7 +201,7 @@ void AZombieDefenceGameMode::GameOver()
 	{
 		if (ATopDownPlayerController* TopDownPlayerController = Cast<ATopDownPlayerController>(Iterator->Get()))
 		{
-			TopDownPlayerController->GameOver();
+			TopDownPlayerController->MulticastGameOver();
 		}
 	}
 
