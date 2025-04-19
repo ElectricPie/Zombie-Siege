@@ -88,21 +88,16 @@ void ATopDownPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Move);
 
 		// Interaction
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
-		                                   &ATopDownPlayerController::Interact);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Interact);
 
 		// Weapons
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATopDownPlayerController::Fire);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this,
-		                                   &ATopDownPlayerController::StopFiring);
-		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this,
-		                                   &ATopDownPlayerController::SwapWeapon);
-		EnhancedInputComponent->BindAction(ReloadWeaponAction, ETriggerEvent::Triggered, this,
-		                                   &ATopDownPlayerController::ReloadWeapon);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ATopDownPlayerController::StopFiring);
+		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::SwapWeapon);
+		EnhancedInputComponent->BindAction(ReloadWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::ReloadWeapon);
 
 		// Menu
-		EnhancedInputComponent->BindAction(MenuAction, ETriggerEvent::Completed, this,
-		                                   &ATopDownPlayerController::ToggleMenu);
+		EnhancedInputComponent->BindAction(MenuAction, ETriggerEvent::Completed, this, &ATopDownPlayerController::ToggleMenu);
 	}
 }
 
@@ -114,6 +109,10 @@ void ATopDownPlayerController::OnPossess(APawn* InPawn)
 	{
 		Hud->InitHud();
 	}
+
+	const APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>();
+	HealthComponent = PlayerCharacter->GetHealthComponent_Implementation();
+	HealthComponent->OnDeathEvent.AddDynamic(this, &ATopDownPlayerController::PlayerDied);
 }
 
 void ATopDownPlayerController::OnRep_PlayerState()
@@ -124,6 +123,10 @@ void ATopDownPlayerController::OnRep_PlayerState()
 	{
 		Hud->InitHud();
 	}
+
+	const APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>();
+	HealthComponent = PlayerCharacter->GetHealthComponent_Implementation();
+	HealthComponent->OnDeathEvent.AddDynamic(this, &ATopDownPlayerController::PlayerDied);
 }
 
 void ATopDownPlayerController::Move(const FInputActionValue& Value)
@@ -222,7 +225,7 @@ void ATopDownPlayerController::ReloadWeapon()
 	if (!CanDoAction())
 		return;
 
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
 	{
 		PlayerCharacter->ReloadWeapon();
 	}
@@ -233,6 +236,8 @@ bool ATopDownPlayerController::CanDoAction() const
 	if (bIsGameOver)
 		return false;
 	if (bIsPaused)
+		return false;
+	if (HealthComponent.IsValid() && HealthComponent->GetIsDead())
 		return false;
 
 	if (const IHealthComponentInterface* HealthComponentInterface = Cast<APlayerCharacter>(GetPawn()))
@@ -264,4 +269,11 @@ void ATopDownPlayerController::OnPauseMenuChanged(const bool bMenuIsOpen)
 	{
 		SetInputGameOnly();
 	}
+}
+
+void ATopDownPlayerController::PlayerDied(AActor* VictimActor, AController* KillerController, AActor* KillerActor)
+{
+	DisableInput(this);
+
+	SetInputMode(FInputModeUIOnly());
 }
