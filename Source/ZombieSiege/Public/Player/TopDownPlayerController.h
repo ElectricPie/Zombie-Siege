@@ -7,6 +7,7 @@
 #include "Money/MoneyStoreInterface.h"
 #include "TopDownPlayerController.generated.h"
 
+class UHealthComponent;
 class UMoneyStoreComponent;
 class APlayerCharacter;
 class UInputMappingContext;
@@ -22,6 +23,9 @@ class ZOMBIESIEGE_API ATopDownPlayerController : public APlayerController, publi
 	GENERATED_BODY()
 
 public:
+	bool bIsPaused = false;
+	
+public:
 	FVector GetAimDirection() const { return AimDirection; }
 	void GameOver();
 	void SetInputGameOnly();
@@ -30,9 +34,6 @@ public:
 	/* MoneyStoreInterface */
 	virtual UMoneyStoreComponent* GetMoneyStoreComponent_Implementation() const override;
 	/* End MoneyStoreInterface */
-
-public:
-	bool bIsPaused = false;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -56,6 +57,9 @@ private:
 	TObjectPtr<UInputAction> ReloadWeaponAction;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> MenuAction;
+
+	UPROPERTY()
+	TWeakObjectPtr<UHealthComponent> HealthComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, Category="Look")
 	float LookRaycastLimit = 3000.f;
@@ -84,4 +88,7 @@ private:
 
 	void ToggleMenu();
 	void OnPauseMenuChanged(const bool bMenuIsOpen);
+	
+	UFUNCTION()
+	void PlayerDied(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
 };

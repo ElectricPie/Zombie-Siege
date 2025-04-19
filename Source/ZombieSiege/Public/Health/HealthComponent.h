@@ -74,7 +74,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="Sound")
 	TObjectPtr<UFMODEvent> DeathSound;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, VisibleInstanceOnly)
 	bool bIsDead = false;
 
 private:

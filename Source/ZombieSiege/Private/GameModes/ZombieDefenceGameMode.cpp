@@ -265,7 +265,7 @@ void AZombieDefenceGameMode::PlayerDied(AActor* VictimActor, AController* Killer
 {
 	const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(VictimActor);
 	check(PlayerCharacter);
-	APlayerController* PlayerController = Cast<APlayerController>(PlayerCharacter->GetController());
+	ATopDownPlayerController* PlayerController = PlayerCharacter->GetController<ATopDownPlayerController>();
 	check(PlayerController);
 	ADefenceGameState* DefenceGameState = GetGameState<ADefenceGameState>();
 	check(DefenceGameState);

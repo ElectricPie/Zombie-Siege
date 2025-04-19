@@ -23,6 +23,7 @@ void UHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(UHealthComponent, MaxHealth);
 	DOREPLIFETIME(UHealthComponent, CurrentHealth);
+	DOREPLIFETIME(UHealthComponent, bIsDead);
 }
 
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -76,6 +77,7 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
 
 	if (CurrentHealth <= 0.f)
 	{
+		bIsDead = true;
 		MulticastDie(InstigatedBy, DamageCauser);
 	}
 	else
