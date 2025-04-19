@@ -27,7 +27,8 @@ public:
 	
 public:
 	FVector GetAimDirection() const { return AimDirection; }
-	void GameOver();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastGameOver();
 	void SetInputGameOnly();
 	void SetInputGameAndUI();
 
