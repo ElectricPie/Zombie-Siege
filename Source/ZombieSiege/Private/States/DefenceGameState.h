@@ -6,6 +6,7 @@
 #include "GameFramework/GameState.h"
 #include "DefenceGameState.generated.h"
 
+class APlayerCharacter;
 class ATopDownPlayerController;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameModeRoundChangedSignature, const int32 /*RoundNumber*/);
 
@@ -34,6 +35,8 @@ public:
 	int32 GetAlivePlayersCount() const { return AlivePlayers.Num(); }
 	UFUNCTION(BlueprintCallable)
 	TArray<ATopDownPlayerController*> GetDeadPlayers() const { return DeadPlayers; }
+	UFUNCTION(BlueprintCallable)
+	TArray<APlayerCharacter*> GetAlivePlayerCharacters() const;
 
 	void RespawnPlayer(ATopDownPlayerController* Player);
 	
@@ -44,6 +47,8 @@ private:
 	TArray<TObjectPtr<ATopDownPlayerController>> AlivePlayers;
 	UPROPERTY()
 	TArray<TObjectPtr<ATopDownPlayerController>> DeadPlayers;
+	UPROPERTY(Replicated)
+	TArray<TWeakObjectPtr<APlayerCharacter>> AlivePlayerCharacters;
 	
 private:
 	UFUNCTION()

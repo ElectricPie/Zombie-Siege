@@ -4,6 +4,7 @@
 #include "GameModes/ZombieDefenceGameMode.h"
 
 #include "Components/WeaponLoadoutComponent.h"
+#include "GameFramework/SpectatorPawn.h"
 #include "Health/HealthComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -11,6 +12,7 @@
 #include "Money/MoneyStoreComponent.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/TopDownPlayerController.h"
+#include "Player/ZSiegeSpectatorPawn.h"
 #include "States/DefenceGameState.h"
 #include "States/DefencePlayerState.h"
 #include "Units/UnitAiController.h"
@@ -51,10 +53,10 @@ void AZombieDefenceGameMode::OnPostLogin(AController* NewPlayer)
 void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 {
 	Super::RestartPlayer(NewPlayer);
-	
+
 	ATopDownPlayerController* NewPlayerController = Cast<ATopDownPlayerController>(NewPlayer);
 	check(NewPlayerController);
-	
+
 	ADefenceGameState* DefenceGameState = GetGameState<ADefenceGameState>();
 	check(DefenceGameState);
 
@@ -75,9 +77,10 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 				WeaponLoadout->AddWeapon_Server(NewWeapon);
 			}
 		}
-		
-		PlayerCharacter->GetHealthComponent_Implementation()->OnDeathEvent.AddDynamic(this, &AZombieDefenceGameMode::PlayerDied);
-		
+
+		PlayerCharacter->GetHealthComponent_Implementation()->OnDeathEvent.AddDynamic(
+			this, &AZombieDefenceGameMode::PlayerDied);
+
 		DefenceGameState->AddAlivePlayer(NewPlayerController);
 	}
 }
@@ -136,7 +139,8 @@ void AZombieDefenceGameMode::SpawnUnit()
 
 		if (UHealthComponent* HealthComponent = NewUnit->GetHealthComponent_Implementation())
 		{
-			HealthComponent->SetMaxHealth(HealthIncreasePerRound * GetGameState<ADefenceGameState>()->GetCurrentRound());
+			HealthComponent->
+				SetMaxHealth(HealthIncreasePerRound * GetGameState<ADefenceGameState>()->GetCurrentRound());
 			HealthComponent->OnDeathEvent.AddDynamic(this, &AZombieDefenceGameMode::UnitKilled);
 		}
 
@@ -278,11 +282,17 @@ void AZombieDefenceGameMode::PlayerDied(AActor* VictimActor, AController* Killer
 		return;
 
 	DefencePlayerState->AddDeath();
+	// Needs to be done before unpossessing the player
 	DefenceGameState->RemoveAlivePlayer(PlayerController);
-	
-	PlayerCharacter->SetLifeSpan(PlayerLifespanAfterDeath);
 	PlayerController->UnPossess();
-	
+	PlayerCharacter->SetLifeSpan(PlayerLifespanAfterDeath);
+
+	AZSiegeSpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<AZSiegeSpectatorPawn>(SpectatorClass, PlayerCharacter->GetActorLocation(),
+		PlayerCharacter->GetActorRotation());
+	check(SpectatorPawn);
+	PlayerController->Possess(SpectatorPawn);
+	SpectatorPawn->SetFollowTarget(GetFirstAlivePlayerCharacter());
+
 	if (DefenceGameState->GetAlivePlayersCount() <= 0)
 	{
 		GameOver();
@@ -293,7 +303,7 @@ void AZombieDefenceGameMode::UnitKilled(AActor* VictimActor, AController* Killer
 {
 	AUnitCharacter* UnitKilled = Cast<AUnitCharacter>(VictimActor);
 	check(UnitKilled);
-	
+
 	if (!ActiveUnits.Contains(UnitKilled))
 		return;
 
@@ -321,7 +331,8 @@ void AZombieDefenceGameMode::RespawnDeadPlayers()
 {
 	ADefenceGameState* DefenceGameState = GetGameState<ADefenceGameState>();
 	check(DefenceGameState);
-	
+
+	// Need to store players as we are modifying the array while iterating over it
 	TArray<ATopDownPlayerController*> PlayersToRespawn;
 	for (auto& APlayerController : DefenceGameState->GetDeadPlayers())
 	{
@@ -330,9 +341,27 @@ void AZombieDefenceGameMode::RespawnDeadPlayers()
 
 	for (const auto& PlayerController : PlayersToRespawn)
 	{
+		APawn* PlayerPawn = PlayerController->GetPawn();
 		PlayerController->UnPossess();
+		PlayerPawn->Destroy();
 		RestartPlayer(PlayerController);
 		DefenceGameState->RespawnPlayer(PlayerController);
 		PlayerController->ClientRespawnPlayer();
 	}
+}
+
+APlayerCharacter* AZombieDefenceGameMode::GetFirstAlivePlayerCharacter() const
+{
+	const ADefenceGameState* DefenceGameState = GetGameState<ADefenceGameState>();
+	check(DefenceGameState);
+	
+	for (const auto& AlivePlayerCharacter : DefenceGameState->GetAlivePlayerCharacters())
+	{
+		if (IsValid(AlivePlayerCharacter))
+		{
+			return AlivePlayerCharacter;
+		}
+	}
+
+	return nullptr;
 }
