@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Rooms/Door.h"
-#include "Rooms/Room.h"
 #include "Interactions/InteractableComponent.h"
-#include "Components/MoneyStoreComponent.h"
+#include "Money/MoneyStoreComponent.h"
 #include "Money/MoneyStoreInterface.h"
+#include "Rooms/Room.h"
 
 #define DEFAULT_DOOR_INTERACT_MESSAGE "Open Door"
 
@@ -24,6 +24,8 @@ ADoor::ADoor()
 	InteractableTrigger->SetupAttachment(RootComponent);
 	InteractableTrigger->SetInteractMessage(FText::FromString(DEFAULT_DOOR_INTERACT_MESSAGE));
 	InteractableTrigger->SetCanInteract(true);
+
+	bReplicates = true;
 }
 
 void ADoor::BeginPlay()
@@ -31,12 +33,11 @@ void ADoor::BeginPlay()
 	Super::BeginPlay();
 
 	InteractableTrigger->OnInteractEvent.AddLambda(
-		[this](const AController* InteractionInstigator, const AActor* InteractionCauser)
+		[this](const AController* InteractionInstigator, const APawn* InteractionCauser)
 		{
-			if (UMoneyStoreComponent* MoneyStoreComponent = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(
-				InteractionInstigator))
+			if (UMoneyStoreComponent* MoneyStoreComponent = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(InteractionInstigator))
 			{
-				BuyDoor(MoneyStoreComponent);
+				TryBuyDoor_Server(MoneyStoreComponent);
 			}
 		});
 
@@ -44,17 +45,23 @@ void ADoor::BeginPlay()
 	InteractableTrigger->SetInteractMessage(InteractMessage);
 }
 
-void ADoor::BuyDoor(UMoneyStoreComponent* MoneyStore)
+void ADoor::MulticastDoorOpened_Implementation()
 {
-	checkf(DoorPart, TEXT("DoorPart is not set on Door actor %s"), *GetName());
-
-	// Not enough money
-	if (!MoneyStore->TakeMoney(OpenCost))
-		return;
-	
 	DoorPart->Destroy();
 	InteractableTrigger->SetCanInteract(false);
 	OnDoorOpenedEvent.Broadcast();
+}
+
+void ADoor::TryBuyDoor_Server(UMoneyStoreComponent* MoneyStore)
+{
+	check(HasAuthority());
+	checkf(DoorPart, TEXT("DoorPart is not set on Door actor %s"), *GetName());
+
+	// Not enough money
+	if (!MoneyStore->TakeMoney_Server(OpenCost))
+		return;
+	
+	MulticastDoorOpened();
 
 	for (const auto& Room : ConnectedRooms)
 	{

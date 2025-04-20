@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Gun.generated.h"
+#include "GunBase.generated.h"
 
 class UWeaponStatsDataAsset;
 class UArrowComponent;
@@ -14,7 +14,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnReloadStateChanged, bool /*bIsReloading*/
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGunFiredSignature);
 
 UCLASS()
-class AGun : public AActor
+class AGunBase : public AActor
 {
 	GENERATED_BODY()
 	
@@ -27,42 +27,31 @@ public:
 
 public:	
 	// Sets default values for this actor's properties
-	AGun();
+	AGunBase();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION(BlueprintPure)
 	const UWeaponStatsDataAsset* GetWeaponStats() const { return WeaponStats; }
-	
-	void StartFiring(AController* ShooterController, AActor* ShooterActor);
+
+	void Fire();
 	void StopFiring();
+	void Reload();
+	
 	UFUNCTION(BlueprintCallable)
-	void SetVisibility(bool bIsVisible);
+	void SetVisibility(bool bIsVisible) const;
 
 	UFUNCTION(BlueprintPure, Category="Weapon")
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
-	UFUNCTION(BlueprintCallable, Category="Weapon")
-	void Reload();
-	UFUNCTION(BlueprintCallable, Category="Weapon")
-	void CancelReload();
+
 	UFUNCTION(BlueprintPure)
 	bool GetIsReloading() const { return bIsReloading; }
 
-	USkeletalMeshComponent* GetMesh() const { return GunMesh; }
+ 	USkeletalMeshComponent* GetMesh() const { return GunMesh; }
 
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	UFUNCTION()
-	void SpawnProjectile(AController* ShooterController, AActor* ShooterActor);
-	UFUNCTION()
-	void SingleShot(AController* ShooterController, AActor* ShooterActor);
-	UFUNCTION()
-	void BurstShot(AController* ShooterController, AActor* ShooterActor);
-	UFUNCTION()
-	void FinishReload();
-
-	void MagEmpty();
-	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<USceneComponent> Root;
@@ -76,9 +65,9 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UWeaponStatsDataAsset> WeaponStats;
 	
-	UPROPERTY(VisibleInstanceOnly, Category="Gun|Ammo")
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentAmmo, VisibleInstanceOnly, Category="Gun|Ammo")
 	int32 CurrentAmmo = 0;
-	
+	UPROPERTY(ReplicatedUsing=OnRep_IsReloading)
 	bool bIsReloading = false;
 	FTimerHandle ReloadingTimerHandle;
 	
@@ -88,4 +77,28 @@ private:
 	FTimerHandle ShotTimer;
 	FTimerHandle BurstTimer;
 	int32 BurstShotsFired = 0;
+	
+private:
+	UFUNCTION(Server, Reliable)
+	void Fire_Server();
+	UFUNCTION(Server, Reliable)
+	void StopFiring_Server();
+	UFUNCTION(Server, Reliable)
+	void Reload_Server();
+	UFUNCTION(Server, Reliable)
+	void CancelReload_Server();
+	
+	void SpawnProjectile();
+	UFUNCTION(NetMulticast, Reliable)
+	void SpawnProjectile_Multicast();
+	
+	void HandleFireMode();
+
+	void MagEmpty();
+	bool CanReload() const;
+	
+	UFUNCTION()
+	void OnRep_CurrentAmmo() const;
+	UFUNCTION()
+	void OnRep_IsReloading();
 };

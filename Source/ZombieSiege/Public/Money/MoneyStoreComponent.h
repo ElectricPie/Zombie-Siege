@@ -14,25 +14,28 @@ UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class UMoneyStoreComponent : public UActorComponent
 {
 	GENERATED_BODY()
+
+public:
+	FOnMoneyChangedSignature OnMoneyChangedEvent;
 	
 public:	
 	// Sets default values for this component's properties
 	UMoneyStoreComponent();
 	
-	FOnMoneyChangedSignature OnMoneyChangedEvent;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	/**
 	 * @brief Sets the players money to the provided amount
 	 * @param AmountToSetTo The amount of money to set the player
 	 */
 	UFUNCTION(BlueprintCallable, Category="Money")
-	void SetMoney(const int32 AmountToSetTo);
+	void SetMoney_Server(const int32 AmountToSetTo);
 	/**
 	 * @brief Adds the given amount to the players current money
 	 * @param AmountToAdd The amount of money to add
 	 */
 	UFUNCTION(BlueprintCallable, Category="Money")
-	void AddMoney(const int32 AmountToAdd);
+	void AddMoney_Server(const int32 AmountToAdd);
 	UFUNCTION(BlueprintPure, Category="Money")
 	int32 GetMoney() const { return Money; }
 	/**
@@ -42,14 +45,18 @@ public:
 	 * @return Returns true if the money can be taken, false otherwise
 	 */
 	UFUNCTION(BlueprintCallable, Category="Money")
-	bool TakeMoney(int32 AmountToTake);
+	bool TakeMoney_Server(int32 AmountToTake);
 	
 private:
-	UPROPERTY(VisibleAnywhere, Category="Money")
+	UPROPERTY(Replicated, VisibleAnywhere, Category="Money")
 	int32 Money = 0;
 
 	UPROPERTY(EditAnywhere, Category="Sound")
 	TObjectPtr<UFMODEvent> MoneyGetSound;
 	UPROPERTY(EditAnywhere, Category="Sound")
 	TObjectPtr<UFMODEvent> MoneySpendSound;
+
+private:
+	UFUNCTION(Client, Reliable)
+	void ClientMoneyChanged(int32 NewMoney, const int32 AmountChanged);
 };

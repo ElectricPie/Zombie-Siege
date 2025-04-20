@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ZombieSiege/Public/Ui/WidgetControllers/AmmoCounterWidgetController.h"
+#include "Ui/WidgetControllers/AmmoCounterWidgetController.h"
 
 #include "Components/WeaponLoadoutComponent.h"
 #include "Player/PlayerCharacter.h"
@@ -12,8 +12,12 @@ void UAmmoCounterWidgetController::BindCallbackToDependencies()
 	if (const APlayerCharacter* PlayerCharacter = PlayerController->GetPawn<APlayerCharacter>())
 	{
 		UWeaponLoadoutComponent* WeaponLoadoutComponent = PlayerCharacter->GetWeaponLoadoutComponent();
-		WeaponLoadoutComponent->OnWeaponChangedEvent.AddDynamic(this, &UAmmoCounterWidgetController::OnWeaponChanged);
-	}	
+		WeaponLoadoutComponent->OnWeaponChangedEvent.AddUniqueDynamic(this, &UAmmoCounterWidgetController::OnWeaponChanged);
+		if (AGunBase* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
+		{
+			OnWeaponChanged(EquippedWeapon);
+        }
+	}
 }
 
 void UAmmoCounterWidgetController::BroadcastInitialValues()
@@ -21,19 +25,20 @@ void UAmmoCounterWidgetController::BroadcastInitialValues()
 	if (const APlayerCharacter* PlayerCharacter = PlayerController->GetPawn<APlayerCharacter>())
 	{
 		UWeaponLoadoutComponent* WeaponLoadoutComponent = PlayerCharacter->GetWeaponLoadoutComponent();
-		if (const AGun* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
+		if (AGunBase* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
 		{
-			AmmoChangedEvent.Broadcast(EquippedWeapon->GetCurrentAmmo(), EquippedWeapon->GetWeaponStats()->GetMaxAmmo());
+			OnWeaponChanged(EquippedWeapon);
 		}
 		else
 		{
 			AmmoChangedEvent.Broadcast(0, 0);
 		}
-	}	
+	}
 }
 
-void UAmmoCounterWidgetController::OnWeaponChanged(AGun* NewWeapon)
+void UAmmoCounterWidgetController::OnWeaponChanged(AGunBase* NewWeapon)
 {
+	// Remove previous weapon's delegates
 	if (CurrentWeapon)
 	{
 		CurrentWeapon->OnAmmoChangedEvent.Remove(AmmoChangeHandle);
@@ -43,9 +48,9 @@ void UAmmoCounterWidgetController::OnWeaponChanged(AGun* NewWeapon)
 	if (NewWeapon)
 	{
 		WeaponReloadHandle = NewWeapon->OnReloadStateChangedEvent.AddLambda([this](const bool bIsReloading)
-	   {
-		   ReloadStateChangedEvent.Broadcast(bIsReloading);
-	   });
+		{
+			ReloadStateChangedEvent.Broadcast(bIsReloading);
+		});
 		AmmoChangeHandle = NewWeapon->OnAmmoChangedEvent.AddLambda([this](const int32 CurrentAmmo, const int32 MaxAmmo)
 		{
 			AmmoChangedEvent.Broadcast(CurrentAmmo, MaxAmmo);

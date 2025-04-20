@@ -6,10 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "WeaponLoadoutComponent.generated.h"
 
-class AGun;
+class AGunBase;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChangedSignature, AGun*, NewWeapon);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponAddedSignature, AGun*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChangedSignature, AGunBase*, NewWeapon);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponAddedSignature, AGunBase*);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UWeaponLoadoutComponent : public UActorComponent
@@ -20,19 +20,21 @@ public:
 	// Sets default values for this component's properties
 	UWeaponLoadoutComponent();
 
-	UFUNCTION(BlueprintCallable)
-	void AddWeapon(AGun* NewWeapon, bool bEquip = false);
-	UFUNCTION(BlueprintCallable)
-	AGun* GetEquippedWeapon();
-	UFUNCTION()
-	void EquipNextWeapon();
-	int32 GetWeaponCount() const { return Weapons.Num(); }
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+
+	void Fire();
+	void StopFiring();
+	bool Reload();
 	
-	/**
-	 * @brief 
-	 * @return 
-	 */
-	bool ReloadWeapon();
+	UFUNCTION(BlueprintCallable)
+	void AddWeapon_Server(AGunBase* NewWeapon, bool bEquip = false);
+	UFUNCTION(BlueprintCallable)
+	AGunBase* GetEquippedWeapon();
+	UFUNCTION(Server, Reliable)
+	void ServerEquipNextWeapon();
+	int32 GetWeaponCount() const { return Weapons.Num(); }
 
 public:
 	UPROPERTY(BlueprintAssignable, Category="Weapon Loadout")
@@ -43,8 +45,14 @@ protected:
 	virtual void BeginPlay() override;
 	
 private:
-	UPROPERTY(EditAnywhere, Category="Weapon Loadout", meta=(ClampMin=0, UIMin=0))
-	int32 EquippedWeaponIndex;
-	UPROPERTY(VisibleAnywhere, Category="Weapon Loadout")
-	TArray<TWeakObjectPtr<AGun>> Weapons;
+	UPROPERTY(ReplicatedUsing=OnRep_EquippedWeaponIndex, EditAnywhere, Category="Weapon Loadout", meta=(ClampMin=0, UIMin=0))
+	int32 EquippedWeaponIndex = -1;
+	UPROPERTY(ReplicatedUsing=OnRep_Weapons, VisibleAnywhere, Category="Weapon Loadout")
+	TArray<TObjectPtr<AGunBase>> Weapons;
+
+private:
+	UFUNCTION()
+	void OnRep_EquippedWeaponIndex(const int32 OldEquippedWeaponIndex);
+	UFUNCTION()
+	void OnRep_Weapons();
 };

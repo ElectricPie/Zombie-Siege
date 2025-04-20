@@ -8,9 +8,9 @@
 #include "States/DefencePlayerState.h"
 #include "Ui/WidgetControllers/AmmoCounterWidgetController.h"
 #include "Ui/WidgetControllers/InteractionWidgetController.h"
+#include "Ui/WidgetControllers/OverlayWidgetController.h"
+#include "Ui/Widgets/ZSiegeUserWidget.h"
 #include "Widgets/OptionsWidget.h"
-#include "ZombieSiege/Public/Ui/WidgetControllers/OverlayWidgetController.h"
-#include "ZombieSiege/Public/Ui/Widgets/ZSiegeUserWidget.h"
 
 void AGameHud::ShowGameOver()
 {
@@ -85,6 +85,12 @@ void AGameHud::ToggleMenu()
 
 void AGameHud::InitHud()
 {
+	if (bHasBeenInitialized)
+	{
+		RebindCharacterWidgetControllerDependencies();
+		return;
+	}
+
 	// Setup Overlay
 	checkf(OverlayWidgetClass, TEXT("Overlay Widget Class is null, please fill out in GameHud Blueprint"));
 	OverlayWidget = CreateWidget<UZSiegeUserWidget>(GetWorld(), OverlayWidgetClass);
@@ -111,6 +117,8 @@ void AGameHud::InitHud()
 	OptionsWidget->SetVisibility(ESlateVisibility::Collapsed);
 	OptionsWidget->OnOptionsClosedEvent.AddDynamic(this, &AGameHud::OnOptionsClosed);
 	Widgets.Add(OptionsWidget);
+
+	bHasBeenInitialized = true;
 }
 
 UOverlayWidgetController* AGameHud::GetOverlayWidgetController(const FWidgetControllerParams& WidgetControllerParams)
@@ -169,6 +177,30 @@ UHealthWidgetController* AGameHud::GetHealthWidgetController(const FWidgetContro
 	}
 
 	return HealthWidgetController;
+}
+
+void AGameHud::RebindCharacterWidgetControllerDependencies() const
+{
+	if (!bHasBeenInitialized)
+		return;
+
+	if (AmmoCounterWidgetController)
+	{
+		AmmoCounterWidgetController->BindCallbackToDependencies();
+		AmmoCounterWidgetController->BroadcastInitialValues();
+	}
+	
+	if (HealthWidgetController)
+	{
+		HealthWidgetController->BindCallbackToDependencies();
+		HealthWidgetController->BroadcastInitialValues();
+	}
+
+	if (InteractionWidgetController)
+	{
+		InteractionWidgetController->BindCallbackToDependencies();
+		InteractionWidgetController->BroadcastInitialValues();
+	}
 }
 
 void AGameHud::CollapseAllWidgets()

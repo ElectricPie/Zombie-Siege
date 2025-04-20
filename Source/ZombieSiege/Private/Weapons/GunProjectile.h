@@ -9,6 +9,21 @@
 class USphereComponent;
 class UProjectileMovementComponent;
 
+USTRUCT(BlueprintType)
+struct FGunProjectileInitData
+{
+	GENERATED_BODY()
+
+	FGunProjectileInitData() {}
+	FGunProjectileInitData(AController* InController, AActor* InActor, TSubclassOf<UDamageType> InDamageType, const float InDamage)
+		: Controller(InController), Actor(InActor), DamageType(InDamageType), Damage(InDamage) {}
+	
+	TWeakObjectPtr<AController> Controller = nullptr;
+	TWeakObjectPtr<AActor> Actor = nullptr;
+	TSubclassOf<UDamageType> DamageType = nullptr;
+	float Damage = 0.f;
+};
+
 UCLASS(Abstract)
 class AGunProjectile : public AActor
 {
@@ -18,7 +33,7 @@ public:
 	// Sets default values for this actor's properties
 	AGunProjectile();
 
-	void Init(AController* Controller, AActor* Actor, TSubclassOf<UDamageType> NewDamageType, float NewDamage);
+	void InitProjectile(const FGunProjectileInitData& InitData);
 
 protected:
 	// Called when the game starts or when spawned

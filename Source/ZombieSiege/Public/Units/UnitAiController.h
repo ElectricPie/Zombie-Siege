@@ -24,4 +24,8 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category="AI")
 	UBehaviorTree* BehaviorTree;
+
+private:
+	UFUNCTION()
+	void OnPossessedUnitDeath(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
 };

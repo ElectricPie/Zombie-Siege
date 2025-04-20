@@ -3,7 +3,7 @@
 
 #include "States/DefencePlayerState.h"
 
-#include "Components/MoneyStoreComponent.h"
+#include "Money/MoneyStoreComponent.h"
 
 ADefencePlayerState::ADefencePlayerState()
 {

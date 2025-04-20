@@ -14,11 +14,11 @@ void UInteractionWidgetController::BindCallbackToDependencies()
 	if (const APlayerCharacter* PlayerCharacter = PlayerController->GetPawn<APlayerCharacter>())
 	{
 		UInteractorComponent* InteractorComponent = PlayerCharacter->GetInteractorComponent();
-		InteractorComponent->OnEnterInteractableEvent.AddLambda([this](UInteractableComponent* InteractableComponent)
+		InteractorComponent->OnEnterInteractableEvent.AddLambda([this](const UInteractableComponent* InteractableComponent)
 		{
 			InteractionMessageEvent.Broadcast(true, InteractableComponent->GetInteractMessage());
 		});
-		InteractorComponent->OnExitInteractableEvent.AddLambda([this](UInteractableComponent* InteractableComponent)
+		InteractorComponent->OnExitInteractableEvent.AddLambda([this](const UInteractableComponent* InteractableComponent)
 		{
 			InteractionMessageEvent.Broadcast(false, FText::GetEmpty());
 		});

@@ -3,15 +3,13 @@
 
 #include "Player/PlayerCharacter.h"
 
-#include "TopDownPlayerController.h"
 #include "Camera/CameraComponent.h"
-#include "Components/HealthComponent.h"
-#include "Interactions/InteractorComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "GameModes/ZombieDefenceGameMode.h"
-#include "Weapons/Gun.h"
-#include "ZombieSiege/Public/Weapons/WeaponStatsDataAsset.h"
+#include "Health/PlayerHealthComponent.h"
+#include "Interactions/InteractorComponent.h"
+#include "Weapons/GunBase.h"
+#include "Weapons/WeaponStatsDataAsset.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -30,21 +28,14 @@ APlayerCharacter::APlayerCharacter()
 	Camera->SetupAttachment(CameraArm);
 	Camera->bUsePawnControlRotation = false;
 
-	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
-
 	WeaponLoadoutComponent = CreateDefaultSubobject<UWeaponLoadoutComponent>(TEXT("WeaponLoadout"));
 	WeaponLoadoutComponent->OnWeaponAddedEvent.AddUObject(this, &APlayerCharacter::OnWeaponAdded);
 
-	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-	HealthComponent->OnDeathEvent.AddDynamic(this, &APlayerCharacter::Die);
+	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("InteractorComponent"));
+
+	HealthComponent = CreateDefaultSubobject<UPlayerHealthComponent>(TEXT("PlayerHealthComponent"));
 
 	GetMesh()->SetReceivesDecals(false);
-}
-
-// Called to bind functionality to input
-void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
 bool APlayerCharacter::IsMovingForward() const
@@ -62,39 +53,27 @@ void APlayerCharacter::Move(const FVector Direction)
 	AddMovementInput(FVector::RightVector, Direction.Y * SpeedModifier);
 }
 
-void APlayerCharacter::Interact()
+void APlayerCharacter::Interact() const
 {
 	InteractorComponent->Interact();
 }
 
-void APlayerCharacter::Fire(AController* Shooter)
+void APlayerCharacter::Fire() const
 {
 	if (bIsReloading)
 		return;
 
-	if (AGun* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
-	{
-		EquippedWeapon->StartFiring(Shooter, this);
-	}
+	WeaponLoadoutComponent->Fire();
 }
 
-void APlayerCharacter::StopFiring()
+void APlayerCharacter::StopFiring() const
 {
-	if (AGun* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
-	{
-		EquippedWeapon->StopFiring();
-	}
+	WeaponLoadoutComponent->StopFiring();
 }
 
-void APlayerCharacter::ReloadWeapon()
+void APlayerCharacter::ReloadWeapon() const
 {
-	if (WeaponLoadoutComponent->ReloadWeapon())
-	{
-		if (UAnimMontage* ReloadAnimation = WeaponLoadoutComponent->GetEquippedWeapon()->GetWeaponStats()->GetReloadAnimMontage())
-		{
-			PlayAnimMontage(ReloadAnimation);
-		}
-	}
+	WeaponLoadoutComponent->Reload();
 }
 
 UMoneyStoreComponent* APlayerCharacter::GetMoneyStoreComponent_Implementation() const
@@ -102,7 +81,30 @@ UMoneyStoreComponent* APlayerCharacter::GetMoneyStoreComponent_Implementation() 
 	return IMoneyStoreInterface::Execute_GetMoneyStoreComponent(GetController());
 }
 
-void APlayerCharacter::OnWeaponAdded(AGun* Weapon)
+UHealthComponent* APlayerCharacter::GetHealthComponent_Implementation() const
+{
+	return HealthComponent;
+}
+
+void APlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (HasAuthority())
+	{
+		OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlap);
+		OnActorEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
+		HealthComponent->OnDeathEvent.AddDynamic(this, &APlayerCharacter::Die_Server);
+	}
+
+	if (!HasAuthority())
+	{
+		OnActorBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlap);
+		OnActorEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
+	}
+}
+
+void APlayerCharacter::OnWeaponAdded(AGunBase* Weapon)
 {
 	if (Weapon == nullptr)
 		return;
@@ -124,18 +126,17 @@ void APlayerCharacter::OnWeaponAdded(AGun* Weapon)
 	Weapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
 }
 
-void APlayerCharacter::Die(AController* KillInstigator, AActor* KillCauser)
+void APlayerCharacter::Die_Server(AActor* VictimActor, AController* KillerController, AActor* KillerActor)
 {
-	if (AZombieDefenceGameMode* GameMode = Cast<AZombieDefenceGameMode>(GetWorld()->GetAuthGameMode()))
-	{
-		GameMode->PlayerDeath(GetController());
-	}
+	HealthComponent->SetEnableHealthRegen(false);
+}
 
-	bIsDead = true;
-	if (HealthComponent)
-	{
-		HealthComponent->SetEnableHealthRegen(false);
-	}
+void APlayerCharacter::OnOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	InteractorComponent->OnOverlapBegin(OtherActor);
+}
 
-	OnPlayerDeathEvent.Broadcast(this);
+void APlayerCharacter::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
+{
+	InteractorComponent->OnOverlapEnd(OtherActor);
 }

@@ -36,6 +36,8 @@ class ZOMBIESIEGE_API UWeaponStatsDataAsset : public UDataAsset
 
 public:
 	UFUNCTION(BlueprintPure)
+	FText GetDisplayName() const { return DisplayName; }
+	UFUNCTION(BlueprintPure)
 	int32 GetMaxAmmo() const { return MaxAmmo; }
 	
 	UFUNCTION(BlueprintPure)
@@ -68,6 +70,8 @@ public:
 	UFMODEvent* GetEmptySound() const { return EmptySound; }
 
 private:
+	UPROPERTY(EditDefaultsOnly)
+	FText DisplayName = FText::FromString("Gun");
 	UPROPERTY(EditDefaultsOnly, Category="Ammo")
 	int32 MaxAmmo = 30;
 

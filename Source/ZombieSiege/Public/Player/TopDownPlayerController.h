@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "ZombieSiege/Public/Money/MoneyStoreInterface.h"
+#include "Money/MoneyStoreInterface.h"
 #include "TopDownPlayerController.generated.h"
 
-class UMoneyStoreComponent;
 class APlayerCharacter;
-class UInputMappingContext;
+class UHealthComponent;
 class UInputAction;
+class UInputMappingContext;
+class UMoneyStoreComponent;
 struct FInputActionValue;
 
 /**
@@ -22,17 +23,21 @@ class ZOMBIESIEGE_API ATopDownPlayerController : public APlayerController, publi
 	GENERATED_BODY()
 
 public:
+	bool bIsPaused = false;
+	
+public:
 	FVector GetAimDirection() const { return AimDirection; }
-	void GameOver();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastGameOver();
 	void SetInputGameOnly();
 	void SetInputGameAndUI();
 
 	/* MoneyStoreInterface */
 	virtual UMoneyStoreComponent* GetMoneyStoreComponent_Implementation() const override;
 	/* End MoneyStoreInterface */
-
-public:
-	bool bIsPaused = false;
+	
+	UFUNCTION(Client, Reliable)
+	void ClientRespawnPlayer();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -40,6 +45,33 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnRep_PlayerState() override;
+	virtual void AcknowledgePossession(APawn* P) override;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputMappingContext> InputMappingContext;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> MoveAction;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> InteractAction;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> FireAction;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> SwapWeaponAction;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> ReloadWeaponAction;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> MenuAction;
+
+	UPROPERTY()
+	TWeakObjectPtr<UHealthComponent> HealthComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, Category="Look")
+	float LookRaycastLimit = 3000.f;
+	
+	FVector AimDirection = FVector(0.f);
+
+	bool bIsGameOver = false;
 	
 private:
 	void Move(const FInputActionValue& Value);
@@ -62,31 +94,6 @@ private:
 	void ToggleMenu();
 	void OnPauseMenuChanged(const bool bMenuIsOpen);
 	
-private:
-	// UPROPERTY(VisibleAnywhere, Category="Money")
-	// TObjectPtr<UMoneyStoreComponent> MoneyStoreComponent;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputMappingContext> InputMappingContext;
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputAction> MoveAction;
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputAction> InteractAction;
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputAction> FireAction;
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputAction> SwapWeaponAction;
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputAction> ReloadWeaponAction;
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputAction> MenuAction;
-
-	UPROPERTY(EditAnywhere, Category="Look")
-	float LookRaycastLimit = 3000.f;
-
-	TWeakObjectPtr<APlayerCharacter> PlayerCharacter;
-	
-	FVector AimDirection = FVector(0.f);
-
-	bool bIsGameOver = false;
+	UFUNCTION()
+	void PlayerDied(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
 };
