@@ -7,11 +7,11 @@
 #include "Money/MoneyStoreInterface.h"
 #include "TopDownPlayerController.generated.h"
 
-class UHealthComponent;
-class UMoneyStoreComponent;
 class APlayerCharacter;
-class UInputMappingContext;
+class UHealthComponent;
 class UInputAction;
+class UInputMappingContext;
+class UMoneyStoreComponent;
 struct FInputActionValue;
 
 /**
@@ -45,6 +45,7 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnRep_PlayerState() override;
+	virtual void AcknowledgePossession(APawn* P) override;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")

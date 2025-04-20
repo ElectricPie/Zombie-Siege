@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ZombieSiege/Public/Ui/WidgetControllers/AmmoCounterWidgetController.h"
+#include "Ui/WidgetControllers/AmmoCounterWidgetController.h"
 
 #include "Components/WeaponLoadoutComponent.h"
 #include "Player/PlayerCharacter.h"
@@ -12,7 +12,7 @@ void UAmmoCounterWidgetController::BindCallbackToDependencies()
 	if (const APlayerCharacter* PlayerCharacter = PlayerController->GetPawn<APlayerCharacter>())
 	{
 		UWeaponLoadoutComponent* WeaponLoadoutComponent = PlayerCharacter->GetWeaponLoadoutComponent();
-		WeaponLoadoutComponent->OnWeaponChangedEvent.AddDynamic(this, &UAmmoCounterWidgetController::OnWeaponChanged);
+		WeaponLoadoutComponent->OnWeaponChangedEvent.AddUniqueDynamic(this, &UAmmoCounterWidgetController::OnWeaponChanged);
 		if (AGunBase* EquippedWeapon = WeaponLoadoutComponent->GetEquippedWeapon())
 		{
 			OnWeaponChanged(EquippedWeapon);
