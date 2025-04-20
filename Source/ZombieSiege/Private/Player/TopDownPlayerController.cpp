@@ -135,6 +135,17 @@ void ATopDownPlayerController::OnRep_PlayerState()
 	HealthComponent->OnDeathEvent.AddDynamic(this, &ATopDownPlayerController::PlayerDied);
 }
 
+
+void ATopDownPlayerController::AcknowledgePossession(APawn* P)
+{
+	Super::AcknowledgePossession(P);
+
+	if (AGameHud* Hud = Cast<AGameHud>(GetHUD()))
+	{
+		Hud->RebindCharacterWidgetControllerDependencies();
+	}
+}
+
 void ATopDownPlayerController::Move(const FInputActionValue& Value)
 {
 	if (!CanDoAction())
@@ -206,7 +217,7 @@ void ATopDownPlayerController::StopFiring()
 	if (!CanDoAction())
 		return;
 
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
 	{
 		PlayerCharacter->StopFiring();
 	}
