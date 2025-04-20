@@ -30,7 +30,8 @@ void ATopDownPlayerController::SetInputGameOnly()
 	SetInputMode(InputMode);
 	CurrentMouseCursor = EMouseCursor::Crosshairs;
 	bShowMouseCursor = true;
-	UGameplayStatics::SetViewportMouseCaptureMode(GetWorld(), EMouseCaptureMode::CapturePermanently_IncludingInitialMouseDown);
+	UGameplayStatics::SetViewportMouseCaptureMode(
+		GetWorld(), EMouseCaptureMode::CapturePermanently_IncludingInitialMouseDown);
 }
 
 void ATopDownPlayerController::SetInputGameAndUI()
@@ -60,7 +61,7 @@ void ATopDownPlayerController::BeginPlay()
 
 	if (!IsLocalController())
 		return;
-	
+
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
 		GetLocalPlayer()))
 	{
@@ -77,7 +78,7 @@ void ATopDownPlayerController::BeginPlay()
 	SetInputGameOnly();
 }
 
-void ATopDownPlayerController::Tick(float DeltaSeconds)
+void ATopDownPlayerController::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
@@ -94,16 +95,21 @@ void ATopDownPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Move);
 
 		// Interaction
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::Interact);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
+		                                   &ATopDownPlayerController::Interact);
 
 		// Weapons
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATopDownPlayerController::Fire);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ATopDownPlayerController::StopFiring);
-		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::SwapWeapon);
-		EnhancedInputComponent->BindAction(ReloadWeaponAction, ETriggerEvent::Triggered, this, &ATopDownPlayerController::ReloadWeapon);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this,
+		                                   &ATopDownPlayerController::StopFiring);
+		EnhancedInputComponent->BindAction(SwapWeaponAction, ETriggerEvent::Triggered, this,
+		                                   &ATopDownPlayerController::SwapWeapon);
+		EnhancedInputComponent->BindAction(ReloadWeaponAction, ETriggerEvent::Triggered, this,
+		                                   &ATopDownPlayerController::ReloadWeapon);
 
 		// Menu
-		EnhancedInputComponent->BindAction(MenuAction, ETriggerEvent::Completed, this, &ATopDownPlayerController::ToggleMenu);
+		EnhancedInputComponent->BindAction(MenuAction, ETriggerEvent::Completed, this,
+		                                   &ATopDownPlayerController::ToggleMenu);
 	}
 }
 
@@ -115,10 +121,6 @@ void ATopDownPlayerController::OnPossess(APawn* InPawn)
 	{
 		Hud->InitHud();
 	}
-
-	const APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>();
-	HealthComponent = PlayerCharacter->GetHealthComponent_Implementation();
-	HealthComponent->OnDeathEvent.AddDynamic(this, &ATopDownPlayerController::PlayerDied);
 }
 
 void ATopDownPlayerController::OnRep_PlayerState()
@@ -129,10 +131,6 @@ void ATopDownPlayerController::OnRep_PlayerState()
 	{
 		Hud->InitHud();
 	}
-
-	const APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>();
-	HealthComponent = PlayerCharacter->GetHealthComponent_Implementation();
-	HealthComponent->OnDeathEvent.AddDynamic(this, &ATopDownPlayerController::PlayerDied);
 }
 
 
@@ -140,9 +138,15 @@ void ATopDownPlayerController::AcknowledgePossession(APawn* P)
 {
 	Super::AcknowledgePossession(P);
 
-	if (AGameHud* Hud = Cast<AGameHud>(GetHUD()))
+	if (const APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>())
 	{
-		Hud->RebindCharacterWidgetControllerDependencies();
+		if (const AGameHud* Hud = Cast<AGameHud>(GetHUD()))
+		{
+			Hud->RebindCharacterWidgetControllerDependencies();
+		}
+	
+		HealthComponent = PlayerCharacter->GetHealthComponent_Implementation();
+		HealthComponent->OnDeathEvent.AddDynamic(this, &ATopDownPlayerController::PlayerDied);
 	}
 }
 
@@ -162,7 +166,7 @@ void ATopDownPlayerController::FaceMouse()
 {
 	if (!CanDoAction())
 		return;
-	
+
 	if (GetPawn())
 	{
 		FIntVector2 ViewportSize;
@@ -205,7 +209,7 @@ void ATopDownPlayerController::Fire()
 {
 	if (!CanDoAction())
 		return;
-	
+
 	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
 	{
 		PlayerCharacter->Fire();
@@ -256,12 +260,6 @@ bool ATopDownPlayerController::CanDoAction() const
 		return false;
 	if (HealthComponent.IsValid() && HealthComponent->GetIsDead())
 		return false;
-
-	if (const IHealthComponentInterface* HealthComponentInterface = Cast<APlayerCharacter>(GetPawn()))
-	{
-		if (HealthComponentInterface->GetHealthComponent_Implementation()->GetIsDead())
-			return false;
-	}
 
 	return true;
 }

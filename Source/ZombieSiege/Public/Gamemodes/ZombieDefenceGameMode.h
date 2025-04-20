@@ -4,22 +4,26 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
+#include "Player/PlayerCharacter.h"
 #include "ZombieDefenceGameMode.generated.h"
 
 class AGunBase;
-class AUnitSpawnPoint;
+class ATopDownPlayerController;
 class AUnitCharacter;
+class AUnitSpawnPoint;
 
 struct FWeightedSpawnPoint
 {
 	TObjectPtr<AUnitSpawnPoint> SpawnPoint;
 	float LastUsedTime;
 
-	FWeightedSpawnPoint(): SpawnPoint(nullptr), LastUsedTime(0.f) {}
-		
+	FWeightedSpawnPoint(): SpawnPoint(nullptr), LastUsedTime(0.f)
+	{
+	}
+
 	FWeightedSpawnPoint(AUnitSpawnPoint* InSpawnPoint, const float InLastUsedTime)
 		: SpawnPoint(InSpawnPoint)
-		, LastUsedTime(InLastUsedTime)
+		  , LastUsedTime(InLastUsedTime)
 	{
 	}
 };
@@ -31,21 +35,23 @@ UCLASS()
 class AZombieDefenceGameMode : public AGameMode
 {
 	GENERATED_BODY()
-	
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	virtual void RestartPlayer(AController* NewPlayer) override;
-	
+
 private:
 	UPROPERTY(EditAnywhere, Category="Player", meta=(ClampMin=0, UIMin=0))
 	int32 StartingMoney = 500;
-	
+
 	UPROPERTY(EditAnywhere, Category="Spawning")
 	TSubclassOf<AUnitCharacter> UnitClass;
-	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=1, UIMin=1, ToolTip="The maximum amount of units that can be spawned in at one time"))
+	UPROPERTY(EditAnywhere, Category="Spawning",
+		meta=(ClampMin=1, UIMin=1, ToolTip="The maximum amount of units that can be spawned in at one time"))
 	int32 MaxCurrentSpawnedUnits = 20;
-	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=1, UIMin=1, ToolTip="The number of units in the first round"))
+	UPROPERTY(EditAnywhere, Category="Spawning",
+		meta=(ClampMin=1, UIMin=1, ToolTip="The number of units in the first round"))
 	int32 InitialUnitCount = 6;
 	UPROPERTY(VisibleAnywhere, Category="Spawning")
 	int32 UnitsToBeSpawnedThisRound = 0;
@@ -53,28 +59,32 @@ private:
 	int32 UnitsSpawnedThisRound = 0;
 	UPROPERTY(VisibleAnywhere, Category="Spawning")
 	int32 UnitsKilledThisRound = 0;
-	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=1.f, UIMin=1.f, ToolTip="The amount of time after the game starts before units start spawning"))
+	UPROPERTY(EditAnywhere, Category="Spawning",
+		meta=(ClampMin=1.f, UIMin=1.f, ToolTip="The amount of time after the game starts before units start spawning"))
 	float RoundStartDelay = 4.f;
-	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The initial time between units spawning"))
+	UPROPERTY(EditAnywhere, Category="Spawning",
+		meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The initial time between units spawning"))
 	float InitialSpawnDelay = 2.f;
 	float CurrentSpawnDelay = 2.f;
-	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The minimum amount of time between units spawning"))
+	UPROPERTY(EditAnywhere, Category="Spawning",
+		meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The minimum amount of time between units spawning"))
 	float MinSpawnDelay = 0.5f;
-	UPROPERTY(EditAnywhere, Category="Spawning", meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The amount of health to add to the units each round"))
+	UPROPERTY(EditAnywhere, Category="Spawning",
+		meta=(ClampMin=0.f, UIMin=0.f, ToolTip="The amount of health to add to the units each round"))
 	float HealthIncreasePerRound = 25.f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Spawning")
 	TObjectPtr<UCurveTable> ZombieStatsTable;
-	
+
 	TArray<FWeightedSpawnPoint*> ActiveSpawnPoints;
-	
+
 	TSet<TObjectPtr<AUnitCharacter>> ActiveUnits;
 
 	UPROPERTY(EditAnywhere, Category="Weapon")
 	TArray<TSubclassOf<AGunBase>> StartingWeaponClasses;
 
 	FTimerHandle RoundSpawnTimerHandle;
-	
+
 	UPROPERTY(EditAnywhere)
 	float PlayerLifespanAfterDeath = 5.f;
 
@@ -89,11 +99,13 @@ private:
 
 	void GameOver();
 	AUnitSpawnPoint* GetWeightedRandomSpawnPoint() const;
-	
+
 	UFUNCTION()
 	void PlayerDied(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
 	UFUNCTION()
 	void UnitKilled(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
 
 	void RespawnDeadPlayers();
+
+	APlayerCharacter* GetFirstAlivePlayerCharacter() const;
 };
