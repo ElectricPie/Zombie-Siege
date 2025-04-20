@@ -4,8 +4,8 @@
 #include "Units/UnitAiController.h"
 
 #include "BrainComponent.h"
+#include "Health/HealthComponent.h"
 #include "Units/UnitCharacter.h"
-
 
 class AUnitCharacter;
 
@@ -28,11 +28,13 @@ void AUnitAiController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	if (AUnitCharacter* Unit = Cast<AUnitCharacter>(InPawn))
+	if (const AUnitCharacter* Unit = Cast<AUnitCharacter>(InPawn))
 	{
-		Unit->OnKilledEvent.AddLambda([this](AUnitCharacter* UnitKilled, AController* KillInstigator, AActor* KillCauser)
-		{
-			StopBehaviorTree();
-		});
+		Unit->GetHealthComponent_Implementation()->OnDeathEvent.AddDynamic(this, &AUnitAiController::OnPossessedUnitDeath);
 	}
+}
+
+void AUnitAiController::OnPossessedUnitDeath(AActor* VictimActor, AController* KillerController, AActor* KillerActor)
+{
+	StopBehaviorTree();
 }

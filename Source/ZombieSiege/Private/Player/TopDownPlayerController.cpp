@@ -1,17 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TopDownPlayerController.h"
+#include "Player/TopDownPlayerController.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "PlayerCharacter.h"
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/PlayerState.h"
+#include "Health/HealthComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PlayerCharacter.h"
 #include "Ui/GameHud.h"
 
-void ATopDownPlayerController::GameOver()
+void ATopDownPlayerController::MulticastGameOver_Implementation()
 {
 	bIsGameOver = true;
 	if (AGameHud* GameHud = Cast<AGameHud>(GetHUD()))
@@ -29,13 +30,14 @@ void ATopDownPlayerController::SetInputGameOnly()
 	SetInputMode(InputMode);
 	CurrentMouseCursor = EMouseCursor::Crosshairs;
 	bShowMouseCursor = true;
-	UGameplayStatics::SetViewportMouseCaptureMode(GetWorld(), EMouseCaptureMode::CapturePermanently_IncludingInitialMouseDown);
+	UGameplayStatics::SetViewportMouseCaptureMode(
+		GetWorld(), EMouseCaptureMode::CapturePermanently_IncludingInitialMouseDown);
 }
 
 void ATopDownPlayerController::SetInputGameAndUI()
 {
 	FInputModeGameAndUI InputMode;
-	// This is need as without it in GameOnly mode it locks the mouse when left clicking
+	// This is need as without it in GameOnly mode it locks the mouse when left-clicking
 	InputMode.SetHideCursorDuringCapture(false);
 	SetInputMode(InputMode);
 	bShowMouseCursor = true;
@@ -47,9 +49,18 @@ UMoneyStoreComponent* ATopDownPlayerController::GetMoneyStoreComponent_Implement
 	return IMoneyStoreInterface::Execute_GetMoneyStoreComponent(GetPlayerState<APlayerState>());
 }
 
+void ATopDownPlayerController::ClientRespawnPlayer_Implementation()
+{
+	EnableInput(this);
+	SetInputGameOnly();
+}
+
 void ATopDownPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (!IsLocalController())
+		return;
 
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
 		GetLocalPlayer()))
@@ -57,6 +68,7 @@ void ATopDownPlayerController::BeginPlay()
 		Subsystem->AddMappingContext(InputMappingContext, 0);
 	}
 
+	// TODO: Setup widget controller for pausing
 	if (AGameHud* GameHud = Cast<AGameHud>(GetHUD()))
 	{
 		GameHud->OnPauseMenuToggledEvent.AddUObject(this, &ATopDownPlayerController::OnPauseMenuChanged);
@@ -66,7 +78,7 @@ void ATopDownPlayerController::BeginPlay()
 	SetInputGameOnly();
 }
 
-void ATopDownPlayerController::Tick(float DeltaSeconds)
+void ATopDownPlayerController::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
@@ -105,11 +117,6 @@ void ATopDownPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	if (APlayerCharacter* PossessedPlayerCharacter = Cast<APlayerCharacter>(InPawn))
-	{
-		PlayerCharacter = PossessedPlayerCharacter;
-	}
-
 	if (AGameHud* Hud = Cast<AGameHud>(GetHUD()))
 	{
 		Hud->InitHud();
@@ -126,13 +133,33 @@ void ATopDownPlayerController::OnRep_PlayerState()
 	}
 }
 
+
+void ATopDownPlayerController::AcknowledgePossession(APawn* P)
+{
+	Super::AcknowledgePossession(P);
+
+	if (const APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>())
+	{
+		if (const AGameHud* Hud = Cast<AGameHud>(GetHUD()))
+		{
+			Hud->RebindCharacterWidgetControllerDependencies();
+		}
+	
+		HealthComponent = PlayerCharacter->GetHealthComponent_Implementation();
+		HealthComponent->OnDeathEvent.AddDynamic(this, &ATopDownPlayerController::PlayerDied);
+	}
+}
+
 void ATopDownPlayerController::Move(const FInputActionValue& Value)
 {
 	if (!CanDoAction())
 		return;
 
-	const FVector2D Direction = Value.Get<FVector2D>();
-	PlayerCharacter->Move(FVector(Direction.X, Direction.Y, 0.f).GetSafeNormal());
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		const FVector2D Direction = Value.Get<FVector2D>();
+		PlayerCharacter->Move(FVector(Direction.X, Direction.Y, 0.f).GetSafeNormal());
+	}
 }
 
 void ATopDownPlayerController::FaceMouse()
@@ -140,26 +167,29 @@ void ATopDownPlayerController::FaceMouse()
 	if (!CanDoAction())
 		return;
 
-	FIntVector2 ViewportSize;
-	GetViewportSize(ViewportSize.X, ViewportSize.Y);
-
-	FVector2D MouseScreenLocation;
-	if (GetMousePosition(MouseScreenLocation.X, MouseScreenLocation.Y))
+	if (GetPawn())
 	{
-		FVector WorldPosition;
-		FVector WorldDirection;
-		DeprojectScreenPositionToWorld(MouseScreenLocation.X, MouseScreenLocation.Y, WorldPosition, WorldDirection);
+		FIntVector2 ViewportSize;
+		GetViewportSize(ViewportSize.X, ViewportSize.Y);
 
-		FHitResult HitResult;
-		FCollisionQueryParams QueryParams;
-		QueryParams.AddIgnoredActor(this);
-
-		const FVector RayEnd = WorldPosition + WorldDirection * LookRaycastLimit;
-		if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldPosition, RayEnd, ECC_Visibility, QueryParams))
+		FVector2D MouseScreenLocation;
+		if (GetMousePosition(MouseScreenLocation.X, MouseScreenLocation.Y))
 		{
-			AimDirection = (HitResult.ImpactPoint - PlayerCharacter->GetActorLocation()).GetSafeNormal();
-			AimDirection.Z = PlayerCharacter->GetActorLocation().X;
-			ClientSetRotation(AimDirection.Rotation());
+			FVector WorldPosition;
+			FVector WorldDirection;
+			DeprojectScreenPositionToWorld(MouseScreenLocation.X, MouseScreenLocation.Y, WorldPosition, WorldDirection);
+
+			FHitResult HitResult;
+			FCollisionQueryParams QueryParams;
+			QueryParams.AddIgnoredActor(this);
+
+			const FVector RayEnd = WorldPosition + WorldDirection * LookRaycastLimit;
+			if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldPosition, RayEnd, ECC_Visibility, QueryParams))
+			{
+				AimDirection = (HitResult.ImpactPoint - GetPawn()->GetActorLocation()).GetSafeNormal();
+				AimDirection.Z = GetPawn()->GetActorLocation().X;
+				ClientSetRotation(AimDirection.Rotation());
+			}
 		}
 	}
 }
@@ -169,7 +199,10 @@ void ATopDownPlayerController::Interact()
 	if (!CanDoAction())
 		return;
 
-	PlayerCharacter->Interact();
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->Interact();
+	}
 }
 
 void ATopDownPlayerController::Fire()
@@ -177,7 +210,10 @@ void ATopDownPlayerController::Fire()
 	if (!CanDoAction())
 		return;
 
-	PlayerCharacter->Fire(this);
+	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->Fire();
+	}
 }
 
 void ATopDownPlayerController::StopFiring()
@@ -185,7 +221,10 @@ void ATopDownPlayerController::StopFiring()
 	if (!CanDoAction())
 		return;
 
-	PlayerCharacter->StopFiring();
+	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->StopFiring();
+	}
 }
 
 void ATopDownPlayerController::SwapWeapon()
@@ -193,9 +232,12 @@ void ATopDownPlayerController::SwapWeapon()
 	if (!CanDoAction())
 		return;
 
-	if (UWeaponLoadoutComponent* WeaponLoadoutComponent = PlayerCharacter->GetWeaponLoadoutComponent())
+	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
 	{
-		WeaponLoadoutComponent->EquipNextWeapon();
+		if (UWeaponLoadoutComponent* WeaponLoadoutComponent = PlayerCharacter->GetWeaponLoadoutComponent())
+		{
+			WeaponLoadoutComponent->ServerEquipNextWeapon();
+		}
 	}
 }
 
@@ -204,18 +246,19 @@ void ATopDownPlayerController::ReloadWeapon()
 	if (!CanDoAction())
 		return;
 
-	PlayerCharacter->ReloadWeapon();
+	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->ReloadWeapon();
+	}
 }
 
 bool ATopDownPlayerController::CanDoAction() const
 {
 	if (bIsGameOver)
 		return false;
-	if (PlayerCharacter == nullptr)
-		return false;
-	if (PlayerCharacter->GetIsDead())
-		return false;
 	if (bIsPaused)
+		return false;
+	if (HealthComponent.IsValid() && HealthComponent->GetIsDead())
 		return false;
 
 	return true;
@@ -241,4 +284,10 @@ void ATopDownPlayerController::OnPauseMenuChanged(const bool bMenuIsOpen)
 	{
 		SetInputGameOnly();
 	}
+}
+
+void ATopDownPlayerController::PlayerDied(AActor* VictimActor, AController* KillerController, AActor* KillerActor)
+{
+	DisableInput(this);
+	SetInputMode(FInputModeUIOnly());
 }

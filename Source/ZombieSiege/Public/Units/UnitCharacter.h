@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Health/HealthComponentInterface.h"
 #include "UnitCharacter.generated.h"
 
 class UHealthComponent;
@@ -15,7 +16,7 @@ class UMoneyRewardComponent;
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnUnitKilledSingature, AUnitCharacter* /*UnitKilled*/, AController* /*KillInstigator*/, AActor* /*KillCauser*/)
 
 UCLASS()
-class AUnitCharacter : public ACharacter
+class AUnitCharacter : public ACharacter, public IHealthComponentInterface
 {
 	GENERATED_BODY()
 
@@ -24,8 +25,7 @@ public:
 	AUnitCharacter();
 
 	UFUNCTION(BlueprintCallable)
-	void Attack(AActor* Target);
-
+	void Attack_Server(AActor* AttackTarget);
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category=Attack)
 	float GetAttackRange() const { return AttackRange; };
 
@@ -35,14 +35,13 @@ public:
 
 	UFUNCTION(BlueprintPure, Category="Money")
 	UMoneyRewardComponent* GetMoneyRewardComponent() const { return MoneyRewardComponent; }
-	UFUNCTION(BlueprintPure, Category="Health")
-	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
+
+	/* HealthComponentInterface */
+	virtual UHealthComponent* GetHealthComponent_Implementation() const override;
+	/* End HealthComponentInterface */
 	
 public:
 	FOnUnitKilledSingature OnKilledEvent;
-	
-protected:
-	virtual void BeginPlay() override;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Attack", meta=(ClampMin=0.f, UIMin=0.f))
@@ -56,16 +55,10 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
+
+protected:
+	virtual void BeginPlay() override;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
-	float MaxHealth = 40.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Health")
-	float CurrentHealth = 40.f;
-
-private:
-	UFUNCTION()
-	void Die(AController* KillInstigator, AActor* KillCauser);
-
 private:
 	UPROPERTY(VisibleAnywhere, Category="Money")
 	TObjectPtr<UMoneyRewardComponent> MoneyRewardComponent;
@@ -83,5 +76,14 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float DeathLifeSpan = 5.f;
+	
+private:
+	UFUNCTION()
+	void Die_Server(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
+	void HealthChange_Client(const float NewCurrentHealth);
 
+	void Ragdoll();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAttack();
 };

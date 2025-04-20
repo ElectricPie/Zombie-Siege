@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Health/HealthComponentInterface.h"
 #include "ZombieSiege/Public/Money/MoneyStoreInterface.h"
 #include "PlayerCharacter.generated.h"
 
-class UHealthComponent;
-class AGun;
+class UPlayerHealthComponent;
+class AGunBase;
 class UAnimMontage;
 class UCameraComponent;
 class UInteractableComponent;
@@ -16,19 +17,14 @@ class UInteractorComponent;
 class USpringArmComponent;
 class UWeaponLoadoutComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDeath, APlayerCharacter*, PlayerCharacter);
-
 UCLASS()
-class APlayerCharacter : public ACharacter, public IMoneyStoreInterface
+class APlayerCharacter : public ACharacter, public IMoneyStoreInterface, public IHealthComponentInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	/**
 	 * @brief Gets the velocity relative to the direction they are facing
@@ -38,30 +34,24 @@ public:
 	bool IsMovingForward() const;
 
 	void Move(const FVector Direction);
-	void Interact();
+	void Interact() const;
 
 	UFUNCTION(BlueprintSetter)
 	UWeaponLoadoutComponent* GetWeaponLoadoutComponent() const { return WeaponLoadoutComponent; }
 
-	void Fire(AController* Shooter);
-	void StopFiring();
-	void ReloadWeapon();
-
-	UFUNCTION(BlueprintPure)
-	bool GetIsDead() const { return bIsDead; }
+	void Fire() const;
+	void StopFiring() const;
+	void ReloadWeapon() const;
 
 	/* MoneyStoreInterface */
 	virtual UMoneyStoreComponent* GetMoneyStoreComponent_Implementation() const override;
 	/* End MoneyStoreInterface */
+	/* HealthComponentInterface */
+	virtual UHealthComponent* GetHealthComponent_Implementation() const override;
+	/* End HealthComponentInterface */
 
 	UFUNCTION(BlueprintPure)
 	UInteractorComponent* GetInteractorComponent() const { return InteractorComponent; }
-	UFUNCTION(BlueprintPure)
-	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
-
-public:
-	UPROPERTY(BlueprintAssignable)
-	FOnPlayerDeath OnPlayerDeathEvent;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
@@ -73,19 +63,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	TObjectPtr<UWeaponLoadoutComponent> WeaponLoadoutComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
-	TObjectPtr<UHealthComponent> HealthComponent;
+	TObjectPtr<UPlayerHealthComponent> HealthComponent;
 
 	float SpeedModifier = 0.8f;
 
+protected:
+	virtual void BeginPlay() override;
+	
 private:
 	UPROPERTY(EditAnywhere, Category="Weapon",
 		meta=(ToolTip="The time a reload takes if the equiped gun has no reload animation"))
 	float DefaultReloadTime = 2.f;
 	bool bIsReloading = false;
 	FTimerHandle ReloadingTimerHandle;
-
-	UPROPERTY(VisibleAnywhere, Category="Health")
-	bool bIsDead = false;
 
 	UPROPERTY(EditAnywhere, Category="Movement",
 		meta=(ToolTip="How far from forward the character can move before they are considered to be moving backwards",
@@ -98,7 +88,12 @@ private:
 	FName RifleWeaponSocket = TEXT("RifleSocket");
 
 private:
-	void OnWeaponAdded(AGun* Weapon);
+	void OnWeaponAdded(AGunBase* Weapon);
 	UFUNCTION()
-	void Die(AController* KillInstigator, AActor* KillCauser);
+	void Die_Server(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
+	
+	UFUNCTION()
+	void OnOverlap(AActor* OverlappedActor, AActor* OtherActor);
+	UFUNCTION()
+	void OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
 };

@@ -3,12 +3,13 @@
 
 #include "Weapons/WeaponBuyPoint.h"
 
-#include "Gun.h"
-#include "Interactions/InteractableComponent.h"
-#include "Components/MoneyStoreComponent.h"
 #include "Components/WeaponLoadoutComponent.h"
+#include "Interactions/InteractableComponent.h"
+#include "Money/MoneyStoreComponent.h"
 #include "Money/MoneyStoreInterface.h"
+#include "Weapons/GunBase.h"
 #include "Weapons/WeaponBuyPointDataAsset.h"
+#include "Weapons/WeaponStatsDataAsset.h"
 
 #define DEFAULT_WEAPON_INTERACT_MESSAGE "Buy weapon"
 
@@ -27,6 +28,8 @@ AWeaponBuyPoint::AWeaponBuyPoint()
 	WeaponMeshComponent->SetupAttachment(RootComponent);
 	WeaponMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	WeaponMeshComponent->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+
+	bReplicates = false;
 }
 
 void AWeaponBuyPoint::OnConstruction(const FTransform& Transform)
@@ -40,24 +43,35 @@ void AWeaponBuyPoint::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InteractableComponent->OnInteractEvent.AddLambda(
-	[this](const AController* InteractionInstigator, const AActor* InteractionCauser)
-	{
-		if (UMoneyStoreComponent* MoneyStoreComponent = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(InteractionInstigator))
-		{
-			BuyWeapon(MoneyStoreComponent, InteractionCauser);
-		}
-	});
-
-	const FText InteractMessage = FText::FromString(FString::Printf(TEXT("Buy weapon [Costs %d]"), WeaponBuyPointDataAsset->GetCost()));
+	const FText DisplayName = WeaponBuyPointDataAsset->GetWeaponClass()->GetDefaultObject<AGunBase>()->GetWeaponStats()->GetDisplayName();
+	const FText InteractMessage = FText::FromString(FString::Printf(TEXT("Buy %s [Costs %d]"), *DisplayName.ToString(), WeaponBuyPointDataAsset->GetCost()));
 	InteractableComponent->SetInteractMessage(InteractMessage);
+	
+	InteractableComponent->OnInteractableConsumedEvent.AddLambda([this]()
+		{
+			SetActorHiddenInGame(true);
+		});
+	
+	// Server only
+	if (HasAuthority())
+	{
+		InteractableComponent->OnInteractEvent.AddLambda(
+		   [this](const AController* InteractionInstigator, APawn* InteractionCauser)
+		   {
+			   if (UMoneyStoreComponent* MoneyStoreComponent = IMoneyStoreInterface::Execute_GetMoneyStoreComponent(InteractionInstigator))
+			   {
+				   TryBuyWeapon_Server(MoneyStoreComponent, InteractionCauser);
+			   }
+		   });
+		return;
+	}
 }
 
 void AWeaponBuyPoint::RefreshWeaponMesh() const
 {
 	if (WeaponBuyPointDataAsset && WeaponBuyPointDataAsset->GetWeaponClass())
 	{
-		const AGun* DefaultWeapon = WeaponBuyPointDataAsset->GetWeaponClass()->GetDefaultObject<AGun>();
+		const AGunBase* DefaultWeapon = WeaponBuyPointDataAsset->GetWeaponClass()->GetDefaultObject<AGunBase>();
 		WeaponMeshComponent->SetSkeletalMesh(DefaultWeapon->GetMesh()->GetSkeletalMeshAsset());
 	}
 	else
@@ -66,23 +80,31 @@ void AWeaponBuyPoint::RefreshWeaponMesh() const
 	}
 }
 
-void AWeaponBuyPoint::BuyWeapon(UMoneyStoreComponent* MoneyStore,
-                                const AActor* ActorToGiveWeapon)
+bool AWeaponBuyPoint::TryBuyWeapon_Server(UMoneyStoreComponent* MoneyStore, APawn* ActorToGiveWeapon)
 {
+	check(HasAuthority());
+
 	if (MoneyStore == nullptr || ActorToGiveWeapon == nullptr)
-		return;
+		return false;
 
 	// Not enough money
-	if (!MoneyStore->TakeMoney(WeaponBuyPointDataAsset->GetCost()))
-		return;
+	if (!MoneyStore->TakeMoney_Server(WeaponBuyPointDataAsset->GetCost()))
+		return false;
 
 	// Adds the weapon to the players loadout
-	if (UWeaponLoadoutComponent* WeaponLoadoutComponent = ActorToGiveWeapon->FindComponentByClass<UWeaponLoadoutComponent>())
+	if (UWeaponLoadoutComponent* WeaponLoadoutComponent = ActorToGiveWeapon->FindComponentByClass<
+		UWeaponLoadoutComponent>())
 	{
-		AGun* NewWeapon = GetWorld()->SpawnActor<AGun>(WeaponBuyPointDataAsset->GetWeaponClass(), GetActorTransform());
-		WeaponLoadoutComponent->AddWeapon(NewWeapon, true);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = ActorToGiveWeapon;
+		SpawnParams.Instigator = ActorToGiveWeapon;
+		AGunBase* NewWeapon = GetWorld()->SpawnActor<AGunBase>(WeaponBuyPointDataAsset->GetWeaponClass(), GetActorTransform(), SpawnParams);
+		WeaponLoadoutComponent->AddWeapon_Server(NewWeapon, true);
+
+		InteractableComponent->InteractionSuccessful();
+
+		return true;
 	}
 
-	// TODO: This is temporary until a it is decided how to handle the weapon ammo and multiplayer
-	Destroy();
+	return false;
 }

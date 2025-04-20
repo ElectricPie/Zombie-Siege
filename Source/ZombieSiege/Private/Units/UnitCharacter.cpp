@@ -5,9 +5,9 @@
 
 #include "FMODBlueprintStatics.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/HealthComponent.h"
-#include "Components/MoneyRewardComponent.h"
+#include "Health/HealthComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Money/MoneyRewardComponent.h"
 
 // Sets default values
 AUnitCharacter::AUnitCharacter()
@@ -18,20 +18,76 @@ AUnitCharacter::AUnitCharacter()
 	MoneyRewardComponent = CreateDefaultSubobject<UMoneyRewardComponent>(TEXT("Money Reward"));
 	
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
-	HealthComponent->OnDeathEvent.AddDynamic(this, &AUnitCharacter::Die);
 }
 
-void AUnitCharacter::Attack(AActor* Target)
+void AUnitCharacter::Attack_Server(AActor* AttackTarget)
 {
-	if (Target == nullptr)
+	check(HasAuthority());
+	
+	if (AttackTarget == nullptr)
 		return;
+	
 	// Delay time between attacks
 	if (GetGameTimeSinceCreation() - LastAttackTime < AttackDelay)
 		return;
 	
-	UGameplayStatics::ApplyDamage(Target, AttackDamage, GetController(), this, UDamageType::StaticClass());
+	UGameplayStatics::ApplyDamage(AttackTarget, AttackDamage, GetController(), this, UDamageType::StaticClass());
 	LastAttackTime = GetGameTimeSinceCreation();
 
+	MulticastAttack();
+}
+
+void AUnitCharacter::SetTargetBarricade(ABarricade* NewTargetBarricade)
+{
+	TargetBarricade = NewTargetBarricade;
+}
+
+UHealthComponent* AUnitCharacter::GetHealthComponent_Implementation() const
+{
+	return HealthComponent;
+}
+
+void AUnitCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (HasAuthority())
+	{
+		HealthComponent->OnDeathEvent.AddDynamic(this, &AUnitCharacter::Die_Server);
+	}
+	else
+	{
+		HealthComponent->OnCurrentHealthChangedEvent.AddUObject(this, &AUnitCharacter::HealthChange_Client);
+	}
+}
+
+void AUnitCharacter::Die_Server(AActor* VictimActor, AController* KillerController, AActor* KillerActor)
+{
+	Ragdoll();
+	
+	OnKilledEvent.Broadcast(this, KillerController, KillerActor);
+	SetLifeSpan(DeathLifeSpan);
+}
+
+void AUnitCharacter::HealthChange_Client(const float NewCurrentHealth)
+{
+	if (NewCurrentHealth <= 0.f)
+	{
+		Ragdoll();
+	}
+}
+
+void AUnitCharacter::Ragdoll()
+{
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AUnitCharacter::MulticastAttack_Implementation()
+{
 	if (AttackSound)
 	{
 		UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), AttackSound, GetActorTransform(), true);
@@ -41,30 +97,5 @@ void AUnitCharacter::Attack(AActor* Target)
 	{
 		PlayAnimMontage(AttackMontage);
 	}
-}
-
-void AUnitCharacter::SetTargetBarricade(ABarricade* NewTargetBarricade)
-{
-	TargetBarricade = NewTargetBarricade;
-}
-
-void AUnitCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-	CurrentHealth = MaxHealth;
-}
-
-void AUnitCharacter::Die(AController* KillInstigator, AActor* KillCauser)
-{
-	// Ragdoll the unit
-	GetMesh()->SetEnableGravity(true);
-	GetMesh()->SetSimulatePhysics(true);
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
-	OnKilledEvent.Broadcast(this, KillInstigator, KillCauser);
-	SetLifeSpan(DeathLifeSpan);
 }
 

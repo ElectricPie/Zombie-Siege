@@ -7,12 +7,14 @@
 #include "WidgetControllers/HealthWidgetController.h"
 #include "GameHud.generated.h"
 
-class UInteractionWidgetController;
+class APlayerCharacter;
 class UAmmoCounterWidgetController;
-struct FWidgetControllerParams;
+class UGameHudWidget;
+class UInteractionWidgetController;
+class UOptionsWidget;
 class UOverlayWidgetController;
 class UZSiegeUserWidget;
-class UOptionsWidget;
+struct FWidgetControllerParams;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPauseMenuToggledSignature, bool /*bMenuIsOpen*/);
 
@@ -23,9 +25,6 @@ enum EGameWidget
 	PauseMenu UMETA(DisplayName = "Menu"),
 	PauseGameOptions UMETA(DisplayName = "Options")
 };
-
-class APlayerCharacter;
-class UGameHudWidget;
 
 /**
  * 
@@ -53,6 +52,11 @@ public:
 	UAmmoCounterWidgetController* GetAmmoCounterWidgetController(const FWidgetControllerParams& WidgetControllerParams);
 	UInteractionWidgetController* GetInteractionWidgetController(const FWidgetControllerParams& WidgetControllerParams);
 	UHealthWidgetController* GetHealthWidgetController(const FWidgetControllerParams& WidgetControllerParams);
+
+	/*
+	 * Rebinds any widget controller dependencies the rely on player characters
+	 */
+	void RebindCharacterWidgetControllerDependencies() const;
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Widgets")
@@ -75,6 +79,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UZSiegeUserWidget> OverlayWidgetClass;
+	UPROPERTY()
 	TObjectPtr<UZSiegeUserWidget> OverlayWidget;
 	
 	UPROPERTY(EditDefaultsOnly, Category="WidgetControllers")
@@ -93,6 +98,8 @@ private:
 	TSubclassOf<UHealthWidgetController> HealthWidgetControllerClass;
 	UPROPERTY()
 	TObjectPtr<UHealthWidgetController> HealthWidgetController;
+
+	bool bHasBeenInitialized = false;
 
 private:	
 	void CollapseAllWidgets();

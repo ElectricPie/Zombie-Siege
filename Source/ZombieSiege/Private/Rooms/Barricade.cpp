@@ -7,8 +7,8 @@
 #include "NavLinkComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Interactions/InteractableComponent.h"
-#include "Components/MoneyRewardComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Money/MoneyRewardComponent.h"
 
 #define DEFAULT_BARRICADE_REWARD 40
 #define DEFAULT_BARRICADE_TIME_BETWEEN_REWARDS 5
@@ -30,7 +30,6 @@ ABarricade::ABarricade()
 	
 	PlayerInteractionTrigger = CreateDefaultSubobject<UInteractableComponent>(TEXT("Inside Interactable"));
 	PlayerInteractionTrigger->SetupAttachment(RootComponent);
-	PlayerInteractionTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
 	PlayerInteractionTrigger->SetInteractMessage(FText::FromString(DEFAULT_BARRICADE_INTERACT_MESSAGE));
 	
 	InsideDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("Inside Direction Arrow"));
@@ -49,46 +48,24 @@ ABarricade::ABarricade()
 	Link.Right = FVector(120.f, 0.f, 0.f);
 	Link.Direction = ENavLinkDirection::LeftToRight;
 	NavLinkComponent->Links.Add(Link);
+
+	bReplicates = true;
 }
 
-float ABarricade::TakeDamage(const float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
+float ABarricade::TakeDamage(const float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (IsDestroyed())
 		return 0.f;
-	
 
 	if (UStaticMeshComponent* Plank = Planks[DestroyedPlanks])
 	{
-		Plank->SetVisibility(false);
 		DestroyedPlanks++;
-		UGameplayStatics::SpawnEmitterAtLocation(this, HitEffect, Plank->GetComponentLocation(), FRotator::ZeroRotator, true);
-		if (IsDestroyed())
-		{
-			UFMODBlueprintStatics::PlayEventAtLocation(this, DestructionSound, GetTransform(), true);
-		}
-		else
-		{
-			UFMODBlueprintStatics::PlayEventAtLocation(this, HitSound, GetTransform(), true);
-		}
+		MulticastDestroyPlank(Plank);
 	}
 
 	PlayerInteractionTrigger->SetCanInteract(true);
 	
 	return DamageAmount;
-}
-
-void ABarricade::Repair()
-{
-	if (AgentsCrossing.Num() > 0) return;
-	
-	for (const auto & Plank : Planks)
-	{
-		Plank->SetVisibility(true);
-	}
-	DestroyedPlanks = 0;
-
-	PlayerInteractionTrigger->SetCanInteract(false);
 }
 
 void ABarricade::SetIsActive(const bool bNewIsActive)
@@ -136,8 +113,50 @@ void ABarricade::StopCrossing(AActor* Agent)
 	}
 }
 
-void ABarricade::OnInteract(AController* InteractionInstigator, AActor* InteractionCauser)
+void ABarricade::BeginPlay()
 {
-	Repair();
+	Super::BeginPlay();
+	
+	PlayerInteractionTrigger->OnInteractEvent.AddUObject(this, &ABarricade::OnInteract);
+}
+
+void ABarricade::OnInteract(AController* InteractionInstigator, APawn* InteractionCauser)
+{
+	Repair_Server();
 	MoneyRewardComponent->RewardMoney(InteractionInstigator);
+}
+
+void ABarricade::MulticastDestroyPlank_Implementation(UStaticMeshComponent* Plank)
+{
+	Plank->SetVisibility(false);
+	UGameplayStatics::SpawnEmitterAtLocation(this, HitEffect, Plank->GetComponentLocation(), FRotator::ZeroRotator, true);
+	if (IsDestroyed())
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(this, DestructionSound, GetTransform(), true);
+	}
+	else
+	{
+		UFMODBlueprintStatics::PlayEventAtLocation(this, HitSound, GetTransform(), true);
+	}
+}
+
+void ABarricade::Repair_Server()
+{
+	check(HasAuthority());
+	
+	if (AgentsCrossing.Num() > 0)
+		return;
+	
+	MulticastRepair();
+	DestroyedPlanks = 0;
+
+	PlayerInteractionTrigger->SetCanInteract(false);
+}
+
+void ABarricade::MulticastRepair_Implementation()
+{
+	for (const auto & Plank : Planks)
+	{
+		Plank->SetVisibility(true);
+	}
 }

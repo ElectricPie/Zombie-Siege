@@ -29,14 +29,16 @@ AGunProjectile::AGunProjectile()
 	ProjectileMovementComponent->MaxSpeed = 3000.f;
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->bShouldBounce = false;
+
+	bReplicates = true;
 }
 
-void AGunProjectile::Init(AController* Controller, AActor* Actor, TSubclassOf<UDamageType> NewDamageType, float NewDamage)
+void AGunProjectile::InitProjectile(const FGunProjectileInitData& InitData)
 {
-	ShooterController = Controller;
-	ShooterActor = Actor;
-	Damage = NewDamage;
-	DamageType = NewDamageType;
+	ShooterController = InitData.Controller;
+	ShooterActor = InitData.Actor;
+	Damage = InitData.Damage;
+	DamageType = InitData.DamageType;
 }
 
 // Called when the game starts or when spawned
@@ -44,7 +46,6 @@ void AGunProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FTimerHandle DestroyHandle;
 	SetLifeSpan(DestroyTime);
 }
 
@@ -56,6 +57,9 @@ void AGunProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 	CollisionComponent->SetCollisionProfileName("NoCollision");
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	
-	UGameplayStatics::ApplyDamage(OtherActor, Damage, ShooterController.Get(), this, nullptr);
+
+	if (HasAuthority())
+	{
+		UGameplayStatics::ApplyDamage(OtherActor, Damage, ShooterController.Get(), this, nullptr);
+	}
 }
