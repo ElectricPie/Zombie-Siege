@@ -82,7 +82,13 @@ void ATopDownPlayerController::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	FaceMouse();
+	if (!IsLocalController())
+		return;
+
+	if (GetPawn<APlayerCharacter>())
+	{
+		FaceMouse();
+	}
 }
 
 void ATopDownPlayerController::SetupInputComponent()
@@ -144,7 +150,7 @@ void ATopDownPlayerController::AcknowledgePossession(APawn* P)
 		{
 			Hud->RebindCharacterWidgetControllerDependencies();
 		}
-	
+
 		HealthComponent = PlayerCharacter->GetHealthComponent_Implementation();
 		HealthComponent->OnDeathEvent.AddDynamic(this, &ATopDownPlayerController::PlayerDied);
 	}
@@ -155,7 +161,7 @@ void ATopDownPlayerController::Move(const FInputActionValue& Value)
 	if (!CanDoAction())
 		return;
 
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	if (APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>())
 	{
 		const FVector2D Direction = Value.Get<FVector2D>();
 		PlayerCharacter->Move(FVector(Direction.X, Direction.Y, 0.f).GetSafeNormal());
@@ -179,17 +185,34 @@ void ATopDownPlayerController::FaceMouse()
 			FVector WorldDirection;
 			DeprojectScreenPositionToWorld(MouseScreenLocation.X, MouseScreenLocation.Y, WorldPosition, WorldDirection);
 
-			FHitResult HitResult;
-			FCollisionQueryParams QueryParams;
-			QueryParams.AddIgnoredActor(this);
+			// Z plane intersection for ray
+			const float TargetZ = GetPawn()->GetActorLocation().Z;
 
-			const FVector RayEnd = WorldPosition + WorldDirection * LookRaycastLimit;
-			if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldPosition, RayEnd, ECC_Visibility, QueryParams))
+			FVector AimPoint;
+			// Check if ray isn't parallel to the plane
+			if (WorldDirection.Z != 0.0f) 
 			{
-				AimDirection = (HitResult.ImpactPoint - GetPawn()->GetActorLocation()).GetSafeNormal();
-				AimDirection.Z = GetPawn()->GetActorLocation().X;
-				ClientSetRotation(AimDirection.Rotation());
+				const float RayDistanceToPlane = (TargetZ - WorldPosition.Z) / WorldDirection.Z;
+				// Ensure intersection is in front of camera
+				if (RayDistanceToPlane >= 0.0f) 
+				{
+					AimPoint = WorldPosition + WorldDirection * RayDistanceToPlane;
+				}
+				else
+				{
+					// Fallback if behind the camera
+					AimPoint = WorldPosition + WorldDirection * LookRaycastLimit;
+				}
 			}
+			else
+			{
+				// Fallback if parallel to the Z plane
+				AimPoint = WorldPosition + WorldDirection * LookRaycastLimit;
+			}
+
+			AimLocation = AimPoint;
+			const FVector AimDirection = (AimLocation - GetPawn()->GetActorLocation()).GetSafeNormal();
+			ClientSetRotation(AimDirection.Rotation());
 		}
 	}
 }
@@ -199,7 +222,7 @@ void ATopDownPlayerController::Interact()
 	if (!CanDoAction())
 		return;
 
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	if (const APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>())
 	{
 		PlayerCharacter->Interact();
 	}
@@ -210,8 +233,14 @@ void ATopDownPlayerController::Fire()
 	if (!CanDoAction())
 		return;
 
-	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	if (const APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>())
 	{
+		PlayerCharacter->SetAimLocation(AimLocation);
+		GetWorldTimerManager().SetTimer(FireTimerHandle, FTimerDelegate::CreateLambda([this, PlayerCharacter]()
+		{
+			PlayerCharacter->SetAimLocation(AimLocation);
+		}), AimLocationUpdateRate, true);
+
 		PlayerCharacter->Fire();
 	}
 }
@@ -221,8 +250,9 @@ void ATopDownPlayerController::StopFiring()
 	if (!CanDoAction())
 		return;
 
-	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	if (const APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>())
 	{
+		StopFireTimer();
 		PlayerCharacter->StopFiring();
 	}
 }
@@ -232,10 +262,11 @@ void ATopDownPlayerController::SwapWeapon()
 	if (!CanDoAction())
 		return;
 
-	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	if (const APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>())
 	{
 		if (UWeaponLoadoutComponent* WeaponLoadoutComponent = PlayerCharacter->GetWeaponLoadoutComponent())
 		{
+			StopFireTimer();
 			WeaponLoadoutComponent->ServerEquipNextWeapon();
 		}
 	}
@@ -246,8 +277,9 @@ void ATopDownPlayerController::ReloadWeapon()
 	if (!CanDoAction())
 		return;
 
-	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	if (const APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>())
 	{
+		StopFireTimer();
 		PlayerCharacter->ReloadWeapon();
 	}
 }
@@ -290,4 +322,10 @@ void ATopDownPlayerController::PlayerDied(AActor* VictimActor, AController* Kill
 {
 	DisableInput(this);
 	SetInputMode(FInputModeUIOnly());
+}
+
+void ATopDownPlayerController::StopFireTimer()
+{
+	GetWorldTimerManager().ClearTimer(FireTimerHandle);
+	FireTimerHandle.Invalidate();
 }

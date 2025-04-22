@@ -86,6 +86,11 @@ UHealthComponent* APlayerCharacter::GetHealthComponent_Implementation() const
 	return HealthComponent;
 }
 
+void APlayerCharacter::SetAimLocation(const FVector& NewAimLocation) const
+{
+	WeaponLoadoutComponent->SetAimLocation(NewAimLocation);
+}
+
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();

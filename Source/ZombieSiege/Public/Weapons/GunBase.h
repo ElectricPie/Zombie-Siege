@@ -49,6 +49,9 @@ public:
 
  	USkeletalMeshComponent* GetMesh() const { return GunMesh; }
 
+	UFUNCTION(Server, Reliable)
+ 	void ServerSetTargetLocation(const FVector& NewTargetLocation);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -77,20 +80,23 @@ private:
 	FTimerHandle ShotTimer;
 	FTimerHandle BurstTimer;
 	int32 BurstShotsFired = 0;
+
+	UPROPERTY(VisibleAnywhere)
+	FVector TargetLocation = FVector::ZeroVector;
 	
 private:
 	UFUNCTION(Server, Reliable)
-	void Fire_Server();
+	void ServerFire();
 	UFUNCTION(Server, Reliable)
-	void StopFiring_Server();
+	void ServerStopFiring();
 	UFUNCTION(Server, Reliable)
-	void Reload_Server();
+	void ServerReload();
 	UFUNCTION(Server, Reliable)
-	void CancelReload_Server();
+	void ServerCancelReload();
 	
 	void SpawnProjectile();
 	UFUNCTION(NetMulticast, Reliable)
-	void SpawnProjectile_Multicast();
+	void MulticastSpawnProjectile();
 	
 	void HandleFireMode();
 

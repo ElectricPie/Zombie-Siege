@@ -53,6 +53,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	UInteractorComponent* GetInteractorComponent() const { return InteractorComponent; }
 
+	void SetAimLocation(const FVector& NewAimLocation) const;
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<USpringArmComponent> CameraArm;

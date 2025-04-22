@@ -42,13 +42,13 @@ void AGunBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 
 void AGunBase::Fire()
 {
-	Fire_Server();
+	ServerFire();
 	// TODO: Handle client side prediction
 }
 
 void AGunBase::StopFiring()
 {
-	StopFiring_Server();
+	ServerStopFiring();
 	// TODO: Handle client side prediction
 }
 
@@ -57,7 +57,7 @@ void AGunBase::Reload()
 	if (!CanReload())
 		return;
 
-	Reload_Server();
+	ServerReload();
 }
 
 void AGunBase::SetVisibility(const bool bIsVisible) const
@@ -72,6 +72,11 @@ void AGunBase::SetVisibility(const bool bIsVisible) const
 	}
 }
 
+void AGunBase::ServerSetTargetLocation_Implementation(const FVector& NewTargetLocation)
+{
+	TargetLocation = NewTargetLocation;
+}
+
 void AGunBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -84,7 +89,7 @@ void AGunBase::BeginPlay()
 	LastFiredTime = -WeaponStats->GetFireCooldownTime();
 }
 
-void AGunBase::Fire_Server_Implementation()
+void AGunBase::ServerFire_Implementation()
 {
 	check(GetOwner()->HasAuthority());
 
@@ -106,7 +111,7 @@ void AGunBase::Fire_Server_Implementation()
 	HandleFireMode();
 }
 
-void AGunBase::StopFiring_Server_Implementation()
+void AGunBase::ServerStopFiring_Implementation()
 {
 	check(GetOwner()->HasAuthority());
 
@@ -114,7 +119,7 @@ void AGunBase::StopFiring_Server_Implementation()
 	GetWorld()->GetTimerManager().ClearTimer(ShotTimer);
 }
 
-void AGunBase::Reload_Server_Implementation()
+void AGunBase::ServerReload_Implementation()
 {
 	check(GetOwner()->HasAuthority());
 
@@ -148,7 +153,7 @@ void AGunBase::Reload_Server_Implementation()
 	}), ReloadTime, false);
 }
 
-void AGunBase::CancelReload_Server_Implementation()
+void AGunBase::ServerCancelReload_Implementation()
 {
 	check(GetOwner()->HasAuthority());
 
@@ -163,11 +168,11 @@ void AGunBase::CancelReload_Server_Implementation()
 }
 
 void AGunBase::SpawnProjectile()
-{
+{		
 	const FActorSpawnParameters SpawnParameters;
 	const FVector SpawnLocation = ProjectileSpawn->GetComponentLocation();
 
-	FRotator SpawnRotation = ProjectileSpawn->GetComponentRotation();
+	FRotator SpawnRotation = (TargetLocation - SpawnLocation).GetSafeNormal().Rotation();
 	SpawnRotation.Pitch = 0.f;
 
 	AGunProjectile* Projectile = GetWorld()->SpawnActor<AGunProjectile>(WeaponStats->GetProjectileClass(),
@@ -179,10 +184,10 @@ void AGunBase::SpawnProjectile()
 	CurrentAmmo--;
 	OnAmmoChangedEvent.Broadcast(CurrentAmmo, WeaponStats->GetMaxAmmo());
 	
-	SpawnProjectile_Multicast();
+	MulticastSpawnProjectile();
 }
 
-void AGunBase::SpawnProjectile_Multicast_Implementation()
+void AGunBase::MulticastSpawnProjectile_Implementation()
 {
 	if (UFMODEvent* FireSound = WeaponStats->GetFireSound())
 	{
