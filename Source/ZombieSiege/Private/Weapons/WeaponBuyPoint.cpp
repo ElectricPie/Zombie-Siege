@@ -52,7 +52,6 @@ void AWeaponBuyPoint::BeginPlay()
 			SetActorHiddenInGame(true);
 		});
 	
-	// Server only
 	if (HasAuthority())
 	{
 		InteractableComponent->OnInteractEvent.AddLambda(
@@ -62,8 +61,7 @@ void AWeaponBuyPoint::BeginPlay()
 			   {
 				   TryBuyWeapon_Server(MoneyStoreComponent, InteractionCauser);
 			   }
-		   });
-		return;
+		   }); 
 	}
 }
 

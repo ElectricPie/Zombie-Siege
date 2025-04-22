@@ -36,6 +36,8 @@ public:
 	void ServerEquipNextWeapon();
 	int32 GetWeaponCount() const { return Weapons.Num(); }
 
+	void SetAimLocation(const FVector& NewAimLocation);
+
 public:
 	UPROPERTY(BlueprintAssignable, Category="Weapon Loadout")
 	FOnWeaponChangedSignature OnWeaponChangedEvent;
@@ -49,6 +51,8 @@ private:
 	int32 EquippedWeaponIndex = -1;
 	UPROPERTY(ReplicatedUsing=OnRep_Weapons, VisibleAnywhere, Category="Weapon Loadout")
 	TArray<TObjectPtr<AGunBase>> Weapons;
+
+	FVector AimLocation = FVector::ZeroVector;
 
 private:
 	UFUNCTION()

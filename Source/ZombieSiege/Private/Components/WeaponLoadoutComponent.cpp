@@ -113,6 +113,14 @@ AGunBase* UWeaponLoadoutComponent::GetEquippedWeapon()
 	return Weapons[EquippedWeaponIndex].Get();
 }
 
+void UWeaponLoadoutComponent::SetAimLocation(const FVector& NewAimLocation)
+{
+	if (AGunBase* EquippedWeapon = GetEquippedWeapon())
+	{
+		EquippedWeapon->ServerSetTargetLocation(NewAimLocation);
+	}
+}
+
 void UWeaponLoadoutComponent::ServerEquipNextWeapon_Implementation()
 {
 	// No need to change weapons if there is only one

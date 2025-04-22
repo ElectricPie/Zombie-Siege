@@ -26,7 +26,6 @@ public:
 	bool bIsPaused = false;
 	
 public:
-	FVector GetAimDirection() const { return AimDirection; }
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastGameOver();
 	void SetInputGameOnly();
@@ -69,9 +68,14 @@ private:
 	UPROPERTY(EditAnywhere, Category="Look")
 	float LookRaycastLimit = 3000.f;
 	
-	FVector AimDirection = FVector(0.f);
+	FVector AimLocation = FVector::ZeroVector;
 
 	bool bIsGameOver = false;
+
+	FTimerHandle FireTimerHandle;
+
+	UPROPERTY(EditAnywhere, meta=(ClampMin=0.2f, UIMin=0.2f, ToolTip="The time between updating the server with the clients aim location"))
+	float AimLocationUpdateRate = 0.2f;
 	
 private:
 	void Move(const FInputActionValue& Value);
@@ -96,4 +100,6 @@ private:
 	
 	UFUNCTION()
 	void PlayerDied(AActor* VictimActor, AController* KillerController, AActor* KillerActor);
+
+	void StopFireTimer();
 };
