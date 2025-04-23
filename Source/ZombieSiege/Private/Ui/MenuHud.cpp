@@ -4,7 +4,10 @@
 #include "Ui/MenuHud.h"
 
 #include "Blueprint/UserWidget.h"
+#include "GameFramework/PlayerState.h"
 #include "Subsystems/GameSaveSubsystem.h"
+#include "Ui/WidgetControllers/MainMenuWidgetController.h"
+#include "Ui/Widgets/ZSiegeUserWidget.h"
 #include "Widgets/OptionsWidget.h"
 
 void AMenuHud::SwitchActiveWidget(EMenuWidget WidgetToActivate)
@@ -19,52 +22,60 @@ void AMenuHud::SwitchActiveWidget(EMenuWidget WidgetToActivate)
 
 	switch (WidgetToActivate)
 	{
-		case EMenuWidget::MainMenu:
-			if (MenuWidget)
-			{
-				MenuWidget->SetVisibility(ESlateVisibility::Visible);
-			}
-			break;
-		case EMenuWidget::MainOptions:
-			if (OptionsWidget)
-			{
-				OptionsWidget->SetVisibility(ESlateVisibility::Visible);
-			}
-			break;
-		default: ;
+	case EMenuWidget::MainMenu:
+		if (MenuWidget)
+		{
+			MenuWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+		break;
+	case EMenuWidget::MainOptions:
+		if (OptionsWidget)
+		{
+			OptionsWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+		break;
+	default: ;
 	}
+}
+
+UMainMenuWidgetController* AMenuHud::GetMainMenuWidgetController(const FWidgetControllerParams& WidgetControllerParams)
+{
+	if (MainMenuWidgetController == nullptr)
+	{
+		checkf(MainMenuWidgetControllerClass,
+		       TEXT("Main Menu Widget Controller Class is null, please fill out in MenuHud Blueprint"));
+		MainMenuWidgetController = NewObject<UMainMenuWidgetController>(this, MainMenuWidgetControllerClass);
+		MainMenuWidgetController->SetWidgetControllerParams(WidgetControllerParams);
+		MainMenuWidgetController->BindCallbackToDependencies();
+	}
+
+	return MainMenuWidgetController;
 }
 
 void AMenuHud::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (APlayerController* PlayerController = GetOwningPlayerController())
-	{
-		PlayerController->bShowMouseCursor = true;
-	}
 	
-	if (MainMenuWidgetClass)
-	{
-		MenuWidget = CreateWidget<UUserWidget>(GetWorld(), MainMenuWidgetClass);
-		if (MenuWidget)
-		{
-			MenuWidget->AddToViewport();
-			Widgets.Add(MenuWidget);
-		}
-	}
+	APlayerController* PlayerController = GetOwningPlayerController();
+	PlayerController->bShowMouseCursor = true;
+	APlayerState* PlayerState = PlayerController->GetPlayerState<APlayerState>();
+	const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState);
+	
+	check(MainMenuWidgetClass);
+	MenuWidget = CreateWidget<UZSiegeUserWidget>(GetWorld(), MainMenuWidgetClass);
+	MenuWidget->SetWidgetController(GetMainMenuWidgetController(WidgetControllerParams));
+	MenuWidget->AddToViewport();
+	Widgets.Add(MenuWidget);
 
-	if (OptionsWidgetClass)
-	{
-		OptionsWidget = CreateWidget<UOptionsWidget>(GetWorld(), OptionsWidgetClass.Get());
-		if (OptionsWidget)
-		{
-			OptionsWidget->AddToViewport();
-			OptionsWidget->SetVisibility(ESlateVisibility::Collapsed);
-			OptionsWidget->OnOptionsClosedEvent.AddDynamic(this, &AMenuHud::OnOptionsClosed);
-			Widgets.Add(OptionsWidget);
-		}
-	}
+
+	check(OptionsWidgetClass)
+	OptionsWidget = CreateWidget<UOptionsWidget>(GetWorld(), OptionsWidgetClass.Get());
+	OptionsWidget->AddToViewport();
+	OptionsWidget->SetVisibility(ESlateVisibility::Collapsed);
+	OptionsWidget->OnOptionsClosedEvent.AddDynamic(this, &AMenuHud::OnOptionsClosed);
+	Widgets.Add(OptionsWidget);
+
 
 	if (const UGameInstance* GameInstance = GetGameInstance())
 	{
