@@ -6,6 +6,9 @@
 #include "GameFramework/HUD.h"
 #include "MenuHud.generated.h"
 
+class UZSiegeUserWidget;
+struct FWidgetControllerParams;
+class UMainMenuWidgetController;
 class UOptionsWidget;
 
 UENUM(BlueprintType)
@@ -27,12 +30,14 @@ public:
 	UFUNCTION(BLueprintCallable)
 	void SwitchActiveWidget(EMenuWidget WidgetToActivate);
 
+	UMainMenuWidgetController* GetMainMenuWidgetController(const FWidgetControllerParams& WidgetControllerParams);
+
 protected:
 	virtual void BeginPlay() override;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category="Widgets")
-	TObjectPtr<UUserWidget> MenuWidget;
+	TObjectPtr<UZSiegeUserWidget> MenuWidget;
 	UPROPERTY(BLueprintReadOnly, Category="Widgets")
 	TObjectPtr<UOptionsWidget> OptionsWidget;
 
@@ -42,9 +47,14 @@ private:
 	
 private:
 	UPROPERTY(EditAnywhere, Category = "Widgets")
-	TSubclassOf<UUserWidget> MainMenuWidgetClass;
+	TSubclassOf<UZSiegeUserWidget> MainMenuWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "Widgets")
 	TSubclassOf<UOptionsWidget> OptionsWidgetClass;
 
 	TArray<TWeakObjectPtr<UUserWidget>> Widgets;
+
+	UPROPERTY(EditDefaultsOnly, Category="Widget Controller")
+	TSubclassOf<UMainMenuWidgetController> MainMenuWidgetControllerClass;
+	UPROPERTY()
+	TObjectPtr<UMainMenuWidgetController> MainMenuWidgetController;
 };
