@@ -34,7 +34,7 @@ void UZSiegeGameInstance::HostGame() const
 
 	FOnlineSessionSettings SessionSettings;
 	SessionSettings.bIsLANMatch = true;
-	SessionSettings.NumPublicConnections = 4;
+	SessionSettings.NumPublicConnections = 1;
 	SessionSettings.bShouldAdvertise = true;
 
 	Session->CreateSession(0, TEXT("Test Session"), SessionSettings);
@@ -46,7 +46,7 @@ void UZSiegeGameInstance::FindGames()
 		return;
 
 	IOnlineSession* Session = SessionInterface.Pin().Get();
-	
+
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	SessionSearch->bIsLanQuery = true;
 	SessionSearch->MaxSearchResults = 10;
@@ -73,15 +73,16 @@ void UZSiegeGameInstance::OnFindSessionsComplete(const bool bWasSuccessful) cons
 	{
 		for (const FOnlineSessionSearchResult& Result : SessionSearch->SearchResults)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Found session: %s"), *Result.GetSessionIdStr());
 			// TODO: Joining first for testing
 			SessionInterface.Pin()->JoinSession(0, TEXT("Test Session"), Result);
+
 			return;
 		}
 	}
 }
 
-void UZSiegeGameInstance::OnJoinSessionComplete(const FName SessionName, EOnJoinSessionCompleteResult::Type Result) const
+void UZSiegeGameInstance::OnJoinSessionComplete(const FName SessionName,
+                                                EOnJoinSessionCompleteResult::Type Result) const
 {
 	if (SessionInterface.IsValid())
 	{
