@@ -10,7 +10,25 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
-	PlayerCount++;
+	// Kicks the player if the session is full
+	if (PlayerControllers.Num() + 1 > MaxPlayers)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Session Full"));
+		NewPlayer->ClientTravel("MainMenuNight", ETravelType::TRAVEL_Absolute);
+		return;
+	}
+
+	PlayerControllers.Add(NewPlayer);
+}
+
+void ALobbyGameMode::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+
+	if (APlayerController* PlayerController = Cast<APlayerController>(Exiting))
+	{
+		PlayerControllers.Remove(PlayerController);
+	}
 }
 
 AActor* ALobbyGameMode::ChoosePlayerStart_Implementation(AController* Player)
@@ -25,9 +43,9 @@ AActor* ALobbyGameMode::ChoosePlayerStart_Implementation(AController* Player)
 		});
 	}
 
-	if (PlayerCount < SpawnPoints.Num())
+	if (PlayerControllers.Num() < SpawnPoints.Num())
 	{
-		return SpawnPoints[PlayerCount];
+		return SpawnPoints[PlayerControllers.Num()];
 	}
 
 	return Super::ChoosePlayerStart_Implementation(Player);

@@ -16,10 +16,16 @@ class ZOMBIESIEGE_API ALobbyGameMode : public AGameMode
 
 public:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void Logout(AController* Exiting) override;
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 private:
 	UPROPERTY()
 	TArray<AActor*> SpawnPoints;
-	int32 PlayerCount = 0;
+
+	UPROPERTY(EditAnywhere)
+	int32 MaxPlayers = 4;
+
+	UPROPERTY()
+	TArray<TObjectPtr<APlayerController>> PlayerControllers;
 };
