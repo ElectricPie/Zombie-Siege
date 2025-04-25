@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Ui/GameHud.h"
+#include "Ui/Huds/GameHud.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Player/TopDownPlayerController.h"
@@ -9,8 +9,8 @@
 #include "Ui/WidgetControllers/AmmoCounterWidgetController.h"
 #include "Ui/WidgetControllers/InteractionWidgetController.h"
 #include "Ui/WidgetControllers/OverlayWidgetController.h"
+#include "Ui/Widgets/OptionsWidget.h"
 #include "Ui/Widgets/ZSiegeUserWidget.h"
-#include "Widgets/OptionsWidget.h"
 
 void AGameHud::ShowGameOver()
 {

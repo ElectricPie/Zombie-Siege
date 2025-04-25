@@ -10,7 +10,7 @@
 #include "Health/HealthComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacter.h"
-#include "Ui/GameHud.h"
+#include "Ui/HUDs/GameHud.h"
 
 void ATopDownPlayerController::MulticastGameOver_Implementation()
 {

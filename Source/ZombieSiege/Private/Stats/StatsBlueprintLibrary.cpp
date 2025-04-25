@@ -5,7 +5,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "States/DefencePlayerState.h"
-#include "Ui/GameHud.h"
+#include "Ui/Huds/GameHud.h"
 #include "Ui/WidgetControllers/WidgetController.h"
 
 class ADefencePlayerState;

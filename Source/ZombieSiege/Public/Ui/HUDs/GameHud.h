@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
-#include "WidgetControllers/HealthWidgetController.h"
+#include "Ui/WidgetControllers/HealthWidgetController.h"
 #include "GameHud.generated.h"
 
 class APlayerCharacter;

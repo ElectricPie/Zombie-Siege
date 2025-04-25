@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Ui/MenuHud.h"
+#include "Ui/HUDs/MenuHud.h"
 
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerState.h"
 #include "Subsystems/GameSaveSubsystem.h"
 #include "Ui/WidgetControllers/MainMenuWidgetController.h"
 #include "Ui/Widgets/ZSiegeUserWidget.h"
-#include "Widgets/OptionsWidget.h"
+#include "Ui/Widgets/OptionsWidget.h"
 
 void AMenuHud::SwitchActiveWidget(EMenuWidget WidgetToActivate)
 {
