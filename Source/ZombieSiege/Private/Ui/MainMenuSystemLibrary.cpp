@@ -3,9 +3,9 @@
 
 #include "Ui/MainMenuSystemLibrary.h"
 
-#include "MenuHud.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Ui/HUDs/MenuHud.h"
 #include "Ui/WidgetControllers/WidgetController.h"
 
 UMainMenuWidgetController* UMainMenuSystemLibrary::GetMainMenuWidgetController(const UObject* WorldContextObject)

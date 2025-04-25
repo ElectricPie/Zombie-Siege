@@ -5,7 +5,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "States/DefencePlayerState.h"
-#include "Ui/GameHud.h"
+#include "Ui/HUDs/GameHud.h"
 #include "Ui/WidgetControllers/InteractionWidgetController.h"
 
 UInteractionWidgetController* UZSiegeInteractionSystemLibrary::GetInteractionWidgetController(
