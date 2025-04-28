@@ -6,8 +6,10 @@
 #include "GameFramework/HUD.h"
 #include "LobbyHud.generated.h"
 
+struct FWidgetControllerParams;
 class UZSiegeUserWidget;
 class ULobbyWidgetController;
+
 /**
  * 
  */
@@ -16,6 +18,9 @@ class ZOMBIESIEGE_API ALobbyHud : public AHUD
 {
 	GENERATED_BODY()
 
+public:
+	ULobbyWidgetController* GetLobbyWidgetController(const FWidgetControllerParams& WidgetControllerParams);
+	
 protected:
 	virtual void BeginPlay() override;
 	
