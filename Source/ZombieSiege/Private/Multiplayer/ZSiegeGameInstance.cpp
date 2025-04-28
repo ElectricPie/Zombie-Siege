@@ -59,6 +59,24 @@ void UZSiegeGameInstance::JoinGame()
 	
 }
 
+void UZSiegeGameInstance::SetMultiplayerPlayerName(const int32 PlayerId, const FString& NewPlayerName)
+{
+	if (ConnectedPlayersCount + 1 > ConnectedPlayers.Num())
+		return;
+	
+	const FConnectedPlayerInfo PlayerInfo(PlayerId, NewPlayerName);
+	ConnectedPlayers[ConnectedPlayersCount++] = PlayerInfo;
+
+	TArray<FString> PlayerNames;
+	PlayerNames.SetNum(ConnectedPlayers.Num());
+	for (int32 i = 0; i < ConnectedPlayers.Num(); i++)
+	{
+		PlayerNames[i] = ConnectedPlayers[i].PlayerName;
+	}
+	
+	PlayerNamesChangedEvent.Broadcast(PlayerNames);
+}
+
 void UZSiegeGameInstance::OnCreateSessionComplete(FName SessionName, const bool bWasSuccessful) const
 {
 	if (bWasSuccessful)

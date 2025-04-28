@@ -5,6 +5,16 @@
 
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
+#include "Multiplayer/ZSiegeGameInstance.h"
+
+void ALobbyGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UZSiegeGameInstance* GameInstance = GetGameInstance<UZSiegeGameInstance>();
+	check(GameInstance);
+	GameInstance->ConnectedPlayers.SetNum(MaxPlayers);
+}
 
 void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {

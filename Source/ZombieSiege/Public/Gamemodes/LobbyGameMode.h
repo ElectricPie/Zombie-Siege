@@ -15,6 +15,7 @@ class ZOMBIESIEGE_API ALobbyGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
+	virtual void BeginPlay() override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
