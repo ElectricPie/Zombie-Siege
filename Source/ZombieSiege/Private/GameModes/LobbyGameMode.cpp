@@ -63,17 +63,10 @@ AActor* ALobbyGameMode::ChoosePlayerStart_Implementation(AController* Player)
 	if (const APlayerController* PlayerController = Cast<APlayerController>(Player))
 	{
 		if (const APlayerState* PlayerState = PlayerController->PlayerState)
-		{
-			if (PlayerState->GetUniqueId() == nullptr)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("UniqueId is nullptr"));
-				return Super::ChoosePlayerStart_Implementation(Player);
-			}
-			
+		{			
 			if (const FConnectedPlayerInfo* PlayerInfo = GameInstance->GetConnectedPlayerInfoByUniqueId_Server(PlayerState->GetUniqueId()->ToString()))
 			{
 				const int32 SpawnIndex = PlayerInfo->PlayerIndex;
-				UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("SpawnIndex: %d"), SpawnIndex), true, true, FLinearColor::Red, 10.0f);
 				if (SpawnPoints.IsValidIndex(SpawnIndex))
 				{
 					return SpawnPoints[SpawnIndex];

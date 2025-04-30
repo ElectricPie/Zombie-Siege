@@ -45,7 +45,7 @@ public:
 	
 public:
 	virtual void Init() override;
-	void InitMultiplayerGame(int32 MaxPlayers);
+	void InitMultiplayerGame(const int32 InMaxPlayers);
 	
 	UFUNCTION(BlueprintCallable)
 	void HostGame() const;
@@ -71,6 +71,7 @@ private:
 	
 	// The player names in multiplayer games, only stored on host
 	TArray<FConnectedPlayerInfo> ConnectedPlayers;
+	int32 MaxPlayers = 4;
 	TArray<int32> AvailablePlayerIndexes;
 	
 private:

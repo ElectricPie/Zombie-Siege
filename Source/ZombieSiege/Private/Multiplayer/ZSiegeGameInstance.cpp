@@ -28,18 +28,19 @@ void UZSiegeGameInstance::Init()
 	GetEngine()->OnNetworkFailure().AddUObject(this, &UZSiegeGameInstance::HandleNetworkFailure);
 }
 
-void UZSiegeGameInstance::InitMultiplayerGame(const int32 MaxPlayers)
+void UZSiegeGameInstance::InitMultiplayerGame(const int32 InMaxPlayers)
 {
-	FMath::Max(MaxPlayers, 1);
+	FMath::Max(InMaxPlayers, 1);
 
 	ConnectedPlayers.Empty();
 
 	AvailablePlayerIndexes.Empty();
-	AvailablePlayerIndexes.SetNum(MaxPlayers);
-	for (int32 i = 0; i < MaxPlayers; i++)
+	AvailablePlayerIndexes.SetNum(InMaxPlayers);
+	for (int32 i = 0; i < InMaxPlayers; i++)
 	{
 		AvailablePlayerIndexes[i] = i;
 	}
+	MaxPlayers = InMaxPlayers;
 }
 
 void UZSiegeGameInstance::HostGame() const
@@ -93,6 +94,7 @@ void UZSiegeGameInstance::SetMultiplayerPlayerName_Server(FString UniqueId, cons
 	if (PlayerInfo)
 	{
 		PlayerInfo->PlayerName = NewPlayerName;
+		BroadcastPlayerNamesChanged();
 	}
 }
 
@@ -190,7 +192,11 @@ void UZSiegeGameInstance::HandleNetworkFailure(UWorld* World, UNetDriver* NetDri
 void UZSiegeGameInstance::BroadcastPlayerNamesChanged() const
 {
 	TArray<FString> PlayerNames;
-	PlayerNames.SetNum(ConnectedPlayers.Num());
+	for (int32 i = 0; i < MaxPlayers; i++)
+	{
+		PlayerNames.Add(TEXT(""));
+	}
+	
 	for (const auto& Player : ConnectedPlayers)
 	{
 		const int32 ConnectedPlayerIndex = Player.PlayerIndex;
@@ -198,7 +204,6 @@ void UZSiegeGameInstance::BroadcastPlayerNamesChanged() const
 		{
 			PlayerNames[ConnectedPlayerIndex] = Player.PlayerName;
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Broadcasting %d to %s"), ConnectedPlayerIndex, *Player.PlayerName);
 	}
 
 	PlayerNamesChangedEvent.Broadcast(PlayerNames);
