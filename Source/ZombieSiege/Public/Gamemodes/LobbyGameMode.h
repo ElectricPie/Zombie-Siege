@@ -6,6 +6,7 @@
 #include "GameFramework/GameMode.h"
 #include "LobbyGameMode.generated.h"
 
+class UZSiegeGameInstance;
 /**
  * 
  */
@@ -15,8 +16,8 @@ class ZOMBIESIEGE_API ALobbyGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
-	virtual void BeginPlay() override;
-	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+	virtual APlayerController* Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
 	virtual void Logout(AController* Exiting) override;
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
@@ -26,7 +27,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	int32 MaxPlayers = 4;
-
+	
 	UPROPERTY()
-	TArray<TObjectPtr<APlayerController>> PlayerControllers;
+	TObjectPtr<UZSiegeGameInstance> GameInstance;
 };

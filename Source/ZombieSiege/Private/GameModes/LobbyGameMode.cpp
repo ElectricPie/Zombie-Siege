@@ -4,40 +4,47 @@
 #include "Gamemodes/LobbyGameMode.h"
 
 #include "GameFramework/PlayerStart.h"
+#include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Multiplayer/ZSiegeGameInstance.h"
 
-void ALobbyGameMode::BeginPlay()
+void ALobbyGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
-	Super::BeginPlay();
+	Super::InitGame(MapName, Options, ErrorMessage);
 
-	UZSiegeGameInstance* GameInstance = GetGameInstance<UZSiegeGameInstance>();
+	GameInstance = GetGameInstance<UZSiegeGameInstance>();
 	check(GameInstance);
-	GameInstance->ConnectedPlayers.SetNum(MaxPlayers);
+	GameInstance->InitMultiplayerGame(MaxPlayers);
 }
 
-void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
+APlayerController* ALobbyGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal,
+	const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-	Super::PostLogin(NewPlayer);
+	GameInstance->AddMultiplayerPlayer(UniqueId->ToString());
+	
+	APlayerController* NewPlayerController = Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
 
 	// Kicks the player if the session is full
-	if (PlayerControllers.Num() + 1 > MaxPlayers)
+	if (MaxPlayers - GameInstance->GetPlayerCount() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Session Full"));
-		NewPlayer->ClientTravel("MainMenuNight", ETravelType::TRAVEL_Absolute);
-		return;
+		NewPlayerController->ClientTravel("MainMenuNight", ETravelType::TRAVEL_Absolute);
+		return NewPlayerController;
 	}
-
-	PlayerControllers.Add(NewPlayer);
+	
+	return NewPlayerController;
 }
 
 void ALobbyGameMode::Logout(AController* Exiting)
 {
 	Super::Logout(Exiting);
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(Exiting))
+	if (const APlayerController* PlayerController = Cast<APlayerController>(Exiting))
 	{
-		PlayerControllers.Remove(PlayerController);
+		if (const APlayerState* PlayerState = PlayerController->PlayerState)
+		{
+			GameInstance->RemoveMultiplayerPlayer_Server(PlayerState->GetUniqueId()->ToString());
+		}
 	}
 }
 
@@ -53,9 +60,26 @@ AActor* ALobbyGameMode::ChoosePlayerStart_Implementation(AController* Player)
 		});
 	}
 
-	if (PlayerControllers.Num() < SpawnPoints.Num())
+	if (const APlayerController* PlayerController = Cast<APlayerController>(Player))
 	{
-		return SpawnPoints[PlayerControllers.Num()];
+		if (const APlayerState* PlayerState = PlayerController->PlayerState)
+		{
+			if (PlayerState->GetUniqueId() == nullptr)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("UniqueId is nullptr"));
+				return Super::ChoosePlayerStart_Implementation(Player);
+			}
+			
+			if (const FConnectedPlayerInfo* PlayerInfo = GameInstance->GetConnectedPlayerInfoByUniqueId_Server(PlayerState->GetUniqueId()->ToString()))
+			{
+				const int32 SpawnIndex = PlayerInfo->PlayerIndex;
+				UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("SpawnIndex: %d"), SpawnIndex), true, true, FLinearColor::Red, 10.0f);
+				if (SpawnPoints.IsValidIndex(SpawnIndex))
+				{
+					return SpawnPoints[SpawnIndex];
+				}
+			}
+		}
 	}
 
 	return Super::ChoosePlayerStart_Implementation(Player);

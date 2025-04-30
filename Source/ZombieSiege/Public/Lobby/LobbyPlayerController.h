@@ -22,17 +22,23 @@ public:
 public:
 	const TArray<FString>& GetPlayerNames() const { return PlayerNames; }
 	
+	virtual void OnRep_PlayerState() override;
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void InitPlayerState() override;
 
 private:
 	UPROPERTY(ReplicatedUsing=OnRep_PlayerNames)
 	TArray<FString> PlayerNames;
 	
 private:
-	UFUNCTION(Server, Reliable)
-	void ServerSetPlayerName(const FString& NewPlayerName);
+	UFUNCTION(Server, Reliable)	
+	void ServerSetPlayerName(const FString& NewPlayerName) const;
+	void OnPlayerNamesUpdated(const TArray<FString>& NewPlayerNames);
 	UFUNCTION()
 	void OnRep_PlayerNames() const;
+
+
 };

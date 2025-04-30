@@ -7,11 +7,15 @@
 #include "Multiplayer/ZSiegeGameInstance.h"
 #include "Net/UnrealNetwork.h"
 
-void ALobbyPlayerController::ServerSetPlayerName_Implementation(const FString& NewPlayerName)
+
+void ALobbyPlayerController::OnRep_PlayerState()
 {
-	UZSiegeGameInstance* GameInstance = GetGameInstance<UZSiegeGameInstance>();
+	Super::OnRep_PlayerState();
+
+	// Set the player name for the clients
+	const UZSiegeGameInstance* GameInstance = GetGameInstance<UZSiegeGameInstance>();
 	check(GameInstance);
-	GameInstance->SetMultiplayerPlayerName(PlayerState->GetPlayerId(), NewPlayerName);
+	ServerSetPlayerName(GameInstance->LocalPlayerName);
 }
 
 void ALobbyPlayerController::BeginPlay()
@@ -22,18 +26,7 @@ void ALobbyPlayerController::BeginPlay()
 	{
 		UZSiegeGameInstance* GameInstance = GetGameInstance<UZSiegeGameInstance>();
 		check(GameInstance);
-		GameInstance->PlayerNamesChangedEvent.AddLambda([this](const TArray<FString>& NewPlayerNames)
-		{
-			PlayerNames = NewPlayerNames;
-			PlayerNamesUpdatedEvent.Broadcast(PlayerNames);
-		});
-	}
-	
-	if (IsLocalController())
-	{
-		const UZSiegeGameInstance* GameInstance = GetGameInstance<UZSiegeGameInstance>();
-		check(GameInstance);
-		ServerSetPlayerName(GameInstance->LocalPlayerName);
+		GameInstance->PlayerNamesChangedEvent.AddUObject(this, &ALobbyPlayerController::OnPlayerNamesUpdated);
 	}
 }
 
@@ -44,7 +37,32 @@ void ALobbyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	DOREPLIFETIME(ALobbyPlayerController, PlayerNames);
 }
 
+void ALobbyPlayerController::InitPlayerState()
+{
+	Super::InitPlayerState();
+
+	// Set the player name for the listen host
+	const UZSiegeGameInstance* GameInstance = GetGameInstance<UZSiegeGameInstance>();
+	check(GameInstance);
+	ServerSetPlayerName(GameInstance->LocalPlayerName);
+}
+
+void ALobbyPlayerController::ServerSetPlayerName_Implementation(const FString& NewPlayerName) const
+{
+	// Store the player name in the game instance
+	UZSiegeGameInstance* GameInstance = GetGameInstance<UZSiegeGameInstance>();
+	check(GameInstance);
+	// GameInstance->SetMultiplayerPlayerName_Server(PlayerState->GetUniqueId()->ToString(), NewPlayerName);
+}
+
+void ALobbyPlayerController::OnPlayerNamesUpdated(const TArray<FString>& NewPlayerNames)
+{
+	PlayerNames = NewPlayerNames;
+	PlayerNamesUpdatedEvent.Broadcast(PlayerNames);
+}
+
 void ALobbyPlayerController::OnRep_PlayerNames() const
 {
 	PlayerNamesUpdatedEvent.Broadcast(PlayerNames);
 }
+
