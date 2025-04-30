@@ -24,6 +24,22 @@ void UZSiegeGameInstance::Init()
 			UE_LOG(LogTemp, Warning, TEXT("Session interface is not valid"));
 		}
 	}
+
+	GetEngine()->OnNetworkFailure().AddUObject(this, &UZSiegeGameInstance::HandleNetworkFailure);
+}
+
+void UZSiegeGameInstance::InitMultiplayerGame(const int32 MaxPlayers)
+{
+	FMath::Max(MaxPlayers, 1);
+
+	ConnectedPlayers.Empty();
+
+	AvailablePlayerIndexes.Empty();
+	AvailablePlayerIndexes.SetNum(MaxPlayers);
+	for (int32 i = 0; i < MaxPlayers; i++)
+	{
+		AvailablePlayerIndexes[i] = i;
+	}
 }
 
 void UZSiegeGameInstance::HostGame() const
@@ -57,25 +73,71 @@ void UZSiegeGameInstance::FindGames()
 
 void UZSiegeGameInstance::JoinGame()
 {
-	
 }
 
-void UZSiegeGameInstance::SetMultiplayerPlayerName(const int32 PlayerId, const FString& NewPlayerName)
+void UZSiegeGameInstance::AddMultiplayerPlayer(const FString& UniqueId)
 {
-	if (ConnectedPlayersCount + 1 > ConnectedPlayers.Num())
-		return;
-	
-	const FConnectedPlayerInfo PlayerInfo(PlayerId, NewPlayerName);
-	ConnectedPlayers[ConnectedPlayersCount++] = PlayerInfo;
+	const int32 PlayerIndex = AvailablePlayerIndexes[0];
+	AvailablePlayerIndexes.RemoveAt(0);
 
-	TArray<FString> PlayerNames;
-	PlayerNames.SetNum(ConnectedPlayers.Num());
-	for (int32 i = 0; i < ConnectedPlayers.Num(); i++)
+	const FConnectedPlayerInfo PlayerInfo(UniqueId, PlayerIndex);
+	ConnectedPlayers.Add(PlayerInfo);
+}
+
+void UZSiegeGameInstance::SetMultiplayerPlayerName_Server(FString UniqueId, const FString& NewPlayerName)
+{
+	FConnectedPlayerInfo* PlayerInfo = ConnectedPlayers.FindByPredicate([UniqueId](const FConnectedPlayerInfo& Info)
 	{
-		PlayerNames[i] = ConnectedPlayers[i].PlayerName;
+		return Info.UniqueId == UniqueId;
+	});
+	if (PlayerInfo)
+	{
+		PlayerInfo->PlayerName = NewPlayerName;
+	}
+}
+
+void UZSiegeGameInstance::RemoveMultiplayerPlayer_Server(FString UniqueIdToRemove)
+{
+	const int32 Index = ConnectedPlayers.IndexOfByPredicate([UniqueIdToRemove](const FConnectedPlayerInfo& PlayerInfo)
+	{
+		return PlayerInfo.UniqueId == UniqueIdToRemove;
+	});
+	
+	if (!ConnectedPlayers.IsValidIndex(Index))
+	{
+		return;
 	}
 	
-	PlayerNamesChangedEvent.Broadcast(PlayerNames);
+	const FConnectedPlayerInfo* PlayerInfo = &ConnectedPlayers[Index];
+	// Return the player index to the available pool
+	AvailablePlayerIndexes.Add(PlayerInfo->PlayerIndex);
+	// Keep new players index at the beginning of the array
+	AvailablePlayerIndexes.Sort([](const int32 A, const int32 B)
+	{
+		return A < B;
+	});
+	
+	ConnectedPlayers.RemoveAt(Index);
+
+	BroadcastPlayerNamesChanged();
+}
+
+FConnectedPlayerInfo* UZSiegeGameInstance::GetConnectedPlayerInfoByUniqueId_Server(const FString& UniqueId)
+{
+	return ConnectedPlayers.FindByPredicate([UniqueId](const FConnectedPlayerInfo& Info)
+	{
+		return Info.UniqueId == UniqueId;;
+	});
+}
+
+
+void UZSiegeGameInstance::EndSession() const
+{
+	if (!SessionInterface.IsValid())
+		return;
+
+	IOnlineSession* Session = SessionInterface.Pin().Get();
+	Session->DestroySession(TEXT("Test Session"));
 }
 
 void UZSiegeGameInstance::OnCreateSessionComplete(FName SessionName, const bool bWasSuccessful) const
@@ -112,4 +174,32 @@ void UZSiegeGameInstance::OnJoinSessionComplete(const FName SessionName,
 			PlayerController->ClientTravel(ConnectString, ETravelType::TRAVEL_Absolute);
 		}
 	}
+}
+
+void UZSiegeGameInstance::HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType,
+                                               const FString& ErrorString) const
+{
+	if (FailureType == ENetworkFailure::ConnectionLost || FailureType == ENetworkFailure::ConnectionTimeout)
+	{
+		UKismetSystemLibrary::PrintString(World, TEXT("Connection lost or timed out. Returning to main menu."), true,
+		                                  true, FLinearColor::Red, 5.f);
+		UGameplayStatics::OpenLevel(this, "MainMenuNight");
+	}
+}
+
+void UZSiegeGameInstance::BroadcastPlayerNamesChanged() const
+{
+	TArray<FString> PlayerNames;
+	PlayerNames.SetNum(ConnectedPlayers.Num());
+	for (const auto& Player : ConnectedPlayers)
+	{
+		const int32 ConnectedPlayerIndex = Player.PlayerIndex;
+		if (PlayerNames.IsValidIndex(ConnectedPlayerIndex))
+		{
+			PlayerNames[ConnectedPlayerIndex] = Player.PlayerName;
+		}
+		UE_LOG(LogTemp, Warning, TEXT("Broadcasting %d to %s"), ConnectedPlayerIndex, *Player.PlayerName);
+	}
+
+	PlayerNamesChangedEvent.Broadcast(PlayerNames);
 }
