@@ -55,6 +55,8 @@ public:
 	void JoinGame();
 	UFUNCTION(BLueprintCallable, BlueprintPure=false)
 	void EndSession() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure=false)
+	void StartGame(const FString& MapURL) const;
 
 	// Set the player name on the server
 	void AddMultiplayerPlayer(const FString& UniqueId);

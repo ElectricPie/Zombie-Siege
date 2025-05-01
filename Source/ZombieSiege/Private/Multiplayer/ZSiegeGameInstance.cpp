@@ -138,8 +138,16 @@ void UZSiegeGameInstance::EndSession() const
 	if (!SessionInterface.IsValid())
 		return;
 
+	UE_LOG(LogTemp, Warning, TEXT("Ending session"));
 	IOnlineSession* Session = SessionInterface.Pin().Get();
 	Session->DestroySession(TEXT("Test Session"));
+}
+
+void UZSiegeGameInstance::StartGame(const FString& MapURL) const
+{
+	EndSession();
+
+	GetWorld()->ServerTravel(MapURL);
 }
 
 void UZSiegeGameInstance::OnCreateSessionComplete(FName SessionName, const bool bWasSuccessful) const
@@ -154,6 +162,12 @@ void UZSiegeGameInstance::OnFindSessionsComplete(const bool bWasSuccessful) cons
 {
 	if (bWasSuccessful && SessionSearch.IsValid())
 	{
+		if (SessionSearch->SearchResults.Num() == 0)
+		{
+			UKismetSystemLibrary::PrintString(this, TEXT("No sessions found"), true, true, FLinearColor::Red, 5.f);
+			return;
+		}
+		
 		for (const FOnlineSessionSearchResult& Result : SessionSearch->SearchResults)
 		{
 			// TODO: Joining first for testing
@@ -196,7 +210,7 @@ void UZSiegeGameInstance::BroadcastPlayerNamesChanged() const
 	{
 		PlayerNames.Add(TEXT(""));
 	}
-	
+	 
 	for (const auto& Player : ConnectedPlayers)
 	{
 		const int32 ConnectedPlayerIndex = Player.PlayerIndex;
