@@ -19,7 +19,8 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
-	void SetDesiredMesh_Server(USkeletalMesh* NewMesh);
+	void SetDesiredCharacterMesh_Server(USkeletalMesh* NewMesh);
+	void SetDesiredHeadGearMesh_Server(UStaticMesh* NewMesh);
 
 protected:
 	virtual void BeginPlay() override;
@@ -29,10 +30,17 @@ private:
 	TObjectPtr<UCameraComponent> Camera;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> Mesh;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> HeadGearMesh;
+	
 	UPROPERTY(ReplicatedUsing=OnRep_DesiredMesh)
-	TObjectPtr<USkeletalMesh> DesiredMesh;
+	TObjectPtr<USkeletalMesh> DesiredCharacterMesh;
+	UPROPERTY(ReplicatedUsing=OnRep_DesiredHeadGearMesh)
+	TObjectPtr<UStaticMesh> DesiredHeadGearMesh;
 
 private:
 	UFUNCTION()
 	void OnRep_DesiredMesh() const;
+	UFUNCTION()
+	void OnRep_DesiredHeadGearMesh() const;
 };

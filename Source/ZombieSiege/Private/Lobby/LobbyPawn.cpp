@@ -22,6 +22,8 @@ ALobbyPawn::ALobbyPawn()
 
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(RootComponent);
+	HeadGearMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HeadGearMesh"));
+	HeadGearMesh->SetupAttachment(Mesh, TEXT("HeadGearSocket"));
 
 	bReplicates = true;
 }
@@ -30,16 +32,24 @@ void ALobbyPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ALobbyPawn, DesiredMesh);
+	DOREPLIFETIME(ALobbyPawn, DesiredCharacterMesh);
+	DOREPLIFETIME(ALobbyPawn, DesiredHeadGearMesh);
 }
 
-void ALobbyPawn::SetDesiredMesh_Server(USkeletalMesh* NewMesh)
+void ALobbyPawn::SetDesiredCharacterMesh_Server(USkeletalMesh* NewMesh)
 {
-	if (!HasAuthority())
-		return;
+	check(HasAuthority());
 
-	DesiredMesh = NewMesh;
-	Mesh->SetSkeletalMesh(DesiredMesh);
+	DesiredCharacterMesh = NewMesh;
+	Mesh->SetSkeletalMesh(DesiredCharacterMesh);
+}
+
+void ALobbyPawn::SetDesiredHeadGearMesh_Server(UStaticMesh* NewMesh)
+{
+	check(HasAuthority());
+
+	DesiredHeadGearMesh = NewMesh;
+	HeadGearMesh->SetStaticMesh(DesiredHeadGearMesh);
 }
 
 void ALobbyPawn::BeginPlay()
@@ -54,5 +64,10 @@ void ALobbyPawn::BeginPlay()
 
 void ALobbyPawn::OnRep_DesiredMesh() const
 {
-	Mesh->SetSkeletalMesh(DesiredMesh);
+	Mesh->SetSkeletalMesh(DesiredCharacterMesh);
+}
+
+void ALobbyPawn::OnRep_DesiredHeadGearMesh() const
+{
+	HeadGearMesh->SetStaticMesh(DesiredHeadGearMesh);
 }
