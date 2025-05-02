@@ -6,6 +6,7 @@
 #include "GameFramework/GameMode.h"
 #include "LobbyGameMode.generated.h"
 
+class UGameSettingsDataAsset;
 class UZSiegeGameInstance;
 /**
  * 
@@ -20,13 +21,14 @@ public:
 	virtual APlayerController* Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
 	virtual void Logout(AController* Exiting) override;
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+	virtual void RestartPlayer(AController* NewPlayer) override;
 
 private:
 	UPROPERTY()
 	TArray<AActor*> SpawnPoints;
 
-	UPROPERTY(EditAnywhere)
-	int32 MaxPlayers = 4;
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UGameSettingsDataAsset> GameSettingsDataAsset;
 	
 	UPROPERTY()
 	TObjectPtr<UZSiegeGameInstance> GameInstance;

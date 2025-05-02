@@ -5,16 +5,21 @@
 
 #include "GameFramework/PlayerStart.h"
 #include "GameFramework/PlayerState.h"
+#include "Gamemodes/GameSettingsDataAsset.h"
 #include "Kismet/GameplayStatics.h"
+#include "Lobby/LobbyPawn.h"
 #include "Multiplayer/ZSiegeGameInstance.h"
+#include "Player/PlayerCharacter.h"
 
 void ALobbyGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
+	check(GameSettingsDataAsset);
+	
 	GameInstance = GetGameInstance<UZSiegeGameInstance>();
 	check(GameInstance);
-	GameInstance->InitMultiplayerGame(MaxPlayers);
+	GameInstance->InitMultiplayerGame(GameSettingsDataAsset->GetMaxPlayers());
 }
 
 APlayerController* ALobbyGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal,
@@ -25,7 +30,7 @@ APlayerController* ALobbyGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRo
 	APlayerController* NewPlayerController = Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
 
 	// Kicks the player if the session is full
-	if (MaxPlayers - GameInstance->GetPlayerCount() == 0)
+	if (GameSettingsDataAsset->GetMaxPlayers() - GameInstance->GetPlayerCount() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Session Full"));
 		NewPlayerController->ClientTravel("MainMenuNight", ETravelType::TRAVEL_Absolute);
@@ -76,4 +81,16 @@ AActor* ALobbyGameMode::ChoosePlayerStart_Implementation(AController* Player)
 	}
 
 	return Super::ChoosePlayerStart_Implementation(Player);
+}
+
+void ALobbyGameMode::RestartPlayer(AController* NewPlayer)
+{
+	Super::RestartPlayer(NewPlayer);
+
+	if (ALobbyPawn* LobbyPawn = Cast<ALobbyPawn>(NewPlayer->GetPawn()))
+	{
+		const FConnectedPlayerInfo* PlayerInfo = GameInstance->GetConnectedPlayerInfoByUniqueId_Server(NewPlayer->PlayerState->GetUniqueId()->ToString());
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *GameSettingsDataAsset->GetPlayerStartMeshes()[PlayerInfo->PlayerIndex]->GetName());
+		LobbyPawn->SetDesiredMesh_Server(GameSettingsDataAsset->GetPlayerStartMeshes()[PlayerInfo->PlayerIndex]);
+	}
 }
