@@ -90,7 +90,12 @@ void ALobbyGameMode::RestartPlayer(AController* NewPlayer)
 	if (ALobbyPawn* LobbyPawn = Cast<ALobbyPawn>(NewPlayer->GetPawn()))
 	{
 		const FConnectedPlayerInfo* PlayerInfo = GameInstance->GetConnectedPlayerInfoByUniqueId_Server(NewPlayer->PlayerState->GetUniqueId()->ToString());
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *GameSettingsDataAsset->GetPlayerStartMeshes()[PlayerInfo->PlayerIndex]->GetName());
-		LobbyPawn->SetDesiredMesh_Server(GameSettingsDataAsset->GetPlayerStartMeshes()[PlayerInfo->PlayerIndex]);
+
+		const FPlayerCharacterSkin& PlayerCharacterSkin = GameSettingsDataAsset->GetPlayerStartMeshes()[PlayerInfo->PlayerIndex];
+		LobbyPawn->SetDesiredCharacterMesh_Server(PlayerCharacterSkin.CharacterMesh);
+		if (PlayerCharacterSkin.CharacterHeadGearMesh)
+		{
+			LobbyPawn->SetDesiredHeadGearMesh_Server(PlayerCharacterSkin.CharacterHeadGearMesh);
+		}
 	}
 }

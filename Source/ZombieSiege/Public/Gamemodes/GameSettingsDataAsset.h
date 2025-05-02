@@ -6,6 +6,18 @@
 #include "Engine/DataAsset.h"
 #include "GameSettingsDataAsset.generated.h"
 
+USTRUCT(BlueprintType)
+struct FPlayerCharacterSkin
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USkeletalMesh> CharacterMesh;
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UStaticMesh> CharacterHeadGearMesh;
+};
+
 /**
  * 
  */
@@ -16,11 +28,11 @@ class ZOMBIESIEGE_API UGameSettingsDataAsset : public UDataAsset
 
 public:
 	int32 GetMaxPlayers() const { return MaxPlayers; }
-	TArray<USkeletalMesh*> GetPlayerStartMeshes() const { return PlayerStartMeshes; }
+	const TArray<FPlayerCharacterSkin>& GetPlayerStartMeshes() const { return PlayerCharacterSkins; }
 
 private:
 	UPROPERTY(EditDefaultsOnly)	
 	int32 MaxPlayers = 4;
 	UPROPERTY(EditDefaultsOnly)
-	TArray<TObjectPtr<USkeletalMesh>> PlayerStartMeshes;
+	TArray<FPlayerCharacterSkin> PlayerCharacterSkins;
 };
