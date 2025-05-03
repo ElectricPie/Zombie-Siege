@@ -43,6 +43,18 @@ void ALobbyPlayerController::BeginPlay()
 	}
 }
 
+void ALobbyPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (HasAuthority() && EndPlayReason == EEndPlayReason::Quit)
+	{
+		UZSiegeGameInstance* GameInstance = GetGameInstance<UZSiegeGameInstance>();
+		check(GameInstance);
+		GameInstance->RemoveMultiplayerPlayer_Server(PlayerState->GetUniqueId()->ToString());
+	}
+}
+
 void ALobbyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
