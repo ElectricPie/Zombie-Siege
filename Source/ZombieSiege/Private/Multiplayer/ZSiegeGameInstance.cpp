@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Multiplayer/ZSiegeGameInstance.h"
 
@@ -104,12 +104,12 @@ void UZSiegeGameInstance::RemoveMultiplayerPlayer_Server(FString UniqueIdToRemov
 	{
 		return PlayerInfo.UniqueId == UniqueIdToRemove;
 	});
-	
+
 	if (!ConnectedPlayers.IsValidIndex(Index))
 	{
 		return;
 	}
-	
+
 	const FConnectedPlayerInfo* PlayerInfo = &ConnectedPlayers[Index];
 	// Return the player index to the available pool
 	AvailablePlayerIndexes.Add(PlayerInfo->PlayerIndex);
@@ -118,7 +118,7 @@ void UZSiegeGameInstance::RemoveMultiplayerPlayer_Server(FString UniqueIdToRemov
 	{
 		return A < B;
 	});
-	
+
 	ConnectedPlayers.RemoveAt(Index);
 
 	BroadcastPlayerNamesChanged();
@@ -167,7 +167,7 @@ void UZSiegeGameInstance::OnFindSessionsComplete(const bool bWasSuccessful) cons
 			UKismetSystemLibrary::PrintString(this, TEXT("No sessions found"), true, true, FLinearColor::Red, 5.f);
 			return;
 		}
-		
+
 		for (const FOnlineSessionSearchResult& Result : SessionSearch->SearchResults)
 		{
 			// TODO: Joining first for testing
@@ -210,7 +210,7 @@ void UZSiegeGameInstance::BroadcastPlayerNamesChanged() const
 	{
 		PlayerNames.Add(TEXT(""));
 	}
-	 
+
 	for (const auto& Player : ConnectedPlayers)
 	{
 		const int32 ConnectedPlayerIndex = Player.PlayerIndex;

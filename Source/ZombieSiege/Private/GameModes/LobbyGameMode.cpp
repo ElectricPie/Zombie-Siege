@@ -40,19 +40,6 @@ APlayerController* ALobbyGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRo
 	return NewPlayerController;
 }
 
-void ALobbyGameMode::Logout(AController* Exiting)
-{
-	Super::Logout(Exiting);
-
-	if (const APlayerController* PlayerController = Cast<APlayerController>(Exiting))
-	{
-		if (const APlayerState* PlayerState = PlayerController->PlayerState)
-		{
-			GameInstance->RemoveMultiplayerPlayer_Server(PlayerState->GetUniqueId()->ToString());
-		}
-	}
-}
-
 AActor* ALobbyGameMode::ChoosePlayerStart_Implementation(AController* Player)
 {
 	if (SpawnPoints.Num() == 0)
@@ -99,3 +86,4 @@ void ALobbyGameMode::RestartPlayer(AController* NewPlayer)
 		}
 	}
 }
+

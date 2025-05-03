@@ -23,7 +23,7 @@ public:
 		: UniqueId(InUniqueId), PlayerIndex(InPlayerIndex)
 	{
 	}
-
+	
 	FString UniqueId;
 	FString PlayerName = TEXT("None");
 	int32 PlayerIndex = -1;
@@ -45,6 +45,7 @@ public:
 	
 public:
 	virtual void Init() override;
+	
 	void InitMultiplayerGame(const int32 InMaxPlayers);
 	
 	UFUNCTION(BlueprintCallable)
@@ -72,6 +73,7 @@ private:
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 	
 	// The player names in multiplayer games, only stored on host
+	UPROPERTY()
 	TArray<FConnectedPlayerInfo> ConnectedPlayers;
 	int32 MaxPlayers = 4;
 	TArray<int32> AvailablePlayerIndexes;
