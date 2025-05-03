@@ -8,6 +8,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Health/PlayerHealthComponent.h"
 #include "Interactions/InteractorComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "Weapons/GunBase.h"
 #include "Weapons/WeaponStatsDataAsset.h"
 
@@ -36,6 +37,15 @@ APlayerCharacter::APlayerCharacter()
 	HealthComponent = CreateDefaultSubobject<UPlayerHealthComponent>(TEXT("PlayerHealthComponent"));
 
 	GetMesh()->SetReceivesDecals(false);
+	HeadGearMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HeadGearMesh"));
+	HeadGearMesh->SetupAttachment(GetMesh(), TEXT("HeadGearSocket"));
+}
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APlayerCharacter, DesiredHeadGearMesh);
 }
 
 bool APlayerCharacter::IsMovingForward() const
@@ -91,6 +101,14 @@ void APlayerCharacter::SetAimLocation(const FVector& NewAimLocation) const
 	WeaponLoadoutComponent->SetAimLocation(NewAimLocation);
 }
 
+void APlayerCharacter::SetDesiredHeadGearMesh_Server(UStaticMesh* NewMesh)
+{
+	check(HasAuthority());
+
+	DesiredHeadGearMesh = NewMesh;
+	HeadGearMesh->SetStaticMesh(DesiredHeadGearMesh);
+}
+
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -144,4 +162,9 @@ void APlayerCharacter::OnOverlap(AActor* OverlappedActor, AActor* OtherActor)
 void APlayerCharacter::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
 {
 	InteractorComponent->OnOverlapEnd(OtherActor);
+}
+
+void APlayerCharacter::OnRep_DesiredHeadGearMesh() const
+{
+	HeadGearMesh->SetStaticMesh(DesiredHeadGearMesh);
 }

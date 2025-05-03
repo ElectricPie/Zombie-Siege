@@ -5,11 +5,13 @@
 
 #include "Components/WeaponLoadoutComponent.h"
 #include "GameFramework/SpectatorPawn.h"
+#include "Gamemodes/GameSettingsDataAsset.h"
 #include "Health/HealthComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Money/MoneyRewardComponent.h"
 #include "Money/MoneyStoreComponent.h"
+#include "Multiplayer/ZSiegeGameInstance.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/TopDownPlayerController.h"
 #include "Player/ZSiegeSpectatorPawn.h"
@@ -54,9 +56,9 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 {
 	Super::RestartPlayer(NewPlayer);
 
+	check(GameSettingsDataAsset);
 	ATopDownPlayerController* NewPlayerController = Cast<ATopDownPlayerController>(NewPlayer);
 	check(NewPlayerController);
-
 	ADefenceGameState* DefenceGameState = GetGameState<ADefenceGameState>();
 	check(DefenceGameState);
 
@@ -82,6 +84,19 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 			this, &AZombieDefenceGameMode::PlayerDied);
 
 		DefenceGameState->AddAlivePlayer(NewPlayerController);
+
+		UZSiegeGameInstance* GameInstance = Cast<UZSiegeGameInstance>(GetGameInstance());
+		check(GameInstance);
+		const APlayerState* PlayerState = NewPlayerController->GetPlayerState<APlayerState>();
+		if (const FConnectedPlayerInfo* PlayerInfo = GameInstance->GetConnectedPlayerInfoByUniqueId_Server(PlayerState->GetUniqueId()->ToString()))
+		{
+			const FPlayerCharacterSkin& PlayerCharacterSkin = GameSettingsDataAsset->GetPlayerStartMeshes()[PlayerInfo->PlayerIndex];
+			PlayerCharacter->GetMesh()->SetSkeletalMesh(PlayerCharacterSkin.CharacterMesh);
+			if (PlayerCharacterSkin.CharacterHeadGearMesh)
+			{
+				PlayerCharacter->SetDesiredHeadGearMesh_Server(PlayerCharacterSkin.CharacterHeadGearMesh);
+			}
+		}
 	}
 }
 
@@ -232,18 +247,14 @@ void AZombieDefenceGameMode::GameOver()
 AUnitSpawnPoint* AZombieDefenceGameMode::GetWeightedRandomSpawnPoint() const
 {
 	if (ActiveSpawnPoints.IsEmpty())
-	{
 		return nullptr;
-	}
 
 	// Get total weight of all spawn points
 	float TotalWeight = 0.f;
 	for (const auto& WeightedSpawnPoint : ActiveSpawnPoints)
 	{
 		if (WeightedSpawnPoint->SpawnPoint == nullptr)
-		{
 			continue;
-		}
 
 		TotalWeight += GetWorld()->TimeSince(WeightedSpawnPoint->LastUsedTime);
 	}
@@ -253,9 +264,7 @@ AUnitSpawnPoint* AZombieDefenceGameMode::GetWeightedRandomSpawnPoint() const
 	for (const auto& WeightedSpawnPoint : ActiveSpawnPoints)
 	{
 		if (WeightedSpawnPoint->SpawnPoint == nullptr)
-		{
 			continue;
-		}
 
 		TotalWeight -= GetWorld()->TimeSince(WeightedSpawnPoint->LastUsedTime);
 		if (TotalWeight <= RandomWeight)

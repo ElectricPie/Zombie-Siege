@@ -26,6 +26,8 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	/**
 	 * @brief Gets the velocity relative to the direction they are facing
 	 * @return Returns positive values if moving forward and negative for backwards
@@ -55,6 +57,8 @@ public:
 
 	void SetAimLocation(const FVector& NewAimLocation) const;
 
+	void SetDesiredHeadGearMesh_Server(UStaticMesh* NewMesh);
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<USpringArmComponent> CameraArm;
@@ -66,6 +70,8 @@ protected:
 	TObjectPtr<UWeaponLoadoutComponent> WeaponLoadoutComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UPlayerHealthComponent> HealthComponent;
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<UStaticMeshComponent> HeadGearMesh;
 
 	float SpeedModifier = 0.8f;
 
@@ -89,6 +95,9 @@ private:
 	UPROPERTY(EditAnywhere, Category="PlayerCharacter|Animation")
 	FName RifleWeaponSocket = TEXT("RifleSocket");
 
+	UPROPERTY(ReplicatedUsing=OnRep_DesiredHeadGearMesh)
+	TObjectPtr<UStaticMesh> DesiredHeadGearMesh;
+
 private:
 	void OnWeaponAdded(AGunBase* Weapon);
 	UFUNCTION()
@@ -98,4 +107,7 @@ private:
 	void OnOverlap(AActor* OverlappedActor, AActor* OtherActor);
 	UFUNCTION()
 	void OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
+
+	UFUNCTION()
+	void OnRep_DesiredHeadGearMesh() const;
 };

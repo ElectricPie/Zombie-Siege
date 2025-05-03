@@ -7,6 +7,7 @@
 #include "Player/PlayerCharacter.h"
 #include "ZombieDefenceGameMode.generated.h"
 
+class UGameSettingsDataAsset;
 class AGunBase;
 class ATopDownPlayerController;
 class AUnitCharacter;
@@ -87,6 +88,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float PlayerLifespanAfterDeath = 5.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UGameSettingsDataAsset> GameSettingsDataAsset;
 
 private:
 	void GetActiveUnitSpawnPoints();
