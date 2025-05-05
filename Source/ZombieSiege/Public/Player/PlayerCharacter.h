@@ -35,7 +35,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsMovingForward() const;
 
-	void Move(const FVector Direction);
+	void Move(const FVector& Direction);
 	void Interact() const;
 
 	UFUNCTION(BlueprintSetter)
