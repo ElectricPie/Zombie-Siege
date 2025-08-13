@@ -10,6 +10,13 @@ ADefencePlayerState::ADefencePlayerState()
 	MoneyStoreComponent = CreateDefaultSubobject<UMoneyStoreComponent>(TEXT("MoneyStoreComponent"));
 }
 
+void ADefencePlayerState::OnRep_PlayerName()
+{
+	Super::OnRep_PlayerName();
+
+	OnNameChangedEvent.Broadcast(GetPlayerName());
+}
+
 UMoneyStoreComponent* ADefencePlayerState::GetMoneyStoreComponent_Implementation() const
 {
 	return MoneyStoreComponent;

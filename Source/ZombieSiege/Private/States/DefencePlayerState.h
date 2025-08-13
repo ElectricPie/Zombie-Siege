@@ -9,6 +9,8 @@
 
 class UMoneyStoreComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNameChangedSignature, const FString&, NewName);
+
 /**
  * 
  */
@@ -18,7 +20,13 @@ class ADefencePlayerState : public APlayerState, public IMoneyStoreInterface
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnNameChangedSignature OnNameChangedEvent;
+	
+public:
 	ADefencePlayerState();
+	
+	virtual void OnRep_PlayerName() override;
 	
 	void AddDeath() { TotalDeaths++; }
 	void AddKill() { TotalKills++; }
