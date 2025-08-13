@@ -6,8 +6,10 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "GameSaveSubsystem.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameLoadSigniture);
+
 struct FLeaderboardData;
-class ULeaderboardsSaveGame;
+class UZSiegeSaveGame;
 /**
  * 
  */
@@ -16,6 +18,17 @@ class UGameSaveSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY()
+	FOnGameLoadSigniture OnGameLoaded;
+
+private:
+	const FString SaveGameSlotName = TEXT("ZombieSiegeSaveGame");
+
+	UPROPERTY(BLueprintGetter=GetLeaderboardData)
+	TArray<FLeaderboardData> LeaderboardData;
+
+	bool bLeaderboardsLoadAttempted = false;
 public:
 	/**
 	 * @brief Adds the leaderboard entry to the leaderboard data, sorting it by rounds survived
@@ -28,19 +41,10 @@ public:
 	 * @return True if the leaderboards were loaded successfully
 	 */
 	UFUNCTION(BlueprintCallable, Category="Game Save", meta=(ReturnDisplayName="Save Was Loaded"))
-	bool LoadLeaderboards(bool bOverwriteCurrent = false);
+	bool Load(bool bOverwriteCurrent = false);
 	UFUNCTION(BlueprintCallable, Category="Game Save")
-	void SaveLeaderboards();
-
+	void Save();
+	
 	UFUNCTION(BlueprintGetter, Category="Game Save")
 	const TArray<FLeaderboardData>& GetLeaderboardData() const { return LeaderboardData; }
-	
-private:
-	UPROPERTY(EditAnywhere, Category="Game Save")
-	FString SaveSlotName = TEXT("Leaderboards");
-
-	UPROPERTY(BLueprintGetter=GetLeaderboardData)
-	TArray<FLeaderboardData> LeaderboardData;
-
-	bool bLeaderboardsLoadAttempted = false;
 };
