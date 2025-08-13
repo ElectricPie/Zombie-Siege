@@ -39,7 +39,7 @@ class ZOMBIESIEGE_API UZSiegeGameInstance : public UGameInstance
 
 public:
 	UPROPERTY(BlueprintReadWrite)
-	FString LocalPlayerName = TEXT("");
+	FString LocalPlayerName = TEXT("New Player");
 	
 	FOnPlayerNamesChangedSignature PlayerNamesChangedEvent;
 	
