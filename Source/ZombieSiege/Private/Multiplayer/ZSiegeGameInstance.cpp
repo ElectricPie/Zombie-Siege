@@ -9,6 +9,8 @@
 
 void UZSiegeGameInstance::Init()
 {
+	Super::Init();
+	
 	if (const IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld()))
 	{
 		SessionInterface = Subsystem->GetSessionInterface();
@@ -24,7 +26,7 @@ void UZSiegeGameInstance::Init()
 			UE_LOG(LogTemp, Warning, TEXT("Session interface is not valid"));
 		}
 	}
-
+	
 	GetEngine()->OnNetworkFailure().AddUObject(this, &UZSiegeGameInstance::HandleNetworkFailure);
 }
 

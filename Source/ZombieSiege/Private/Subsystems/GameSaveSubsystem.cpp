@@ -5,7 +5,6 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Leaderboards/LeaderboardsSaveGame.h"
-#include "States/DefenceGameState.h"
 
 void UGameSaveSubsystem::AddLeaderboardEntry(const FLeaderboardData& Data)
 {
@@ -24,12 +23,12 @@ void UGameSaveSubsystem::AddLeaderboardEntry(const FLeaderboardData& Data)
 	}
 }
 
-bool UGameSaveSubsystem::LoadLeaderboards(bool bOverwriteCurrent)
+bool UGameSaveSubsystem::LoadLeaderboards(const bool bOverwriteCurrent)
 {
 	// Ignore check if we are overwriting the current data
 	if (!bOverwriteCurrent)
 	{
-		// Dont load if there are already entries
+		// Don't load if there are already entries
 		if (LeaderboardData.Num() > 0)
 			return false;
 	}

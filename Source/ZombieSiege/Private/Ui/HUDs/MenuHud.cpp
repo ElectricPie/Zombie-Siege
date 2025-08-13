@@ -55,7 +55,6 @@ UMainMenuWidgetController* AMenuHud::GetMainMenuWidgetController(const FWidgetCo
 void AMenuHud::BeginPlay()
 {
 	Super::BeginPlay();
-
 	
 	APlayerController* PlayerController = GetOwningPlayerController();
 	PlayerController->bShowMouseCursor = true;
@@ -75,15 +74,6 @@ void AMenuHud::BeginPlay()
 	OptionsWidget->SetVisibility(ESlateVisibility::Collapsed);
 	OptionsWidget->OnOptionsClosedEvent.AddDynamic(this, &AMenuHud::OnOptionsClosed);
 	Widgets.Add(OptionsWidget);
-
-
-	if (const UGameInstance* GameInstance = GetGameInstance())
-	{
-		if (UGameSaveSubsystem* GameSaveSubsystem = GameInstance->GetSubsystem<UGameSaveSubsystem>())
-		{
-			GameSaveSubsystem->LoadLeaderboards();
-		}
-	}
 }
 
 void AMenuHud::OnOptionsClosed()
