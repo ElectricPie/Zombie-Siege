@@ -30,8 +30,7 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                      FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-
+	
 	if (GetOwner()->HasAuthority() && bEnableHealthRegen)
 	{
 		const float NewHealth = FMath::Clamp(CurrentHealth + HealthRegenRate * DeltaTime, 0.f, MaxHealth);

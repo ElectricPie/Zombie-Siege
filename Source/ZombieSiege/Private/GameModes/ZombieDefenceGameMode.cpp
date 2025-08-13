@@ -87,7 +87,7 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 
 		UZSiegeGameInstance* GameInstance = Cast<UZSiegeGameInstance>(GetGameInstance());
 		check(GameInstance);
-		const APlayerState* PlayerState = NewPlayerController->GetPlayerState<APlayerState>();
+		APlayerState* PlayerState = NewPlayerController->GetPlayerState<APlayerState>();
 		if (const FConnectedPlayerInfo* PlayerInfo = GameInstance->GetConnectedPlayerInfoByUniqueId_Server(PlayerState->GetUniqueId()->ToString()))
 		{
 			const FPlayerCharacterSkin& PlayerCharacterSkin = GameSettingsDataAsset->GetPlayerStartMeshes()[PlayerInfo->PlayerIndex];
@@ -96,6 +96,8 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 			{
 				PlayerCharacter->SetDesiredHeadGearMesh_Server(PlayerCharacterSkin.CharacterHeadGearMesh);
 			}
+
+			PlayerState->SetPlayerName(PlayerInfo->PlayerName);
 		}
 	}
 }
