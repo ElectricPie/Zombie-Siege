@@ -29,11 +29,13 @@ struct FLeaderboardData
  * 
  */
 UCLASS()
-class ULeaderboardsSaveGame : public USaveGame
+class UZSiegeSaveGame : public USaveGame
 {
 	GENERATED_BODY()
 
 public:
+	UPROPERTY()
+	FString PlayerName;
 	UPROPERTY()
 	TArray<FLeaderboardData> LeaderboardData;
 };

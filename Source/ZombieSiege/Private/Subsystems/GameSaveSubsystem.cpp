@@ -5,6 +5,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Leaderboards/LeaderboardsSaveGame.h"
+#include "Multiplayer/ZSiegeGameInstance.h"
 
 void UGameSaveSubsystem::AddLeaderboardEntry(const FLeaderboardData& Data)
 {
@@ -23,7 +24,7 @@ void UGameSaveSubsystem::AddLeaderboardEntry(const FLeaderboardData& Data)
 	}
 }
 
-bool UGameSaveSubsystem::LoadLeaderboards(const bool bOverwriteCurrent)
+bool UGameSaveSubsystem::Load(const bool bOverwriteCurrent)
 {
 	// Ignore check if we are overwriting the current data
 	if (!bOverwriteCurrent)
@@ -35,17 +36,19 @@ bool UGameSaveSubsystem::LoadLeaderboards(const bool bOverwriteCurrent)
 	
 	bLeaderboardsLoadAttempted = true;
 	
-	USaveGame* SaveGame = UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0);
-	if (const ULeaderboardsSaveGame* LeaderboardsSaveGame = Cast<ULeaderboardsSaveGame>(SaveGame))
+	USaveGame* SaveGame = UGameplayStatics::LoadGameFromSlot(SaveGameSlotName, 0);
+	if (const UZSiegeSaveGame* ZSiegeSaveGame = Cast<UZSiegeSaveGame>(SaveGame))
 	{
-		LeaderboardData = LeaderboardsSaveGame->LeaderboardData;
+		LeaderboardData = ZSiegeSaveGame->LeaderboardData;
+		Cast<UZSiegeGameInstance>(GetGameInstance())->LocalPlayerName = ZSiegeSaveGame->PlayerName;
+		OnGameLoaded.Broadcast();
 		return true;
 	}
 
 	return false;
 }
 
-void UGameSaveSubsystem::SaveLeaderboards()
+void UGameSaveSubsystem::Save()
 {
 	// if the leaderboards are empty try to load them
 	if (!bLeaderboardsLoadAttempted)
@@ -53,14 +56,16 @@ void UGameSaveSubsystem::SaveLeaderboards()
 		// Save the current leaderboard data to be added back after loading
 		const TArray<FLeaderboardData> TempLeaderboardData = LeaderboardData;
 		UE_LOG(LogTemp, Warning, TEXT("SaveLeaderboards: have not been loaded, loading from save"));
-		LoadLeaderboards(true);
+		Load(true);
 		for (auto& Data : TempLeaderboardData)
 		{
 			AddLeaderboardEntry(Data);
 		}
 	}
 
-	ULeaderboardsSaveGame* LeaderboardsSaveGame = Cast<ULeaderboardsSaveGame>(UGameplayStatics::CreateSaveGameObject(ULeaderboardsSaveGame::StaticClass()));
+	UZSiegeSaveGame* LeaderboardsSaveGame = Cast<UZSiegeSaveGame>(UGameplayStatics::CreateSaveGameObject(UZSiegeSaveGame::StaticClass()));
+	LeaderboardsSaveGame->PlayerName = Cast<UZSiegeGameInstance>(GetGameInstance())->LocalPlayerName;
+
 	if (LeaderboardsSaveGame == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to create save game object"));
@@ -68,12 +73,12 @@ void UGameSaveSubsystem::SaveLeaderboards()
 	}
 
 	LeaderboardsSaveGame->LeaderboardData = LeaderboardData;
-	if (UGameplayStatics::SaveGameToSlot(LeaderboardsSaveGame, SaveSlotName, 0))
+	if (UGameplayStatics::SaveGameToSlot(LeaderboardsSaveGame, SaveGameSlotName, 0))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Saved leaderboards"));
+		UE_LOG(LogTemp, Warning, TEXT("Saved game data"));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to save leaderboards"));
+		UE_LOG(LogTemp, Error, TEXT("Failed to save game data"));
 	}
 }

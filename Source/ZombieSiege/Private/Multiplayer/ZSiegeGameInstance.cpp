@@ -6,6 +6,7 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
 #include "Kismet/GameplayStatics.h"
+#include "Subsystems/GameSaveSubsystem.h"
 
 void UZSiegeGameInstance::Init()
 {
@@ -25,6 +26,11 @@ void UZSiegeGameInstance::Init()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Session interface is not valid"));
 		}
+	}
+
+	if (UGameSaveSubsystem* GameSaveSubsystem = GetSubsystem<UGameSaveSubsystem>())
+	{
+		GameSaveSubsystem->Load();
 	}
 	
 	GetEngine()->OnNetworkFailure().AddUObject(this, &UZSiegeGameInstance::HandleNetworkFailure);
