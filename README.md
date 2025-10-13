@@ -18,6 +18,11 @@ Follow these steps to build and run the Zombie Siege project using Unreal Engine
    - Place the `FMODStudio` and `FMODStudioNiagara` into `ZombieSiege/Plugins`.
      - Overwrite the existing files.
 
+4. **Additional Repos**:
+    - Due to licensing this project relies on a private repo for paid assets. As a result, the project will run without the additional repo, but most of the models will be missing.
+      - Create a folder named 'ExternalAssets' in the 'Content' directory of the project.
+      - Clone the private repo into the 'ExternalAssets' folder using the following command ```git clone https://github.com/ElectricPie/ZombieSiegeAssets.git ./```.
+
 ### Running the Project
 You can either run the uproject file or run the project from the .sln file in you IDE which will require generating project files (See below).
 
