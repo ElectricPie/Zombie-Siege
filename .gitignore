@@ -201,3 +201,6 @@ ZombieSiege_FMODProject/.unsaved/
 !ZombieSiege_FMODProject/.cache/.gitkeep
 !ZombieSiege_FMODProject/.backup/.gitkeep
 !ZombieSiege_FMODProject/.unsaved/.gitkeep
+
+# External Assets
+Content/ExternalAssets/
