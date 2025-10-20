@@ -6,6 +6,8 @@
 #include "Engine/DataAsset.h"
 #include "GameSettingsDataAsset.generated.h"
 
+class AGunBase;
+
 USTRUCT(BlueprintType)
 struct FPlayerCharacterSkin
 {
@@ -29,10 +31,13 @@ class ZOMBIESIEGE_API UGameSettingsDataAsset : public UDataAsset
 public:
 	int32 GetMaxPlayers() const { return MaxPlayers; }
 	const TArray<FPlayerCharacterSkin>& GetPlayerStartMeshes() const { return PlayerCharacterSkins; }
+	const TArray<TSubclassOf<AGunBase>>& GetStartingLoadout() const { return StartingLoadout; }
 
 private:
 	UPROPERTY(EditDefaultsOnly)	
 	int32 MaxPlayers = 4;
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FPlayerCharacterSkin> PlayerCharacterSkins;
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSubclassOf<AGunBase>> StartingLoadout; 
 };

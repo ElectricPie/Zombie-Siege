@@ -13,7 +13,7 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAmmoChangedSignature, int32 /*NewAmmoCou
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnReloadStateChanged, bool /*bIsReloading*/);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGunFiredSignature);
 
-UCLASS()
+UCLASS(Abstract)
 class AGunBase : public AActor
 {
 	GENERATED_BODY()
