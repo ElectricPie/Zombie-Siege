@@ -81,9 +81,6 @@ private:
 
 	TSet<TObjectPtr<AUnitCharacter>> ActiveUnits;
 
-	UPROPERTY(EditAnywhere, Category="Weapon")
-	TArray<TSubclassOf<AGunBase>> StartingWeaponClasses;
-
 	FTimerHandle RoundSpawnTimerHandle;
 
 	UPROPERTY(EditAnywhere)

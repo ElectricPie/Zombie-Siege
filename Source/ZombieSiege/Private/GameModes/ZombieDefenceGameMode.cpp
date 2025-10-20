@@ -67,7 +67,7 @@ void AZombieDefenceGameMode::RestartPlayer(AController* NewPlayer)
 		// Gives the player their starting weapons
 		if (UWeaponLoadoutComponent* WeaponLoadout = PlayerCharacter->FindComponentByClass<UWeaponLoadoutComponent>())
 		{
-			for (auto& Weapon : StartingWeaponClasses)
+			for (auto& Weapon : GameSettingsDataAsset->GetStartingLoadout())
 			{
 				if (Weapon == nullptr)
 					continue;
