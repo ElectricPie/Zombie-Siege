@@ -21,15 +21,14 @@ Follow these steps to build and run the Zombie Siege project using Unreal Engine
 4. **Additional Repos**:
     - Due to licensing this project relies on a private repo for paid assets. As a result, the project will run without the additional repo, but most of the models will be missing.
       - Create a folder named 'ExternalAssets' in the 'Content' directory of the project.
-      - Clone the private repo into the 'ExternalAssets' folder using the following command ```git clone https://github.com/ElectricPie/ZombieSiegeAssets.git ./```.
+      - Clone the private repo into the 'ExternalAssets' folder using the following command `git clone https://github.com/ElectricPie/ZombieSiegeAssets.git ./`.
 
 ### Running the Project
 You can either run the uproject file or run the project from the .sln file in you IDE which will require generating project files (See below).
 
 ### Generate Project Files:
 1. Right-click on the `ZombieSiege.uproject` file and select Generate Visual Studio project files.
-Alternatively, run the following command in the project directory:
-UnrealVersionSelector.exe `/projectfiles Z[.gitignore](.gitignore)ombieSiege.uproject`
+Alternatively, run the following command in the project directory: `UnrealVersionSelector.exe /projectfiles ZombieSiege.uproject`
 
 2. Open the generated .sln file in Visual Studio or open the ZombieSiege.uproject file in Unreal Engine 5.5.
 
