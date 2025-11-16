@@ -47,15 +47,13 @@ void ADoor::BeginPlay()
 
 void ADoor::MulticastDoorOpened_Implementation()
 {
-	DoorPart->Destroy();
 	InteractableTrigger->SetCanInteract(false);
-	OnDoorOpenedEvent.Broadcast();
+	OpenDoor();
 }
 
 void ADoor::TryBuyDoor_Server(UMoneyStoreComponent* MoneyStore)
 {
 	check(HasAuthority());
-	checkf(DoorPart, TEXT("DoorPart is not set on Door actor %s"), *GetName());
 
 	// Not enough money
 	if (!MoneyStore->TakeMoney_Server(OpenCost))
