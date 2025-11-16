@@ -6,11 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "Door.generated.h"
 
-class UMoneyStoreComponent;
 class ARoom;
+class UInteractableComponent;
+class UMoneyStoreComponent;
 class UNavModifierComponent;
 class UNavLinkComponent;
-class UInteractableComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoorOpenedSignature);
 
@@ -18,21 +18,6 @@ UCLASS()
 class ADoor : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ADoor();
-
-public:
-	UPROPERTY(BlueprintAssignable)
-	FOnDoorOpenedSignature OnDoorOpenedEvent;
-
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TObjectPtr<AActor> DoorPart;
-
-protected:
-	virtual void BeginPlay() override;
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category="Components")
@@ -47,7 +32,17 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Room")
 	TArray<TWeakObjectPtr<ARoom>> ConnectedRooms;
+
+public:	
+	// Sets default values for this actor's properties
+	ADoor();
 	
+protected:
+	virtual void BeginPlay() override;
+	UFUNCTION(BlueprintImplementableEvent)
+	void OpenDoor();
+	
+private:
 	void TryBuyDoor_Server(UMoneyStoreComponent* MoneyStore);
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastDoorOpened();
