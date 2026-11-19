@@ -38,17 +38,17 @@ void UZSiegeGameInstance::Init()
 
 void UZSiegeGameInstance::InitMultiplayerGame(const int32 InMaxPlayers)
 {
-	FMath::Max(InMaxPlayers, 1);
+	const int32 ClampedMaxPlayers = FMath::Max(InMaxPlayers, 1);
 
 	ConnectedPlayers.Empty();
 
 	AvailablePlayerIndexes.Empty();
-	AvailablePlayerIndexes.SetNum(InMaxPlayers);
-	for (int32 i = 0; i < InMaxPlayers; i++)
+	AvailablePlayerIndexes.SetNum(ClampedMaxPlayers);
+	for (int32 i = 0; i < ClampedMaxPlayers; i++)
 	{
 		AvailablePlayerIndexes[i] = i;
 	}
-	MaxPlayers = InMaxPlayers;
+	MaxPlayers = ClampedMaxPlayers;
 }
 
 void UZSiegeGameInstance::HostGame() const
