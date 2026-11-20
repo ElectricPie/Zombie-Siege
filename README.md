@@ -14,9 +14,9 @@ Follow these steps to build and run the Zombie Siege project using Unreal Engine
         - Ensure you have the latest version of the **MSVC toolset** and **Windows SDK**.
 
 3. **FMOD**:
-   - Download and install FMOD for Unreal 2.03.06 from the [FMOD website](https://www.fmod.com/download), you will need an FMOD account to download.
-   - Place the `FMODStudio` and `FMODStudioNiagara` into `ZombieSiege/Plugins`.
-     - Overwrite the existing files.
+   - Download FMOD for Unreal **2.03.15** (the UE 5.7 build) from the [FMOD website](https://www.fmod.com/download). You'll need an FMOD account to download.
+   - Copy the `FMODStudio` and `FMODStudioNiagara` folders into `ZombieSiege/Plugins`.
+     - The plugins aren't included in this repo because they're covered by the FMOD EULA, and the project won't open until they're installed.
 
 4. **Additional Repos**:
     - Due to licensing this project relies on a private repo for paid assets. As a result, the project will run without the additional repo, but most of the models will be missing.
@@ -45,7 +45,7 @@ Alternatively, run the following command in the project directory: `UnrealVersio
 To ensure FMOD audio works correctly in the Zombie Siege project you may need to reopen the Unreal project after its initial running or build the FMOD banks:
 
 1. **Install FMOD Studio**:
-   - Download and install FMOD Studio 2.03.06 from the [FMOD website](https://www.fmod.com/download), you will need an FMOD account to download.
+   - Download and install FMOD Studio 2.03.15 from the [FMOD website](https://www.fmod.com/download), you will need an FMOD account to download.
 
 2. **Open the FMOD Project**:
    - Open FMOD project file `ZombieSiege_FMODProject.fspro` in FMOD Studio found in the `ZombieSiege/ZombieSiege_FMODProject` directory.

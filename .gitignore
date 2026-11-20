@@ -177,10 +177,9 @@ Plugins/**/Intermediate/*
 # End of https://www.toptal.com/developers/gitignore/api/unrealengine,rider
 
 ## FMOD
-# FMOD plugins
-Plugins/FMODStudio/Binaries/
-Plugins/FMODStudio/Intermediate/
-Plugins/FMODStudio/DerivedDataCache/
+# FMOD plugins are third-party (FMOD EULA) and installed per developer, see README
+Plugins/FMODStudio/
+Plugins/FMODStudioNiagara/
 
 # FMOD Content
 */FMOD/Banks/

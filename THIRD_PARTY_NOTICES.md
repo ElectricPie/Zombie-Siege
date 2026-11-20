@@ -12,7 +12,7 @@ Assets marked **private** are not included in this repository. They live in the 
 | Name | Owner | Licence | Location |
 |---|---|---|---|
 | Unreal Engine 5.7 | Epic Games | [Unreal Engine EULA](https://www.unrealengine.com/eula) | Not included |
-| FMOD Studio / FMOD for Unreal 2.03.15 (incl. FMODStudioNiagara) | Firelight Technologies Pty Ltd | [FMOD EULA](https://www.fmod.com/legal) | `Plugins/FMODStudio`, `Plugins/FMODStudioNiagara` |
+| FMOD Studio / FMOD for Unreal 2.03.15 (incl. FMODStudioNiagara) | Firelight Technologies Pty Ltd | [FMOD EULA](https://www.fmod.com/legal) | Not included. Install into `Plugins/` (see README) |
 
 Audio engine: **FMOD Studio by Firelight Technologies Pty Ltd.**
 
