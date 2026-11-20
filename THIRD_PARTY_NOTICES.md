@@ -24,7 +24,10 @@ Audio engine: **FMOD Studio by Firelight Technologies Pty Ltd.**
 | Animation Starter Pack | Epic Games (Fab) | Fab / Epic Content licence | Private (`ExternalAssets/AnimStarterPack`) |
 | Population Zero BB font | Blambot, via FontSpace | Free licence covers comic use only, **not video games**. **To be replaced** before any release. | Private (`ExternalAssets/Fonts/PopulationZeroBB`) |
 | Mixamo Y Bot character and animations | Adobe Mixamo | [Adobe Mixamo terms](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html) | Private (`ExternalAssets/Mixamo`) |
-| Mixamo animations retargeted to the Synty skeleton | Adobe Mixamo | [Adobe Mixamo terms](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html) | Private (`ExternalAssets/Animations`, `ExternalAssets/Rigs`) |
+| Mixamo animations retargeted to the Synty skeleton | Adobe Mixamo | [Adobe Mixamo terms](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html) | Private (`ExternalAssets/Animations`) |
+
+The anim Blueprint, blend spaces, montages, IK rigs and retargeter in `Content/Animations` are original work built on
+top of these assets. They're included for reference, but need the private assets to open correctly.
 
 ## Sound effects
 
