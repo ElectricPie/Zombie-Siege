@@ -22,7 +22,7 @@ Audio engine: **FMOD Studio by Firelight Technologies Pty Ltd.**
 |---|---|---|---|
 | POLYGON City Zombies, POLYGON Military, POLYGON Battle Royale | Synty Studios | Synty Store licence | Private (`ExternalAssets/Polygon*`, `SKEL_Synty`) |
 | Animation Starter Pack | Epic Games (Fab) | Fab / Epic Content licence | Private (`ExternalAssets/AnimStarterPack`) |
-| Population Zero BB font | Blambot, via FontSpace | See the font's licence on FontSpace / Blambot | Private (`ExternalAssets/Fonts/PopulationZeroBB`) |
+| Population Zero BB font | Blambot, via FontSpace | Free licence covers comic use only, **not video games**. **To be replaced** before any release. | Private (`ExternalAssets/Fonts/PopulationZeroBB`) |
 | Mixamo animations (retargeted to the Synty skeleton) | Adobe Mixamo | [Adobe Mixamo terms](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html) | `Content/Animations/Synty` |
 
 ## Sound effects
@@ -33,7 +33,7 @@ contain these sounds in packaged form. Paths below are relative to `FMODAudio/`.
 **Sources and licences**
 - **Pixabay**: [Pixabay Content License](https://pixabay.com/service/license-summary/)
 - **Sonniss GDC Game Audio Bundles**: [Sonniss GDC bundle licence](https://sonniss.com/gameaudiogdc/)
-- **SoundDino**: see [sounddino.com](https://sounddino.com/) for its terms
+- **SoundDino**: free licence, attribution not required ([sounddino.com](https://sounddino.com/)). Credited here voluntarily.
 
 ### Ambiance
 | File | Source |
