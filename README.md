@@ -26,6 +26,7 @@ Follow these steps to build and run the Zombie Siege project using Unreal Engine
       - To edit or rebuild the FMOD project, link its `Assets` folder to that audio. Run this from the project root in a Command Prompt:
         `mklink /J ZombieSiege_FMODProject\Assets Content\ExternalAssets\FMODAudio`
       - This isn't needed just to run the game, because the built banks in `Content/FMOD` are committed.
+    - See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the third-party assets used and their licences.
 
 ### Running the Project
 You can either run the uproject file or run the project from the .sln file in you IDE which will require generating project files (See below).

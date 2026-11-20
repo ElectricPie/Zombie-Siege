@@ -20,3 +20,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+This licence applies to the source code and original content in this
+repository. Third-party software and assets (including the FMOD plugin,
+sound effects, animations, fonts and models) are not covered by it and
+remain under their own licences. See THIRD_PARTY_NOTICES.md.
