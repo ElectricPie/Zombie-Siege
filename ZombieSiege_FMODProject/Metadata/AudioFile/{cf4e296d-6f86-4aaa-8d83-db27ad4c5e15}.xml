@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.03.00">
 	<object class="AudioFile" id="{cf4e296d-6f86-4aaa-8d83-db27ad4c5e15}">
 		<property name="assetPath">
-			<value>Backgorund Gunfire/battle-war-zone-gun-fight-32155 - Trimmed 1.wav</value>
+			<value>Ambiance/Background Gunfire/battle-war-zone-gun-fight-32155 - Trimmed 1.wav</value>
 		</property>
 		<property name="frequencyInKHz">
 			<value>24</value>

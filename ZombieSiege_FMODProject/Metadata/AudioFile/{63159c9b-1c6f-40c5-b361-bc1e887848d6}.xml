@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.03.00">
 	<object class="AudioFile" id="{63159c9b-1c6f-40c5-b361-bc1e887848d6}">
 		<property name="assetPath">
-			<value>Backgorund Gunfire/battle-war-zone-gun-fight-32155.mp3</value>
+			<value>Ambiance/Background Gunfire/battle-war-zone-gun-fight-32155.mp3</value>
 		</property>
 		<property name="isStreaming">
 			<value>true</value>

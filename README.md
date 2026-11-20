@@ -22,6 +22,10 @@ Follow these steps to build and run the Zombie Siege project using Unreal Engine
     - Due to licensing this project relies on a private repo for paid assets. As a result, the project will run without the additional repo, but most of the models will be missing.
       - Create a folder named 'ExternalAssets' in the 'Content' directory of the project.
       - Clone the private repo into the 'ExternalAssets' folder using the following command `git clone https://github.com/ElectricPie/ZombieSiegeAssets.git ./`.
+    - The private repo also holds the third-party fonts, animations and the raw FMOD source audio (`ExternalAssets/FMODAudio`).
+      - To edit or rebuild the FMOD project, link its `Assets` folder to that audio. Run this from the project root in a Command Prompt:
+        `mklink /J ZombieSiege_FMODProject\Assets Content\ExternalAssets\FMODAudio`
+      - This isn't needed just to run the game, because the built banks in `Content/FMOD` are committed.
 
 ### Running the Project
 You can either run the uproject file or run the project from the .sln file in you IDE which will require generating project files (See below).

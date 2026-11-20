@@ -6,7 +6,7 @@
 </value>
 		</property>
 		<property name="assetPath">
-			<value>Gunfire/Glock17/Glock 17 - FIRING - Take 1 - 20m In Front - AB - MKH8020.wav</value>
+			<value>Weapons/Gunfire/Glock17/Glock 17 - FIRING - Take 1 - 20m In Front - AB - MKH8020.wav</value>
 		</property>
 		<property name="isStreaming">
 			<value>true</value>

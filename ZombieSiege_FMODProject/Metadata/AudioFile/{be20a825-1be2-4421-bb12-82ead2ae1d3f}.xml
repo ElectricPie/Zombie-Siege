@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.03.00">
 	<object class="AudioFile" id="{be20a825-1be2-4421-bb12-82ead2ae1d3f}">
 		<property name="assetPath">
-			<value>Small Wood Pile, Smash.wav</value>
+			<value>Barricade/Small Wood Pile, Smash.wav</value>
 		</property>
 		<property name="frequencyInKHz">
 			<value>96</value>

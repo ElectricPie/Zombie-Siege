@@ -204,6 +204,8 @@ ZombieSiege_FMODProject/.unsaved/
 
 # External Assets
 Content/ExternalAssets/
+# FMOD source audio lives in ExternalAssets/FMODAudio; this is a local junction to it
+ZombieSiege_FMODProject/Assets
 
 ## IDEs
 # JetBrains Rider project files (regenerated per-user from the .uproject)
