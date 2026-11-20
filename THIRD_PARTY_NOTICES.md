@@ -23,7 +23,8 @@ Audio engine: **FMOD Studio by Firelight Technologies Pty Ltd.**
 | POLYGON City Zombies, POLYGON Military, POLYGON Battle Royale | Synty Studios | Synty Store licence | Private (`ExternalAssets/Polygon*`, `SKEL_Synty`) |
 | Animation Starter Pack | Epic Games (Fab) | Fab / Epic Content licence | Private (`ExternalAssets/AnimStarterPack`) |
 | Population Zero BB font | Blambot, via FontSpace | Free licence covers comic use only, **not video games**. **To be replaced** before any release. | Private (`ExternalAssets/Fonts/PopulationZeroBB`) |
-| Mixamo animations (retargeted to the Synty skeleton) | Adobe Mixamo | [Adobe Mixamo terms](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html) | `Content/Animations/Synty` |
+| Mixamo Y Bot character and animations | Adobe Mixamo | [Adobe Mixamo terms](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html) | Private (`ExternalAssets/Mixamo`) |
+| Mixamo animations retargeted to the Synty skeleton | Adobe Mixamo | [Adobe Mixamo terms](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html) | Private (`ExternalAssets/Animations`, `ExternalAssets/Rigs`) |
 
 ## Sound effects
 
